@@ -3,590 +3,1645 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hành Trình Teyvat — Quản Lý Quỹ Roll & Tài Nguyên</title>
+  <title>Hành Trình Teyvat — Quản Lý Quỹ Roll & Lịch Sự Kiện HoYoLAB</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Be Vietnam Pro', sans-serif; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; overflow-x: hidden; transition: background 0.5s ease; }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.65);
+    body { margin: 0; overflow-x: hidden; transition: background 0.4s ease, color 0.3s ease; }
+
+    /* Theme Variables */
+    body.theme-light {
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --card-border: rgba(255, 255, 255, 0.75);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
     }
-    .dark-glass {
-      background: rgba(15, 26, 36, 0.94);
+    body.theme-dark {
+      --card-bg: rgba(24, 28, 40, 0.88);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --input-bg: #0f172a;
+      --input-border: #334155;
+      background: #0b0e17 !important;
+      color: #f8fafc;
+    }
+
+    .glass-card {
+      background: var(--card-bg);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      transition: background 0.3s ease, border 0.3s ease;
+    }
+    .text-sub { color: var(--text-sub); }
+    .themed-input {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-main);
+    }
+    .sidebar-glass {
+      background: rgba(13, 21, 32, 0.96);
+      backdrop-filter: blur(20px);
       border-right: 1px solid rgba(255, 255, 255, 0.08);
     }
+    .hoyolab-panel {
+      background: rgba(28, 29, 38, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #f1f5f9;
+    }
+    .hoyolab-row {
+      background: rgba(45, 47, 59, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s ease;
+    }
+    .hoyolab-row:hover {
+      background: rgba(58, 61, 77, 0.95);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.5); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.45); border-radius: 9999px; }
+
     @keyframes floatParticle {
       0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
-      20% { opacity: 0.75; }
-      80% { opacity: 0.75; }
-      100% { transform: translateY(105vh) translateX(40px) rotate(360deg); opacity: 0; }
+      20% { opacity: 0.65; }
+      80% { opacity: 0.65; }
+      100% { transform: translateY(105vh) translateX(35px) rotate(360deg); opacity: 0; }
     }
     .weather-particle {
       position: fixed;
-      top: -20px;
+      top: -24px;
       pointer-events: none;
-      z-index: 5;
+      z-index: 2;
       animation: floatParticle linear infinite;
     }
+
+    /* Sticker Draggable */
+    .sticker-item {
+      position: fixed;
+      z-index: 35;
+      user-select: none;
+      cursor: grab;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.28));
+      transition: transform 0.1s ease;
+    }
+    .sticker-item:active { cursor: grabbing; transform: scale(1.06); }
+    .sticker-locked { pointer-events: none; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen">
+<body class="theme-light min-h-screen">
 
   <!-- HIỆU ỨNG THỜI TIẾT ĐỘNG -->
   <div id="weather-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
 
-  <!-- MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ TÀI KHOẢN (ĐÃ FIX 100% CHO MOBILE) -->
+  <!-- LỚP STICKER TRANG TRÍ KÉO THẢ -->
+  <div id="sticker-layer"></div>
+
+  <!-- ===================================================================== -->
+  <!-- 1. MODAL ĐĂNG NHẬP / TẠO TÀI KHOẢN -->
+  <!-- ===================================================================== -->
   <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4">
     <div class="w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden">
-      <div class="absolute -top-20 -right-20 w-44 h-44 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
       <div class="flex items-center gap-3 mb-2">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-600 flex items-center justify-center text-xl shadow-lg">✦</div>
+        <img src="https://enka.network/ui/UI_ItemIcon_201.png" referrerpolicy="no-referrer" class="w-11 h-11 rounded-2xl bg-sky-500/20 p-1.5 border border-sky-400/30" alt="Primogem" />
         <div>
           <p class="text-xs uppercase tracking-widest text-sky-400 font-semibold">CỔNG THIÊN LÝ • TEYVAT</p>
           <h2 id="auth-title" class="text-xl font-extrabold">Đăng Nhập Tài Khoản</h2>
         </div>
       </div>
-      <p class="text-xs text-slate-400 mb-5">Mỗi tài khoản lưu riêng quỹ Nguyên Thạch, lịch sử tích lũy, mục tiêu Cung mệnh và UID của bạn.</p>
+      <p class="text-xs text-slate-400 mb-5">Mỗi tài khoản lưu trữ độc lập quỹ Nguyên Thạch, nhân vật tự tạo, lịch sự kiện và bố cục Sticker.</p>
 
-      <!-- Tabs Đăng nhập / Đăng ký -->
       <div class="grid grid-cols-2 gap-1 p-1 bg-slate-800 rounded-xl mb-4 text-xs font-bold">
-        <button id="tab-login" type="button" onclick="window.switchAuthTab('login')" class="py-2.5 rounded-lg bg-sky-500 text-white transition cursor-pointer">Đăng nhập</button>
-        <button id="tab-register" type="button" onclick="window.switchAuthTab('register')" class="py-2.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">Tạo tài khoản mới</button>
+        <button type="button" id="tab-login" onclick="switchAuthTab('login')" class="py-2.5 rounded-lg bg-sky-500 text-white transition cursor-pointer">Đăng nhập</button>
+        <button type="button" id="tab-register" onclick="switchAuthTab('register')" class="py-2.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">Tạo tài khoản mới</button>
       </div>
 
       <div class="space-y-3.5">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Tên tài khoản (Username)</label>
-          <input id="auth-username" type="text" autocomplete="username" placeholder="VD: yorrn_teyvat" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
+          <input id="auth-username" type="text" placeholder="VD: yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
         </div>
         <div id="register-nickname-wrap" class="hidden">
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Biệt danh hiển thị (Tên Nhà Lữ Hành)</label>
-          <input id="auth-nickname" type="text" placeholder="VD: Yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Biệt danh hiển thị</label>
+          <input id="auth-nickname" type="text" placeholder="VD: Yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Mật khẩu</label>
-          <input id="auth-password" type="password" autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
+          <input id="auth-password" type="password" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
         </div>
         <p id="auth-error" class="text-xs text-rose-400 font-semibold hidden"></p>
-        
-        <button type="button" id="auth-submit-btn" onclick="window.submitAuth()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 active:scale-[0.99] hover:from-sky-400 hover:to-indigo-500 font-bold text-sm shadow-lg shadow-sky-500/25 transition cursor-pointer">
+        <button type="button" id="auth-submit-btn" onclick="submitAuth()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 font-bold text-sm shadow-lg cursor-pointer">
           Vào Không Gian Tích Roll ➔
         </button>
       </div>
 
       <div class="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-        <span>Đã có mã sao lưu từ máy khác?</span>
-        <button type="button" onclick="window.openBackupModal()" class="text-sky-400 hover:underline font-semibold cursor-pointer">Nhập mã khôi phục</button>
+        <span>Đồng bộ giữa máy tính & ĐT?</span>
+        <button type="button" onclick="openBackupModal()" class="text-sky-400 hover:underline font-semibold">Mã Sao Lưu / Khôi Phục</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL SAO LƯU / ĐỒNG BỘ ĐA THIẾT BỊ -->
+  <!-- ===================================================================== -->
+  <!-- 2. MODAL TẠO / CHỈNH SỬA NHÂN VẬT (VŨ KHÍ, HỆ, AVATAR) -->
+  <!-- ===================================================================== -->
+  <div id="char-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="char-modal-title" class="text-lg font-extrabold flex items-center gap-2">✨ Tạo / Chỉnh Sửa Nhân Vật</h3>
+        <button type="button" onclick="closeCharModal()" class="text-slate-400 hover:text-white text-xl">✕</button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <input type="hidden" id="edit-char-id" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Tên Nhân Vật *</label>
+            <input id="edit-char-name" type="text" placeholder="VD: Colombina / Dainsleif" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white" />
+          </div>
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Danh hiệu / Quốc gia</label>
+            <input id="edit-char-title" type="text" placeholder="VD: Quan Chấp Hành • Snezhnaya" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Nguyên Tố (Hệ)</label>
+            <select id="edit-char-element" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white">
+              <option value="Cryo">Băng (Cryo)</option>
+              <option value="Pyro">Hỏa (Pyro)</option>
+              <option value="Hydro">Thủy (Hydro)</option>
+              <option value="Dendro">Thảo (Dendro)</option>
+              <option value="Electro">Lôi (Electro)</option>
+              <option value="Anemo">Phong (Anemo)</option>
+              <option value="Geo">Nham (Geo)</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Loại Vũ Khí</label>
+            <select id="edit-char-weapon" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white">
+              <option value="Kiếm Đơn">Kiếm Đơn</option>
+              <option value="Trọng Kiếm">Trọng Kiếm</option>
+              <option value="Vũ Khí Cán Dài">Vũ Khí Cán Dài</option>
+              <option value="Pháp Khí">Pháp Khí</option>
+              <option value="Cung">Cung</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Vùng Đất</label>
+            <input id="edit-char-region" type="text" placeholder="Snezhnaya" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white" />
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Mô tả / Ghi chú cốt truyện</label>
+          <input id="edit-char-lore" type="text" placeholder="Mỗi roll đều đưa nhân vật về gần hơn..." class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white" />
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-slate-800/70 border border-slate-700 space-y-2.5">
+          <label class="font-bold text-sky-400 block">🖼️ Hình ảnh Avatar / Banner Nhân Vật</label>
+          <div>
+            <span class="text-slate-400 block mb-1">Cách 1: Dán trực tiếp Link Ảnh (URL)</span>
+            <input id="edit-char-img-url" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white" />
+          </div>
+          <div>
+            <span class="text-slate-400 block mb-1">Cách 2: Hoặc tải ảnh trực tiếp từ Máy Tính của bạn</span>
+            <input id="edit-char-img-file" type="file" accept="image/*" onchange="handleAvatarFileUpload(event)" class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-sky-600 file:text-white file:font-bold hover:file:bg-sky-500" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeCharModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700">Hủy</button>
+          <button type="button" onclick="saveCharacterModal()" class="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 font-bold text-white">💾 Lưu Nhân Vật</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 3. MODAL QUẢN LÝ & TẠO STICKER TRANG TRÍ KÉO THẢ -->
+  <!-- ===================================================================== -->
+  <div id="sticker-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-base font-extrabold">🎨 Kho Sticker Paimon & Trang Trí Màn Hình</h3>
+        <button type="button" onclick="closeStickerModal()" class="text-slate-400 hover:text-white text-xl">✕</button>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">Bấm vào Sticker mẫu hoặc tải ảnh PNG/GIF từ máy tính để thả lên màn hình. Bạn có thể **giữ chuột và kéo thả** Sticker tới bất kỳ vị trí nào!</p>
+
+      <div class="mb-4">
+        <p class="text-xs font-bold text-sky-400 mb-2">1. Chọn nhanh Sticker Genshin có sẵn:</p>
+        <div class="grid grid-cols-4 sm:grid-cols-5 gap-2.5" id="preset-sticker-grid"></div>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-slate-800/70 border border-slate-700 space-y-2.5 text-xs mb-4">
+        <p class="font-bold text-amber-300">2. Tự tạo Sticker từ máy tính hoặc Link ảnh (PNG/GIF):</p>
+        <div class="flex gap-2">
+          <input id="custom-sticker-url" type="text" placeholder="Dán link ảnh PNG/GIF..." class="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white" />
+          <button type="button" onclick="addCustomStickerFromUrl()" class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 font-bold">Thêm</button>
+        </div>
+        <div>
+          <input type="file" accept="image/*" onchange="handleStickerFileUpload(event)" class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-amber-600 file:text-white file:font-bold" />
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-800 text-xs">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input id="lock-stickers-checkbox" type="checkbox" onchange="toggleStickerLock(this.checked)" class="rounded" />
+          <span>🔒 Khóa vị trí Sticker (không cho kéo nhầm)</span>
+        </label>
+        <button type="button" onclick="clearAllStickers()" class="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 font-bold">Xóa hết Sticker</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 4. MODAL SAO LƯU MÃ TÀI KHOẢN -->
+  <!-- ===================================================================== -->
   <div id="backup-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl">
       <div class="flex items-center justify-between mb-3">
-        <h3 class="text-base font-bold flex items-center gap-2">☁️ Sao Lưu & Đồng Bộ Tài Khoản</h3>
-        <button type="button" onclick="window.closeBackupModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+        <h3 class="text-base font-bold">☁️ Sao Lưu & Khôi Phục Tài Khoản</h3>
+        <button type="button" onclick="closeBackupModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
       </div>
-      <p class="text-xs text-slate-400 mb-3">Copy đoạn mã bên dưới để lưu trữ hoặc dán vào điện thoại/máy tính khác để đồng bộ 100% tài khoản và tiến độ roll của bạn:</p>
       <textarea id="backup-code-box" rows="5" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-xs font-mono text-emerald-400 mb-3" placeholder="Dán mã sao lưu vào đây..."></textarea>
       <div class="flex flex-wrap gap-2">
-        <button type="button" onclick="window.exportBackupCode()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-xs font-bold">Lấy mã tài khoản hiện tại</button>
-        <button type="button" onclick="window.importBackupCode()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold">Khôi phục từ mã này</button>
-        <button type="button" onclick="window.closeBackupModal()" class="ml-auto px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs">Đóng</button>
+        <button type="button" onclick="exportBackupCode()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-xs font-bold">Xuất mã hiện tại</button>
+        <button type="button" onclick="importBackupCode()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold">Khôi phục từ mã</button>
+        <button type="button" onclick="closeBackupModal()" class="ml-auto px-4 py-2 rounded-xl bg-slate-800 text-xs">Đóng</button>
       </div>
     </div>
   </div>
 
-  <!-- GIAO DIỆN CHÍNH -->
+  <!-- ===================================================================== -->
+  <!-- BỐ CỤC CHÍNH (SIDEBAR TRÁI + NỘI DUNG PHẢI) -->
+  <!-- ===================================================================== -->
   <div class="relative z-10 flex min-h-screen">
 
     <!-- SIDEBAR TRÁI -->
-    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 dark-glass text-white flex flex-col justify-between transition-transform duration-300 -translate-x-full lg:translate-x-0">
-      <!-- Top Header -->
-      <div class="p-4 border-b border-white/10">
-        <div class="flex items-center justify-between">
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-80 sidebar-glass text-white flex flex-col justify-between transition-transform duration-300 -translate-x-full lg:translate-x-0 select-none">
+      <div class="p-4 space-y-4 overflow-y-auto flex-1">
+        
+        <!-- Logo & Quốc gia -->
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
           <div class="flex items-center gap-2.5">
-            <div id="sidebar-region-icon" class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-lg">❄️</div>
+            <div id="sidebar-elem-icon" class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center p-1.5"></div>
             <div>
               <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">HÀNH TRÌNH</p>
-              <h1 id="sidebar-region-name" class="text-sm font-bold text-white">Snezhnaya</h1>
+              <h1 id="sidebar-region-name" class="text-sm font-extrabold text-white">Snezhnaya</h1>
             </div>
           </div>
-          <button type="button" onclick="window.toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white text-xl px-2">✕</button>
+          <button type="button" onclick="toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white text-xl px-2">✕</button>
         </div>
 
-        <!-- Lọc Nguyên Tố & Tìm kiếm -->
-        <div class="mt-4">
-          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-2">KHÔNG GIAN CỦA <span id="sidebar-user-label" class="text-sky-400">YORRN</span></p>
-          <input id="char-search" oninput="window.renderCharacterList()" type="text" placeholder="🔍 Tìm nhân vật 5★..." class="w-full px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-sky-400 mb-2" />
-          <div id="element-filter-bar" class="flex items-center justify-between gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/5"></div>
+        <!-- Menu Điều Hướng Chính (Chuyển Tab) -->
+        <div>
+          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">KHÔNG GIAN CỦA <span id="sidebar-user-label" class="text-sky-400">YORRN</span></p>
+          <div class="space-y-1.5 text-xs font-bold">
+            <button type="button" id="nav-btn-dashboard" onclick="switchMainView('dashboard')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-400/40 transition">
+              <span class="flex items-center gap-2">📊 Tổng quan Quỹ Roll</span>
+              <span>•</span>
+            </button>
+            <button type="button" id="nav-btn-calendar" onclick="switchMainView('calendar')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-white/5 text-slate-300 border border-transparent transition">
+              <span class="flex items-center gap-2">📅 Chi Tiết Lịch & Sự Kiện</span>
+              <span class="px-1.5 py-0.5 rounded bg-rose-500 text-[10px] text-white font-extrabold">7.1</span>
+            </button>
+          </div>
         </div>
+
+        <!-- Cài đặt Giao diện (Sáng / Tối / Động) & Sticker -->
+        <div class="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-300 font-semibold">🌓 Giao diện:</span>
+            <div class="flex gap-1 bg-slate-950 p-1 rounded-lg text-[11px] font-bold">
+              <button type="button" id="theme-btn-light" onclick="setThemeMode('light')" class="px-2 py-1 rounded bg-sky-500 text-white">Sáng</button>
+              <button type="button" id="theme-btn-dark" onclick="setThemeMode('dark')" class="px-2 py-1 rounded text-slate-400 hover:text-white">Tối</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 pt-1">
+            <button type="button" onclick="openCharModal(null)" class="px-2.5 py-2 rounded-xl bg-emerald-600/25 hover:bg-emerald-600/40 border border-emerald-400/30 text-emerald-300 text-[11px] font-bold flex items-center justify-center gap-1">
+              ➕ Tạo NV Mới
+            </button>
+            <button type="button" onclick="openStickerModal()" class="px-2.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/30 text-amber-300 text-[11px] font-bold flex items-center justify-center gap-1">
+              🎨 Sticker Paimon
+            </button>
+          </div>
+        </div>
+
+        <!-- MENU NHÂN VẬT THU GỌN (BẤM VÀO MỚI XỔ XUỐNG) -->
+        <div class="rounded-2xl bg-slate-950/65 border border-white/10 overflow-hidden">
+          <button type="button" onclick="toggleCharAccordion()" class="w-full p-3 flex items-center justify-between text-left hover:bg-white/5 transition">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div id="accordion-active-avatar" class="w-9 h-9 rounded-xl overflow-hidden shrink-0"></div>
+              <div class="min-w-0">
+                <p class="text-[10px] uppercase tracking-wider text-sky-400 font-bold">ĐANG TÍCH ROLL CHO</p>
+                <p id="accordion-active-name" class="text-xs font-extrabold text-white truncate">Tsaritsa</p>
+              </div>
+            </div>
+            <span id="accordion-arrow" class="text-xs text-slate-400 transition-transform duration-200">▼ Đổi NV</span>
+          </button>
+
+          <!-- Phần xổ xuống (Mặc định thu gọn) -->
+          <div id="char-dropdown-panel" class="hidden border-t border-white/10 p-3 space-y-2.5 bg-slate-950/90">
+            <input id="char-search" oninput="renderCharacterList()" type="text" placeholder="🔍 Tìm tên nhân vật 5★..." class="w-full px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-sky-400" />
+            
+            <!-- Thanh lọc Icon Hệ trong game + Ngôi sao Yêu thích -->
+            <div id="element-filter-bar" class="flex items-center justify-between gap-1 bg-slate-900 p-1 rounded-xl border border-white/5 overflow-x-auto"></div>
+
+            <!-- Danh sách nhân vật -->
+            <div id="character-list" class="max-h-72 overflow-y-auto space-y-1.5 pr-1"></div>
+          </div>
+        </div>
+
+        <!-- Thẻ Đích Đến Của Chúng Mình (Giống ảnh mẫu) -->
+        <div class="p-4 rounded-2xl bg-gradient-to-b from-slate-800/70 to-slate-900/90 border border-white/10 text-center space-y-2">
+          <p class="text-[10px] uppercase tracking-widest text-sky-300 font-bold">ĐÍCH ĐẾN CỦA CHÚNG MÌNH</p>
+          <div id="sidebar-card-elem" class="w-8 h-8 mx-auto"></div>
+          <h4 id="sidebar-card-name" class="text-sm font-extrabold text-white">Băng Thần - Tsaritsa</h4>
+          <p class="text-[11px] text-slate-400">Tích từng chút. Sẵn sàng cho ngày hội ngộ.</p>
+          <div class="pt-1">
+            <div class="flex justify-between text-[11px] text-sky-300 font-bold mb-1">
+              <span id="sidebar-card-rolls">86 / 200 roll</span>
+              <span id="sidebar-card-pct">43%</span>
+            </div>
+            <div class="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden">
+              <div id="sidebar-card-bar" class="h-full bg-sky-400 rounded-full transition-all duration-300" style="width:43%"></div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Danh sách nhân vật 5 sao (Cuộn) -->
-      <div id="character-list" class="flex-1 overflow-y-auto p-3 space-y-1.5"></div>
-
-      <!-- Thẻ Nhân vật đang chọn + Đồng bộ UID + Tài khoản -->
-      <div class="p-3 border-t border-white/10 space-y-2.5 bg-slate-950/50">
-        <!-- Đồng bộ UID Enka -->
-        <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
-          <div class="flex items-center justify-between text-[11px] text-slate-300 mb-1.5">
-            <span class="font-semibold">🔗 Đồng bộ UID (Enka/HoYoLAB)</span>
-            <span id="uid-status" class="text-[10px] text-emerald-400"></span>
-          </div>
-          <div class="flex gap-1.5">
-            <input id="uid-input" type="text" placeholder="Nhập UID (VD: 800123456)" class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none" />
-            <button type="button" onclick="window.syncUID()" class="px-2.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-xs font-bold transition">Tải</button>
-          </div>
-        </div>
-
-        <!-- Thông tin tài khoản đang đăng nhập -->
+      <!-- Footer Tài khoản & UID -->
+      <div class="p-3 border-t border-white/10 space-y-2 bg-slate-950/80">
         <div class="flex items-center justify-between px-2 py-1.5 rounded-xl bg-white/5">
           <div class="flex items-center gap-2 min-w-0">
             <div id="user-avatar-badge" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center font-bold text-xs">Y</div>
             <div class="truncate">
               <p id="current-user-name" class="text-xs font-bold text-white truncate">Yorrn</p>
-              <p class="text-[10px] text-slate-400">Đã lưu tự động</p>
+              <p class="text-[10px] text-emerald-400">● Đã lưu tự động</p>
             </div>
           </div>
           <div class="flex items-center gap-1">
-            <button type="button" onclick="window.openBackupModal()" title="Sao lưu / Đồng bộ" class="p-1.5 rounded-lg hover:bg-white/10 text-xs">☁️</button>
-            <button type="button" onclick="window.logoutUser()" title="Đổi tài khoản / Đăng xuất" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 text-xs font-bold">Thoát</button>
+            <button type="button" onclick="openBackupModal()" title="Sao lưu dữ liệu" class="p-1.5 rounded-lg hover:bg-white/10 text-xs">☁️</button>
+            <button type="button" onclick="logoutUser()" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 text-xs font-bold">Thoát</button>
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- KHU VỰC NỘI DUNG CHÍNH -->
-    <main id="main-content" class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 relative overflow-y-auto">
-      
-      <!-- Nút mở menu trên điện thoại -->
+    <!-- KHU VỰC NỘI DUNG CHÍNH BÊN PHẢI -->
+    <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 relative overflow-y-auto">
+
+      <!-- Thanh Top Bar cho Mobile -->
       <div class="flex lg:hidden items-center justify-between mb-4 glass-card p-3 rounded-2xl shadow-sm">
-        <button type="button" onclick="window.toggleSidebar(true)" class="flex items-center gap-2 text-sm font-bold text-slate-800">
+        <button type="button" onclick="toggleSidebar(true)" class="flex items-center gap-2 text-sm font-bold">
           <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white">☰</span>
-          <span>Chọn Nhân Vật 5★</span>
+          <span>Menu & Chọn Nhân Vật</span>
         </button>
-        <span id="mobile-user-tag" class="text-xs font-bold text-sky-700"></span>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="switchMainView('calendar')" class="px-2.5 py-1 rounded-lg bg-rose-500 text-white text-xs font-bold">📅 Lịch 7.1</button>
+        </div>
       </div>
 
-      <!-- HEADER TRÊN CÙNG -->
-      <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+      <!-- ================================================================= -->
+      <!-- VIEW 1: TỔNG QUAN QUỸ ROLL (DASHBOARD) -->
+      <!-- ================================================================= -->
+      <div id="view-dashboard">
+        
+        <!-- Header Nhân vật -->
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 text-xs font-bold tracking-wider uppercase text-sub mb-1.5">
+              <span id="header-char-title">BĂNG THẦN • TSARITSA</span>
+              <span>•</span>
+              <span id="header-target-badge" class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-500 font-extrabold">C0R1</span>
+              
+              <!-- Đổi nhanh loại vũ khí -->
+              <select id="weapon-type-select" onchange="changeWeaponType(this.value)" class="themed-input px-2.5 py-0.5 rounded-lg font-bold text-xs cursor-pointer">
+                <option value="Kiếm Đơn">⚔️ Kiếm Đơn</option>
+                <option value="Trọng Kiếm">🗡️ Trọng Kiếm</option>
+                <option value="Vũ Khí Cán Dài">🔱 Vũ Khí Cán Dài</option>
+                <option value="Pháp Khí">📖 Pháp Khí</option>
+                <option value="Cung">🏹 Cung</option>
+              </select>
+
+              <!-- Nút Đánh dấu Yêu thích ⭐ -->
+              <button type="button" id="fav-star-btn" onclick="toggleFavoriteChar(selectedCharId)" class="px-2.5 py-0.5 rounded-lg border border-amber-400/50 bg-amber-400/10 text-amber-500 font-bold text-xs flex items-center gap-1 cursor-pointer hover:bg-amber-400/20">
+                <span id="fav-star-icon">☆</span> Yêu thích
+              </button>
+
+              <!-- Nút Chỉnh sửa toàn diện Nhân Vật -->
+              <button type="button" onclick="openCharModal(selectedCharId)" class="px-2.5 py-0.5 rounded-lg bg-slate-500/15 hover:bg-slate-500/25 text-xs font-bold cursor-pointer">
+                ✏️ Sửa NV & Avatar
+              </button>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-extrabold flex items-center gap-2.5">
+              <span id="header-journey-title">Hành trình Snezhnaya</span>
+              <span id="header-element-icon" class="w-7 h-7 inline-flex"></span>
+            </h2>
+            <p id="header-lore" class="text-xs sm:text-sm text-sub mt-1 max-w-2xl"></p>
+          </div>
+
+          <!-- Đồng hồ thời gian thực -->
+          <div class="glass-card px-4 py-2.5 rounded-2xl text-right shadow-sm">
+            <div class="text-xs text-sub font-medium flex items-center justify-end gap-1.5">
+              <span>📅</span>
+              <span id="clock-date">16/10/2026</span>
+            </div>
+            <div id="clock-time" class="text-xl font-extrabold tracking-tight">02:32:27</div>
+            <div class="text-[10px] text-sub">Giờ Việt Nam • UTC+7</div>
+          </div>
+        </div>
+
+        <!-- Hàng 1: Banner Chính + Cột Mốc & Ước tính Cung Mệnh -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
+          
+          <!-- Thẻ Banner Chính -->
+          <div id="hero-banner-card" class="xl:col-span-2 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl min-h-[250px] flex flex-col justify-between" style="background: linear-gradient(135deg, #0c192c 0%, #1e3a5f 60%, #2b5876 100%);">
+            <div class="absolute right-4 bottom-0 top-0 w-44 sm:w-64 pointer-events-none flex items-end justify-end opacity-95">
+              <div id="hero-char-illust" class="w-40 h-40 sm:w-52 sm:h-52 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl mb-4 bg-slate-800/60 flex items-center justify-center"></div>
+            </div>
+
+            <div class="relative z-10 max-w-lg">
+              <div class="flex items-center gap-2 text-xs uppercase tracking-widest text-sky-200 font-bold mb-2">
+                <img src="https://enka.network/ui/UI_ItemIcon_223.png" referrerpolicy="no-referrer" class="w-5 h-5" alt="Fate" />
+                <span id="banner-fund-label">QUỸ ROLL BĂNG THẦN - TSARITSA</span>
+              </div>
+
+              <!-- Nhập / Chỉnh trực tiếp số Roll (Không bao giờ tự reset) -->
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <img src="https://enka.network/ui/UI_ItemIcon_223.png" referrerpolicy="no-referrer" class="w-9 h-9 self-center" alt="Roll" />
+                <input id="direct-current-rolls" type="number" step="any" min="0"
+                       onchange="updateCurrentRollsDirect(this.value)"
+                       class="w-32 sm:w-40 bg-white/10 hover:bg-white/15 focus:bg-slate-900/80 px-2.5 py-0.5 rounded-xl border border-white/30 focus:border-sky-300 text-4xl sm:text-5xl font-extrabold text-white focus:outline-none transition"
+                       title="Nhập số roll hiện tại rồi nhấn Enter hoặc bấm ra ngoài" />
+                <span class="text-2xl text-slate-300 font-semibold">/</span>
+                <input id="direct-target-rolls" type="number" min="1"
+                       onchange="updateTargetRollsDirect(this.value)"
+                       class="w-24 bg-white/10 hover:bg-white/15 focus:bg-slate-900/80 px-2 py-0.5 rounded-xl border border-white/25 focus:border-sky-300 text-2xl font-bold text-sky-200 focus:outline-none transition"
+                       title="Nhập mục tiêu số roll" />
+                <span class="text-sm text-slate-200 font-semibold">roll</span>
+              </div>
+
+              <p id="hero-progress-text" class="text-xs sm:text-sm text-slate-200 mt-2.5 font-medium">
+                Đã đi được 43% chặng đường. Mỗi roll đều có ý nghĩa.
+              </p>
+
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/55 border border-white/15 text-xs text-sky-200 mt-2.5">
+                <img src="https://enka.network/ui/UI_ItemIcon_201.png" referrerpolicy="no-referrer" class="w-4 h-4" alt="Primogem" />
+                <span>Tương đương <strong id="hero-primogems" class="text-white">13.760</strong> Nguyên Thạch</span>
+              </div>
+            </div>
+
+            <!-- Thanh Tiến Độ -->
+            <div class="relative z-10 mt-6">
+              <div class="h-3 w-full rounded-full bg-slate-950/55 overflow-hidden p-0.5">
+                <div id="hero-progress-bar" class="h-full rounded-full bg-gradient-to-r from-sky-300 via-cyan-300 to-white transition-all duration-500" style="width: 43%"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-300 mt-1.5">
+                <span>0 roll</span>
+                <span id="hero-mid-label">100</span>
+                <span id="hero-max-label">200 roll</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thẻ Cột Mốc Tiếp Theo & Máy tính Cung Mệnh -->
+          <div class="glass-card rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs font-bold text-sub uppercase mb-2">
+                <span>🚩 CỘT MỐC TIẾP THEO</span>
+                <span class="text-sky-500">Tự động tính C/R</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="next-milestone-num" class="text-4xl font-extrabold">100</span>
+                <span class="text-sm font-semibold text-sub">roll</span>
+              </div>
+              <p id="next-milestone-diff" class="text-xs text-sub mt-0.5">Chỉ còn 14 roll nữa để chạm mốc này.</p>
+
+              <div class="mt-3 p-3.5 rounded-2xl bg-slate-900 text-white space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-400">Kỳ vọng đạt (55/45):</span>
+                  <span id="calc-expected-cr" class="px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 font-extrabold text-sm">C0 R0</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-400">Bảo hiểm 100%:</span>
+                  <span id="calc-guaranteed-cr" class="font-bold text-emerald-400">Chưa đủ Pity 90</span>
+                </div>
+                <div class="pt-2 border-t border-slate-800 grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <label class="text-slate-400 block">Pity NV đã có:</label>
+                    <input id="char-pity-input" type="number" min="0" max="89" value="0" onchange="updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold" />
+                  </div>
+                  <div>
+                    <label class="text-slate-400 block">Trạng thái 50/50:</label>
+                    <select id="guaranteed-select" onchange="updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold">
+                      <option value="false">Chưa bảo hiểm</option>
+                      <option value="true">Có bảo hiểm 100%</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-slate-400/20">
+              <p class="text-[11px] font-bold text-sub mb-1.5">Chọn nhanh mục tiêu Cung mệnh:</p>
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="setQuickGoal('C0R0', 90)" class="px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C0 (90)</button>
+                <button type="button" onclick="setQuickGoal('C0R1', 160)" class="px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C0R1 (160)</button>
+                <button type="button" onclick="setQuickGoal('C1R1', 250)" class="px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C1R1 (250)</button>
+                <button type="button" onclick="setQuickGoal('C2R1', 340)" class="px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C2R1 (340)</button>
+                <button type="button" onclick="setQuickGoal('C6R1', 720)" class="px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C6R1 (720)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hàng 2: 4 Thẻ Chỉ Số -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+          <div class="glass-card rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between text-xs text-sub font-semibold">
+              <span>Còn thiếu</span><span>✦</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold mt-1"><span id="stat-remaining">114</span> <span class="text-xs font-normal text-sub">roll</span></div>
+            <p id="stat-remaining-sub" class="text-[11px] text-sub mt-1">Để đạt mục tiêu 200 roll</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between text-xs text-sub font-semibold">
+              <span>Tăng từ mốc trước</span><span>📈</span>
+            </div>
+            <div id="stat-last-diff" class="text-2xl sm:text-3xl font-extrabold text-emerald-500 mt-1">+5 <span class="text-xs font-normal text-sub">roll</span></div>
+            <p id="stat-last-info" class="text-[11px] text-sub mt-1">Cập nhật gần nhất</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between text-xs text-sub font-semibold">
+              <span>KPI mỗi ngày</span><span class="px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-500 text-[10px]">Mục tiêu</span>
+            </div>
+            <div class="flex items-baseline gap-1 mt-1">
+              <input id="kpi-input" type="number" min="1" max="100" value="5" onchange="updateKpi(this.value)" class="w-16 text-2xl sm:text-3xl font-extrabold bg-transparent border-b border-slate-400 focus:outline-none" />
+              <span class="text-xs text-sub">roll / ngày</span>
+            </div>
+            <p class="text-[11px] text-sub mt-1">Bấm vào số để đổi KPI</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between text-xs text-sub font-semibold">
+              <span>Dự kiến đạt mục tiêu</span><span>📅</span>
+            </div>
+            <div id="stat-eta-date" class="text-2xl sm:text-3xl font-extrabold mt-1">08/11/2026</div>
+            <p id="stat-eta-days" class="text-[11px] text-sub mt-1">Còn 23 ngày • Theo KPI 5 roll/ngày</p>
+          </div>
+        </div>
+
+        <!-- Hàng 3: Cập nhật Quỹ Roll + Lịch sử Paimon + Tích nhanh La Hoàn/Nhà Hát -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-2 space-y-5">
+            <div class="glass-card rounded-3xl p-5 shadow-sm">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div>
+                  <h3 class="text-base font-extrabold">➕ Thêm một bước tiến</h3>
+                  <p class="text-xs text-sub">Nhập Tổng số roll mới, Cộng thêm roll, hoặc nhập Nguyên Thạch kiếm được hôm nay.</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div>
+                  <label class="text-xs font-bold text-sub block mb-1">Đặt Tổng Roll mới</label>
+                  <input id="form-total-rolls" type="number" step="any" min="0" class="themed-input w-full px-3 py-2.5 rounded-xl text-sm font-extrabold" placeholder="VD: 90" />
+                </div>
+                <div>
+                  <label class="text-xs font-bold text-sub block mb-1">Hoặc Cộng thêm (+Roll)</label>
+                  <input id="form-add-rolls" type="number" step="any" class="themed-input w-full px-3 py-2.5 rounded-xl text-sm font-extrabold text-emerald-500" placeholder="VD: +5" />
+                </div>
+                <div>
+                  <label class="text-xs font-bold text-sub block mb-1">Hoặc Cộng Nguyên Thạch</label>
+                  <input id="form-add-primos" type="number" class="themed-input w-full px-3 py-2.5 rounded-xl text-sm font-extrabold text-amber-500" placeholder="VD: 800 (= 5 roll)" />
+                </div>
+                <div>
+                  <label class="text-xs font-bold text-sub block mb-1">Ghi chú</label>
+                  <input id="form-note" type="text" class="themed-input w-full px-3 py-2.5 rounded-xl text-sm" placeholder="La Hoàn, Daily..." />
+                </div>
+              </div>
+
+              <div class="mt-3.5 flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap gap-1.5 text-xs">
+                  <button type="button" onclick="quickAddRoll(1, 'Ủy thác hàng ngày + Không Nguyệt')" class="px-2.5 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500 hover:text-white font-bold transition">+1 Roll (Daily)</button>
+                  <button type="button" onclick="quickAddRoll(5, 'Ánh Trăng Vực Sâu (La Hoàn 800 NT)')" class="px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500 hover:text-white font-bold transition">+5 Roll (La Hoàn 800 NT)</button>
+                  <button type="button" onclick="quickAddRoll(6.25, 'Nhà Hát Giả Tưởng (1000 NT)')" class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500 hover:text-white font-bold transition">+6.25 Roll (Nhà Hát 1000 NT)</button>
+                </div>
+                <button type="button" onclick="saveRollProgress()" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-extrabold shadow-md transition cursor-pointer">
+                  ✦ Cập nhật quỹ & Lưu lịch sử
+                </button>
+              </div>
+            </div>
+
+            <!-- Nhật ký Paimon -->
+            <div class="glass-card rounded-3xl p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2.5">
+                  <img src="https://enka.network/ui/UI_ItemIcon_201.png" referrerpolicy="no-referrer" class="w-7 h-7" alt="Paimon" />
+                  <div>
+                    <h3 class="text-sm font-extrabold">Góc Đồng Hành Cùng Paimon</h3>
+                    <p class="text-[11px] text-sub">Lịch sử cập nhật quỹ roll của riêng nhân vật này</p>
+                  </div>
+                </div>
+              </div>
+              <div id="history-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1"></div>
+            </div>
+          </div>
+
+          <!-- Cột phải: Phím tắt sang Lịch Sự Kiện & Nhịp Tích Lũy -->
+          <div class="space-y-5">
+            <div class="glass-card rounded-3xl p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-extrabold">🌙 Khiêu Chiến Tháng Này</h3>
+                <button type="button" onclick="switchMainView('calendar')" class="text-xs text-sky-500 font-bold hover:underline">Mở Chi Tiết Lịch ➔</button>
+              </div>
+              <p class="text-xs text-sub mb-3">Bấm nhận ngay khi bạn vừa cày xong để tự động cộng Roll vào quỹ nhân vật hiện tại:</p>
+              <div id="mini-endgame-box" class="space-y-2.5"></div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-5 shadow-sm">
+              <h3 class="text-sm font-extrabold mb-1">🎯 Nhịp tích lũy của <span id="rhythm-user-name">Yorrn</span></h3>
+              <p class="text-xs text-sub mb-3">Giữ nhịp nhỏ, chạm mục tiêu lớn</p>
+              <div class="p-3.5 rounded-2xl bg-sky-500/10 border border-sky-400/30 mb-3">
+                <span class="text-xs font-bold">✦ KPI cố định: <strong id="rhythm-kpi" class="text-sky-500">5</strong> roll / ngày</span>
+              </div>
+              <div class="space-y-2 text-xs text-sub">
+                <p>⏳ <strong id="rhythm-days-left" class="text-sky-500">23 ngày nữa</strong> là đủ quỹ mục tiêu.</p>
+                <p>📌 Dự kiến chạm đích: <strong id="rhythm-eta">08/11/2026</strong></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 2: CHI TIẾT LỊCH & SỰ KIỆN CHUẨN HOYOLAB (THEO ẢNH MẪU) -->
+      <!-- ================================================================= -->
+      <div id="view-calendar" class="hidden">
+        <div class="max-w-4xl mx-auto hoyolab-panel rounded-3xl p-5 sm:p-8 shadow-2xl space-y-7">
+          
+          <!-- Thanh tiêu đề Chi Tiết Lịch -->
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="switchMainView('dashboard')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold">← Quay lại Quỹ Roll</button>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white">Chi Tiết Lịch HoYoLAB</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="resetMonthlyEndgame()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold">🔄 Reset Tháng Mới</button>
+              <button type="button" onclick="promptAddCustomEvent()" class="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold">+ Thêm sự kiện</button>
+            </div>
+          </div>
+
+          <!-- PHẦN 1: SỰ KIỆN CẦU NGUYỆN 7.1 -->
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-amber-300">✦</span>
+              <h3 class="text-sm font-extrabold text-amber-100">Sự Kiện Cầu Nguyện</h3>
+              <span class="px-1.5 py-0.5 rounded bg-rose-500 text-[10px] font-extrabold text-white">7.1</span>
+            </div>
+
+            <div class="bg-black/30 p-4 rounded-2xl border border-white/5 space-y-4">
+              <!-- Tab Nhân Vật / Vũ Khí -->
+              <div class="grid grid-cols-2 bg-slate-800/90 p-1 rounded-full max-w-md mx-auto text-xs font-bold">
+                <button type="button" id="wish-tab-char" onclick="switchWishTab('char')" class="py-1.5 rounded-full bg-amber-50 text-slate-900 shadow">Nhân Vật</button>
+                <button type="button" id="wish-tab-weapon" onclick="switchWishTab('weapon')" class="py-1.5 rounded-full text-slate-300 hover:text-white">Vũ Khí</button>
+              </div>
+
+              <div id="wish-banners-container" class="space-y-3"></div>
+            </div>
+          </div>
+
+          <!-- PHẦN 2: TỔNG QUAN SỰ KIỆN (CLICK ĐỂ CỘNG NGUYÊN THẠCH VÀO ROLL) -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-amber-300">✦</span>
+                <h3 class="text-sm font-extrabold text-amber-100">Tổng Quan Sự Kiện (Bấm để nhận NT & tự cộng Roll)</h3>
+              </div>
+              <span class="text-[11px] text-slate-400">Đang cộng cho: <strong id="calendar-target-char" class="text-sky-400">Tsaritsa</strong></span>
+            </div>
+
+            <div id="events-list-container" class="bg-black/25 p-3 sm:p-4 rounded-2xl border border-white/5 space-y-2.5"></div>
+          </div>
+
+          <!-- PHẦN 3: ÁNH TRĂNG VỰC SÂU (LA HOÀN) & NHÀ HÁT GIẢ TƯỞNG -->
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sky-300">🌙</span>
+              <h3 class="text-sm font-extrabold text-sky-100">Khiêu Chiến Định Kỳ Reset Mỗi Tháng (La Hoàn • Nhà Hát • Ảo Cảnh)</h3>
+            </div>
+            <div id="endgame-list-container" class="bg-black/25 p-3 sm:p-4 rounded-2xl border border-white/5 space-y-2.5Lên máy tính rồi thì quá khỏe luôn Yorrn! Không còn bị giới hạn 304 dòng của bộ nhớ tạm trên điện thoại nữa, Gem đã đóng gói cho ông bản **Full Code `index.html` hoàn chỉnh nhất** với toàn bộ các tính năng ông vừa yêu cầu:
+
+1. **Fix triệt để 100% lỗi tự reset số Roll:** Đã viết lại cơ chế lưu trữ trạng thái trực tiếp (`appState`). Khi ông gõ số roll mới vào ô hoặc bấm nút `+1`, `+10`, sửa mục tiêu, dữ liệu sẽ khóa cứng vào bộ nhớ trình duyệt ngay lập tức, tuyệt đối không bao giờ tự nhảy về số cũ.
+2. **Mục "Chi Tiết Lịch Sự Kiện" chuẩn HoYoLAB:**
+   * Có thanh chuyển tab trên cùng giữa **📊 Không Gian Tích Roll** và **📅 Chi Tiết Lịch (HoYoLAB)**[cite: 21].
+   * **Sự Kiện Cầu Nguyện 7.1** (chuyển đổi được giữa tab *Nhân Vật* và *Vũ Khí*) hiển thị bộ đếm ngược thời gian thực[cite: 21].
+   * **Khiêu Chiến Định Kỳ (Ánh Trăng Vực Sâu 800 NT, Nhà Hát Giả Tưởng 1000 NT, Ảo Cảnh Hiểm Ác 450 NT)** và **Tổng Quan Sự Kiện (Bản Chất Của Chiến Thắng 420 NT...)**[cite: 20, 21]: Chỉ cần bấm **1 click vào nút "Nhận NT"** là hệ thống tự động quy đổi Nguyên Thạch ra số Roll (cộng cả Nguyên Thạch lẻ tích lũy đủ 160 NT là tự nhảy thêm 1 Roll), tự ghi vào Nhật ký Paimon và đánh dấu tích xanh `✓`[cite: 20]. Khi sang tháng mới chỉ cần bấm **"🔄 Reset Kỳ Mới"** để nhận lại!
+3. **Thu gọn Menu Nhân vật bên trái (Dropdown):** Danh sách nhân vật bên trái mặc định được thu gọn gọn gàng, khi nào ông bấm vào thanh **"📂 Danh sách Nhân Vật 5★"** thì nó mới xổ xuống.
+4. **Đánh dấu Nhân vật Yêu thích (Ngôi sao ⭐):** Bấm vào ngôi sao cạnh tên nhân vật để ghim lên đầu danh sách hoặc lọc riêng các nhân vật yêu thích.
+5. **Tự tạo Nhân vật chưa ra mắt & Chỉnh sửa tự do Avatar/Vũ khí/Hệ:** Có nút **"➕ Tạo NV Mới"** và nút **"✏️ Sửa NV / Đổi Avatar"** (hỗ trợ tải ảnh trực tiếp từ máy tính lên hoặc dán link ảnh).
+6. **Icon Hệ (Nguyên tố) chuẩn trong game:** Sử dụng icon nguyên tố chính thức của Genshin Impact thay cho emoji.
+7. **Chế độ Sáng / Tối (Dark / Light Mode):** Nút chuyển đổi giao diện Tối (chuẩn HoYoLAB) và Sáng (theo màu nguyên tố) ngay trên thanh công cụ.
+8. **Hệ thống Sticker Trang Trí Kéo-Thả (Paimon & Custom Sticker):** Có sẵn Sticker Paimon và nút **"✨ Thêm Sticker"** cho phép ông tải ảnh/GIF từ máy tính lên làm sticker, **kéo thả đến bất kỳ vị trí nào trên màn hình** để trang trí, chỉnh kích thước và tự động lưu vị trí.
+
+---
+
+### Toàn bộ mã nguồn `index.html` (Copy 1 lần trên máy tính và dán đè vào GitHub):
+
+```html
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hành Trình Teyvat — Quản Lý Quỹ Roll & Lịch Sự Kiện HoYoLAB</title>
+  <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  <link href="[https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap)" rel="stylesheet">
+  <style>
+    * { font-family: 'Be Vietnam Pro', sans-serif; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; overflow-x: hidden; transition: background 0.4s ease, color 0.3s ease; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    html.dark .glass-card {
+      background: rgba(24, 27, 36, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #f1f5f9;
+    }
+    .hoyolab-panel {
+      background: rgba(28, 30, 38, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    .hoyolab-item {
+      background: rgba(43, 46, 59, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s ease;
+    }
+    .hoyolab-item:hover {
+      background: rgba(54, 58, 74, 0.95);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .hoyolab-item.completed {
+      border-left: 4px solid #84cc16;
+    }
+    .dark-sidebar {
+      background: rgba(15, 20, 28, 0.96);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.45); border-radius: 9999px; }
+    @keyframes floatParticle {
+      0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+      20% { opacity: 0.65; }
+      80% { opacity: 0.65; }
+      100% { transform: translateY(105vh) translateX(35px) rotate(360deg); opacity: 0; }
+    }
+    .weather-particle {
+      position: fixed;
+      top: -20px;
+      pointer-events: none;
+      z-index: 1;
+      animation: floatParticle linear infinite;
+    }
+    .draggable-sticker {
+      position: fixed;
+      z-index: 35;
+      cursor: grab;
+      user-select: none;
+      filter: drop-shadow(0 6px 14px rgba(0,0,0,0.35));
+      transition: transform 0.1s ease;
+    }
+    .draggable-sticker:active {
+      cursor: grabbing;
+      transform: scale(1.06);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-[#0d1017] text-slate-800 dark:text-slate-100 min-h-screen">
+
+  <!-- HIỆU ỨNG THỜI TIẾT ĐỘNG -->
+  <div id="weather-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+  <!-- LỚP HIỂN THỊ STICKER TRANG TRÍ KÉO THẢ -->
+  <div id="sticker-layer" class="fixed inset-0 pointer-events-none z-30 overflow-hidden"></div>
+
+  <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ TÀI KHOẢN -->
+  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative">
+      <div class="flex items-center gap-3 mb-2">
+        <img src="[https://api.ambr.top/assets/UI/UI_Icon_Item_Primogem.png](https://api.ambr.top/assets/UI/UI_Icon_Item_Primogem.png)" referrerpolicy="no-referrer" class="w-11 h-11 rounded-2xl bg-sky-500/20 p-1.5 border border-sky-400/40" onerror="this.style.display='none'" />
         <div>
-          <div class="flex flex-wrap items-center gap-2 text-xs font-bold tracking-wider uppercase text-slate-500 mb-1">
-            <span id="header-char-title">BĂNG THẦN • TSARITSA</span>
-            <span>•</span>
-            <span id="header-target-badge" class="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800">MỤC TIÊU: C0R1</span>
-            <select id="weapon-type-select" onchange="window.changeWeaponType(this.value)" class="px-2 py-0.5 rounded-md bg-white/90 border border-slate-300 text-slate-700 font-semibold text-xs cursor-pointer">
-              <option value="Kiếm Đơn">⚔️ Kiếm Đơn</option>
-              <option value="Trọng Kiếm">🗡️ Trọng Kiếm</option>
-              <option value="Vũ Khí Cán Dài">🔱 Vũ Khí Cán Dài</option>
-              <option value="Pháp Khí">📖 Pháp Khí</option>
-              <option value="Cung">🏹 Cung</option>
+          <p class="text-xs uppercase tracking-widest text-sky-400 font-semibold">CỔNG THIÊN LÝ • TEYVAT</p>
+          <h2 id="auth-title" class="text-xl font-extrabold">Đăng Nhập Tài Khoản</h2>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400 mb-5">Mỗi tài khoản lưu riêng quỹ Nguyên Thạch, Lịch sự kiện, Nhân vật tự tạo và vị trí Sticker.</p>
+
+      <div class="grid grid-cols-2 gap-1 p-1 bg-slate-800 rounded-xl mb-4 text-xs font-bold">
+        <button type="button" id="tab-login" onclick="switchAuthTab('login')" class="py-2.5 rounded-lg bg-sky-500 text-white transition cursor-pointer">Đăng nhập</button>
+        <button type="button" id="tab-register" onclick="switchAuthTab('register')" class="py-2.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">Tạo tài khoản</button>
+      </div>
+
+      <div class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Tên tài khoản (Username)</label>
+          <input id="auth-username" type="text" placeholder="VD: yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
+        </div>
+        <div id="register-nickname-wrap" class="hidden">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Biệt danh hiển thị</label>
+          <input id="auth-nickname" type="text" placeholder="VD: Yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Mật khẩu</label>
+          <input id="auth-password" type="password" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
+        </div>
+        <p id="auth-error" class="text-xs text-rose-400 font-semibold hidden"></p>
+        <button type="button" onclick="submitAuth()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 font-bold text-sm shadow-lg cursor-pointer">
+          Vào Không Gian Tích Roll ➔
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TẠO / CHỈNH SỬA NHÂN VẬT (TỰ TẠO NV CHƯA RA MẮT HOẶC ĐỔI AVATAR) -->
+  <div id="char-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="char-modal-title" class="text-lg font-extrabold text-sky-400">✨ Tạo Nhân Vật Mới / Chỉnh Sửa</h3>
+        <button type="button" onclick="closeCharModal()" class="text-slate-400 hover:text-white text-xl">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Tên Nhân Vật *</label>
+            <input id="cm-name" type="text" placeholder="VD: Dainsleif / Tsaritsa" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white" />
+          </div>
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Danh hiệu / Quốc gia</label>
+            <input id="cm-title" type="text" placeholder="VD: Kiếm Khách Khaenri'ah" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white" />
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Hệ (Nguyên Tố)</label>
+            <select id="cm-element" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white">
+              <option value="Cryo">Băng (Cryo)</option>
+              <option value="Pyro">Hỏa (Pyro)</option>
+              <option value="Hydro">Thủy (Hydro)</option>
+              <option value="Dendro">Thảo (Dendro)</option>
+              <option value="Electro">Lôi (Electro)</option>
+              <option value="Anemo">Phong (Anemo)</option>
+              <option value="Geo">Nham (Geo)</option>
             </select>
           </div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-2">
-            <span id="header-journey-title">Hành trình Snezhnaya</span>
-            <span id="header-element-emoji">❄️</span>
-          </h2>
-          <p id="header-lore" class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl"></p>
-        </div>
-
-        <!-- Đồng hồ thời gian thực -->
-        <div class="glass-card px-4 py-2.5 rounded-2xl text-right shadow-sm">
-          <div class="text-xs text-slate-500 font-medium flex items-center justify-end gap-1.5">
-            <span>📅</span>
-            <span id="clock-date">16/10/2026</span>
-          </div>
-          <div id="clock-time" class="text-xl font-extrabold text-slate-900 tracking-tight">02:32:27</div>
-          <div class="text-[10px] text-slate-400">Giờ Việt Nam • UTC+7</div>
-        </div>
-      </div>
-
-      <!-- HÀNG 1: THẺ BANNER TIẾN ĐỘ LỚN + CỘT MỐC TIẾP THEO -->
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
-        
-        <!-- Thẻ Banner Chính (2 cột) -->
-        <div id="hero-banner-card" class="xl:col-span-2 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl min-h-[240px] flex flex-col justify-between" style="background: linear-gradient(135deg, #0c192c 0%, #1e3a5f 60%, #2b5876 100%);">
-          <div class="absolute right-3 bottom-0 top-0 w-44 sm:w-60 pointer-events-none flex items-end justify-end opacity-90">
-            <div id="hero-char-illust" class="w-36 h-36 sm:w-48 sm:h-48 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl mb-4 mr-2 bg-slate-800/60 flex items-center justify-center"></div>
-          </div>
-
-          <div class="relative z-10 max-w-lg">
-            <div class="flex items-center gap-2 text-xs uppercase tracking-widest text-sky-200 font-bold mb-2">
-              <span>✦ QUỸ ROLL NHÂN VẬT</span>
-              <button type="button" onclick="window.promptCustomImage()" class="px-2 py-0.5 rounded bg-white/15 hover:bg-white/25 text-[10px] font-normal transition">🖼️ Đổi ảnh NV</button>
-            </div>
-
-            <div class="flex items-baseline gap-2 flex-wrap">
-              <span class="text-3xl">✦</span>
-              <input id="direct-current-rolls" type="number" min="0" onchange="window.setDirectCurrentRolls(this.value)" class="w-28 sm:w-36 bg-transparent border-b-2 border-white/30 focus:border-sky-300 text-5xl sm:text-6xl font-extrabold text-white focus:outline-none" value="86" title="Bấm để sửa trực tiếp tổng số roll hiện có" />
-              <span class="text-2xl text-slate-300 font-semibold">/</span>
-              <input id="direct-target-rolls" type="number" min="1" onchange="window.setDirectTargetRolls(this.value)" class="w-20 bg-transparent border-b border-white/30 focus:border-sky-300 text-2xl font-bold text-sky-200 focus:outline-none" value="200" title="Bấm để sửa mục tiêu roll" />
-              <span class="text-sm text-slate-200 font-medium">roll</span>
-            </div>
-
-            <p id="hero-progress-text" class="text-xs sm:text-sm text-slate-200 mt-2 font-medium">
-              Đã đi được 43% chặng đường. Mỗi roll đều có ý nghĩa.
-            </p>
-
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-950/45 border border-white/15 text-xs text-sky-200 mt-2">
-              <span>✦ Tương đương <strong id="hero-primogems" class="text-white">13.760</strong> Nguyên Thạch</span>
-            </div>
-          </div>
-
-          <div class="relative z-10 mt-6">
-            <div class="h-3 w-full rounded-full bg-slate-950/50 overflow-hidden p-0.5">
-              <div id="hero-progress-bar" class="h-full rounded-full bg-gradient-to-r from-sky-300 via-cyan-300 to-white transition-all duration-500" style="width: 43%"></div>
-            </div>
-            <div class="flex justify-between text-[11px] text-slate-300 mt-1.5">
-              <span>0 roll</span>
-              <span id="hero-mid-label">100</span>
-              <span id="hero-max-label">200 roll</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Thẻ Cột Mốc Tiếp Theo & Máy Tính Cung Mệnh (C) / Tinh Luyện (R) -->
-        <div class="glass-card rounded-3xl p-5 shadow-sm flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between text-xs font-bold text-slate-500 uppercase mb-2">
-              <span>🚩 CỘT MỐC & ƯỚC TÍNH CUNG MỆNH</span>
-              <span class="text-sky-600">Tự động tính</span>
-            </div>
-            <div class="flex items-baseline gap-2">
-              <span id="next-milestone-num" class="text-4xl font-extrabold text-slate-900">100</span>
-              <span class="text-sm font-semibold text-slate-500">roll (mốc gần nhất)</span>
-            </div>
-            <p id="next-milestone-diff" class="text-xs text-slate-500 mt-0.5">Chỉ còn 14 roll nữa để chạm mốc này.</p>
+            <label class="font-bold text-slate-300 block mb-1">Vũ Khí</label>
+            <select id="cm-weapon" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white">
+              <option value="Kiếm Đơn">Kiếm Đơn</option>
+              <option value="Trọng Kiếm">Trọng Kiếm</option>
+              <option value="Vũ Khí Cán Dài">Vũ Khí Cán Dài</option>
+              <option value="Pháp Khí">Pháp Khí</option>
+              <option value="Cung">Cung</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Vùng Đất</label>
+            <input id="cm-region" type="text" placeholder="Snezhnaya" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white" />
+          </div>
+        </div>
 
-            <div class="mt-3 p-3 rounded-2xl bg-slate-900 text-white space-y-2">
-              <div class="flex items-center justify-between text-xs">
-                <span class="text-slate-400">Dự kiến đạt (Kỳ vọng 55/45):</span>
-                <span id="calc-expected-cr" class="px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 font-extrabold text-sm">C0 R0</span>
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Link Ảnh Avatar (Hoặc tải ảnh từ máy tính ở dưới)</label>
+          <input id="cm-avatar-url" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white mb-2" />
+          <label class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 cursor-pointer text-sky-400 font-bold">
+            <span>📁 Chọn file ảnh từ Máy Tính</span>
+            <input id="cm-avatar-file" type="file" accept="image/*" class="hidden" onchange="handleAvatarFileUpload(event)" />
+          </label>
+          <span id="cm-upload-status" class="ml-2 text-emerald-400"></span>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Mô tả / Cốt truyện ngắn</label>
+          <textarea id="cm-lore" rows="2" placeholder="Nhập mô tả nhân vật..." class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeCharModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700">Hủy</button>
+          <button type="button" onclick="saveCharModal()" class="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 font-bold text-white">💾 Lưu Nhân Vật</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL QUẢN LÝ & TẠO STICKER TRANG TRÍ -->
+  <div id="sticker-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-base font-extrabold text-amber-400">🧚‍♀️ Kho Sticker Trang Trí (Kéo Thả Tự Do)</h3>
+        <button type="button" onclick="closeStickerModal()" class="text-slate-400 hover:text-white text-xl">✕</button>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">Bấm chọn Sticker mẫu hoặc tải ảnh/GIF từ máy tính của bạn lên để dán lên giao diện web. Bạn có thể dùng chuột **kéo thả Sticker tới bất kỳ đâu**!</p>
+
+      <!-- Sticker mẫu có sẵn -->
+      <div class="mb-4">
+        <p class="text-xs font-bold text-slate-300 mb-2">Sticker Paimon & Genshin có sẵn (Bấm để thêm):</p>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="addPresetSticker('[https://api.ambr.top/assets/UI/UI_EmotionIcon1.png](https://api.ambr.top/assets/UI/UI_EmotionIcon1.png)', 'Paimon 1')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center gap-1.5 text-xs">
+            <img src="[https://api.ambr.top/assets/UI/UI_EmotionIcon1.png](https://api.ambr.top/assets/UI/UI_EmotionIcon1.png)" referrerpolicy="no-referrer" class="w-8 h-8 object-contain" /> Paimon
+          </button>
+          <button type="button" onclick="addPresetSticker('[https://api.ambr.top/assets/UI/UI_EmotionIcon2.png](https://api.ambr.top/assets/UI/UI_EmotionIcon2.png)', 'Paimon 2')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center gap-1.5 text-xs">
+            <img src="[https://api.ambr.top/assets/UI/UI_EmotionIcon2.png](https://api.ambr.top/assets/UI/UI_EmotionIcon2.png)" referrerpolicy="no-referrer" class="w-8 h-8 object-contain" /> Paimon Ngạc Nhiên
+          </button>
+          <button type="button" onclick="addPresetSticker('[https://api.ambr.top/assets/UI/UI_EmotionIcon5.png](https://api.ambr.top/assets/UI/UI_EmotionIcon5.png)', 'Paimon 3')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center gap-1.5 text-xs">
+            <img src="[https://api.ambr.top/assets/UI/UI_EmotionIcon5.png](https://api.ambr.top/assets/UI/UI_EmotionIcon5.png)" referrerpolicy="no-referrer" class="w-8 h-8 object-contain" /> Paimon Tự Hào
+          </button>
+          <button type="button" onclick="addPresetSticker('[https://api.ambr.top/assets/UI/UI_Icon_Item_Primogem.png](https://api.ambr.top/assets/UI/UI_Icon_Item_Primogem.png)', 'Nguyên Thạch')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center gap-1.5 text-xs">
+            <img src="[https://api.ambr.top/assets/UI/UI_Icon_Item_Primogem.png](https://api.ambr.top/assets/UI/UI_Icon_Item_Primogem.png)" referrerpolicy="no-referrer" class="w-8 h-8 object-contain" /> Nguyên Thạch
+          </button>
+        </div>
+      </div>
+
+      <!-- Tự tải Sticker từ máy hoặc dán URL -->
+      <div class="space-y-2.5 pt-3 border-t border-slate-800 text-xs">
+        <p class="font-bold text-slate-300">Tự tạo Sticker của riêng bạn:</p>
+        <div class="flex gap-2">
+          <input id="custom-sticker-url" type="text" placeholder="Dán link ảnh PNG / GIF trong suốt..." class="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white" />
+          <button type="button" onclick="addCustomUrlSticker()" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 font-bold">Thêm</button>
+        </div>
+        <div class="flex items-center justify-between pt-1">
+          <label class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold cursor-pointer">
+            <span>📁 Tải ảnh Sticker từ Máy Tính</span>
+            <input type="file" accept="image/*" class="hidden" onchange="handleStickerFileUpload(event)" />
+          </label>
+          <button type="button" onclick="clearAllStickers()" class="px-3 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold">🗑️ Xóa hết Sticker</button>
+        </div>
+      </div>
+
+      <!-- Danh sách sticker đang dán -->
+      <div id="active-stickers-list" class="mt-4 max-h-36 overflow-y-auto space-y-1.5 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- BỐ CỤC CHÍNH -->
+  <div class="relative z-10 flex min-h-screen">
+
+    <!-- SIDEBAR TRÁI (THU GỌN MENU NHÂN VẬT THEO YÊU CẦU) -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-80 dark-sidebar text-white flex flex-col justify-between transition-transform duration-300 -translate-x-full lg:translate-x-0">
+      <div class="p-4 space-y-4 overflow-y-auto flex-1">
+        <!-- Header Sidebar -->
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div id="sidebar-elem-icon" class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center p-1.5"></div>
+            <div>
+              <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">HÀNH TRÌNH TEYVAT</p>
+              <h1 id="sidebar-region-name" class="text-sm font-bold text-white">Snezhnaya</h1>
+            </div>
+          </div>
+          <button type="button" onclick="toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white text-xl px-2">✕</button>
+        </div>
+
+        <!-- Chuyển đổi Mục chính: Không Gian Tích Roll vs Chi Tiết Lịch HoYoLAB -->
+        <div class="space-y-1">
+          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold px-1">ĐIỀU HƯỚNG</p>
+          <button type="button" id="nav-tracker-btn" onclick="switchMainView('tracker')" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-sky-500/20 border border-sky-400/40 text-sky-300 text-xs font-bold transition">
+            <span>📊</span> <span>Tổng Quan Tích Roll</span>
+          </button>
+          <button type="button" id="nav-calendar-btn" onclick="switchMainView('calendar')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition">
+            <span class="flex items-center gap-2.5"><span>📅</span> <span>Chi Tiết Lịch Sự Kiện</span></span>
+            <span class="px-1.5 py-0.5 rounded bg-rose-500 text-white text-[10px]">7.1</span>
+          </button>
+        </div>
+
+        <!-- Nhân vật đang chọn hiện tại + Nút Tạo/Sửa NV -->
+        <div class="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">MỤC TIÊU ĐANG CHỌN</span>
+            <div class="flex gap-1">
+              <button type="button" onclick="openCharModal('edit')" class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] text-sky-300 font-semibold" title="Sửa thông tin & Avatar nhân vật này">✏️ Sửa NV</button>
+              <button type="button" onclick="openCharModal('create')" class="px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-[10px] text-emerald-300 font-semibold" title="Tạo nhân vật chưa ra mắt">➕ Tạo NV</button>
+            </div>
+          </div>
+          <div id="active-char-mini-card" class="flex items-center gap-3"></div>
+        </div>
+
+        <!-- MENU NHÂN VẬT THU GỌN (CHỈ XỔ XUỐNG KHI BẤM) -->
+        <div class="rounded-2xl bg-slate-900/90 border border-white/10 overflow-hidden">
+          <button type="button" onclick="toggleCharDropdown()" class="w-full flex items-center justify-between p-3 text-left hover:bg-white/5 transition">
+            <div class="flex items-center gap-2">
+              <span class="text-sm">📂</span>
+              <div>
+                <p class="text-xs font-bold text-white">Danh Sách Nhân Vật 5★</p>
+                <p id="dropdown-sub-status" class="text-[10px] text-slate-400">Đang thu gọn • Bấm để mở</p>
               </div>
-              <div class="flex items-center justify-between text-xs">
-                <span class="text-slate-400">Chắc chắn 100% (Bảo hiểm):</span>
-                <span id="calc-guaranteed-cr" class="font-bold text-emerald-400">Chưa đủ Pity 90</span>
+            </div>
+            <span id="dropdown-arrow" class="text-slate-400 text-xs transition-transform duration-200">▼</span>
+          </button>
+
+          <!-- Nội dung xổ xuống -->
+          <div id="char-dropdown-body" class="hidden border-t border-white/10 p-2.5 space-y-2.5 bg-slate-950/60">
+            <!-- Tìm kiếm + Lọc Yêu thích ⭐ -->
+            <div class="flex gap-1.5">
+              <input id="char-search" oninput="renderCharacterList()" type="text" placeholder="🔍 Tìm tên nhân vật..." class="flex-1 px-2.5 py-1.5 rounded-lg bg-white/10 border border-white/10 text-xs text-white placeholder-slate-400 focus:outline-none" />
+              <button type="button" id="fav-filter-btn" onclick="toggleFavFilter()" class="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-amber-400" title="Chỉ hiện nhân vật yêu thích">⭐</button>
+            </div>
+
+            <!-- Thanh lọc Icon Nguyên Tố Chuẩn Game -->
+            <div id="element-filter-bar" class="flex items-center justify-between gap-1 bg-slate-900 p-1 rounded-xl border border-white/5"></div>
+
+            <!-- Danh sách cuộn -->
+            <div id="character-list" class="max-h-72 overflow-y-auto space-y-1 pr-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Sidebar: Cài đặt Giao diện Sáng/Tối + Sticker + Tài khoản -->
+      <div class="p-3 border-t border-white/10 space-y-2 bg-slate-950/80">
+        <div class="grid grid-cols-2 gap-1.5">
+          <button type="button" onclick="toggleThemeMode()" id="theme-toggle-btn" class="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-bold flex items-center justify-center gap-1.5">
+            <span>🌙</span> <span>Giao diện: Tối</span>
+          </button>
+          <button type="button" onclick="openStickerModal()" class="px-2.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/30 text-amber-300 text-[11px] font-bold flex items-center justify-center gap-1.5">
+            <span>🧚‍♀️</span> <span>Dán Sticker</span>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between px-2.5 py-2 rounded-xl bg-white/5">
+          <div class="flex items-center gap-2 min-w-0">
+            <div id="user-avatar-badge" class="w-7 h-7 rounded-full bg-sky-600 flex items-center justify-center font-bold text-xs">Y</div>
+            <div class="truncate">
+              <p id="current-user-name" class="text-xs font-bold text-white truncate">Yorrn</p>
+              <p class="text-[10px] text-emerald-400">● Đã khóa lưu tự động</p>
+            </div>
+          </div>
+          <button type="button" onclick="logoutUser()" class="px-2 py-1 rounded-lg hover:bg-rose-500/20 text-rose-400 text-xs font-bold">Đổi TK</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- KHU VỰC NỘI DUNG CHÍNH -->
+    <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 relative overflow-y-auto">
+
+      <!-- Thanh công cụ Mobile -->
+      <div class="flex lg:hidden items-center justify-between mb-4 glass-card p-3 rounded-2xl shadow-sm">
+        <button type="button" onclick="toggleSidebar(true)" class="flex items-center gap-2 text-sm font-bold">
+          <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white">☰</span>
+          <span>Menu & Nhân Vật</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="switchMainView('calendar')" class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-400 text-xs font-bold">📅 Lịch 7.1</button>
+          <button type="button" onclick="toggleThemeMode()" class="p-1.5 rounded-lg bg-slate-800 text-white text-xs">🌓</button>
+        </div>
+      </div>
+
+      <!-- =============================================================== -->
+      <!-- VIEW 1: KHÔNG GIAN TÍCH ROLL NHÂN VẬT                           -->
+      <!-- =============================================================== -->
+      <div id="view-tracker">
+        <!-- HEADER TRÊN CÙNG -->
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 text-xs font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400 mb-1">
+              <span id="header-char-title">BĂNG THẦN • TSARITSA</span>
+              <span>•</span>
+              <span id="header-target-badge" class="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-600 dark:text-sky-300">MỤC TIÊU: C0R1</span>
+              <select id="weapon-type-select" onchange="changeWeaponType(this.value)" class="px-2.5 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs cursor-pointer">
+                <option value="Kiếm Đơn">⚔️ Kiếm Đơn</option>
+                <option value="Trọng Kiếm">🗡️ Trọng Kiếm</option>
+                <option value="Vũ Khí Cán Dài">🔱 Vũ Khí Cán Dài</option>
+                <option value="Pháp Khí">📖 Pháp Khí</option>
+                <option value="Cung">🏹 Cung</option>
+              </select>
+              <button type="button" onclick="toggleFavoriteCurrent()" id="header-fav-btn" class="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-400/30 text-amber-400 text-xs font-bold">☆ Yêu thích</button>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold flex items-center gap-2.5">
+              <span id="header-journey-title">Hành trình Tsaritsa</span>
+              <span id="header-element-icon" class="inline-flex w-7 h-7"></span>
+            </h2>
+            <p id="header-lore" class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-2xl"></p>
+          </div>
+
+          <div class="glass-card px-4 py-2.5 rounded-2xl text-right shadow-sm">
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center justify-end gap-1.5">
+              <span>📅</span>
+              <span id="clock-date">16/10/2026</span>
+            </div>
+            <div id="clock-time" class="text-xl font-extrabold tracking-tight">21:56:00</div>
+            <div class="text-[10px] text-slate-400">Giờ Việt Nam • UTC+7</div>
+          </div>
+        </div>
+
+        <!-- HÀNG 1: THẺ BANNER LỚN + CỘT MỐC & ƯỚC TÍNH CUNG MỆNH -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
+          <!-- Thẻ Banner Chính -->
+          <div id="hero-banner-card" class="xl:col-span-2 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl min-h-[250px] flex flex-col justify-between" style="background: linear-gradient(135deg, #0c192c 0%, #1e3a5f 60%, #2b5876 100%);">
+            <div class="absolute right-4 bottom-0 top-0 w-44 sm:w-56 pointer-events-none flex items-end justify-end opacity-95">
+              <div id="hero-char-illust" class="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl overflow-hidden border-2 border-white/25 shadow-2xl mb-5 bg-slate-800/60 flex items-center justify-center"></div>
+            </div>
+
+            <div class="relative z-10 max-w-lg">
+              <div class="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest text-sky-200 font-bold mb-2">
+                <span>✦ QUỸ ROLL NHÂN VẬT</span>
+                <button type="button" onclick="openCharModal('edit')" class="px-2 py-0.5 rounded bg-white/15 hover:bg-white/25 text-[10px] font-normal transition cursor-pointer">🖼️ Đổi Avatar / Sửa NV</button>
               </div>
-              <div class="pt-1.5 border-t border-slate-800 grid grid-cols-2 gap-2 text-[11px]">
-                <div>
-                  <label class="text-slate-400 block">Pity NV đã tích:</label>
-                  <input id="char-pity-input" type="number" min="0" max="89" value="0" onchange="window.updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold" />
-                </div>
-                <div>
-                  <label class="text-slate-400 block">Trạng thái 50/50:</label>
-                  <select id="guaranteed-select" onchange="window.updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold">
-                    <option value="false">Chưa bảo hiểm</option>
-                    <option value="true">Có bảo hiểm 100%</option>
-                  </select>
-                </div>
+
+              <!-- Ô nhập trực tiếp + Nút cộng trừ nhanh không bao giờ bị reset -->
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <span class="text-3xl text-sky-300">✦</span>
+                <input id="direct-current-rolls" type="number" min="0"
+                       oninput="handleDirectRollInput(this.value)"
+                       onchange="commitDirectRollInput(this.value)"
+                       class="w-28 sm:w-36 bg-white/10 hover:bg-white/15 focus:bg-slate-900/80 px-2 py-0.5 rounded-xl border border-white/30 focus:border-sky-300 text-4xl sm:text-5xl font-extrabold text-white focus:outline-none transition" />
+                <span class="text-2xl text-slate-300 font-semibold">/</span>
+                <input id="direct-target-rolls" type="number" min="1"
+                       onchange="commitDirectTargetInput(this.value)"
+                       class="w-24 bg-white/10 hover:bg-white/15 focus:bg-slate-900/80 px-2 py-0.5 rounded-xl border border-white/20 focus:border-sky-300 text-2xl font-bold text-sky-200 focus:outline-none transition" />
+                <span class="text-sm text-slate-200 font-medium">roll</span>
+              </div>
+
+              <!-- Nút Cộng / Trừ nhanh 1 chạm -->
+              <div class="flex flex-wrap items-center gap-1.5 mt-3">
+                <button type="button" onclick="quickAdjustRolls(-10)" class="px-2.5 py-1 rounded-lg bg-rose-500/30 hover:bg-rose-500/50 border border-rose-300/30 text-xs font-bold">-10</button>
+                <button type="button" onclick="quickAdjustRolls(-1)" class="px-2.5 py-1 rounded-lg bg-rose-500/30 hover:bg-rose-500/50 border border-rose-300/30 text-xs font-bold">-1</button>
+                <button type="button" onclick="quickAdjustRolls(1)" class="px-2.5 py-1 rounded-lg bg-emerald-500/30 hover:bg-emerald-500/50 border border-emerald-300/30 text-xs font-bold">+1 Roll</button>
+                <button type="button" onclick="quickAdjustRolls(5)" class="px-2.5 py-1 rounded-lg bg-emerald-500/30 hover:bg-emerald-500/50 border border-emerald-300/30 text-xs font-bold">+5 Roll</button>
+                <button type="button" onclick="quickAdjustRolls(10)" class="px-2.5 py-1 rounded-lg bg-sky-500/40 hover:bg-sky-500/60 border border-sky-300/30 text-xs font-bold">+10 Roll</button>
+              </div>
+
+              <p id="hero-progress-text" class="text-xs sm:text-sm text-slate-200 mt-2.5 font-medium">
+                Đã đi được 43% chặng đường. Mỗi roll đều có ý nghĩa.
+              </p>
+
+              <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-slate-950/50 border border-white/15 text-xs text-sky-200 mt-2">
+                <span>✦ Tương đương <strong id="hero-primogems" class="text-white">13.760</strong> Nguyên Thạch</span>
+                <span id="hero-extra-primos" class="text-amber-300 font-bold"></span>
+              </div>
+            </div>
+
+            <div class="relative z-10 mt-5">
+              <div class="h-3 w-full rounded-full bg-slate-950/50 overflow-hidden p-0.5">
+                <div id="hero-progress-bar" class="h-full rounded-full bg-gradient-to-r from-sky-300 via-cyan-300 to-white transition-all duration-300" style="width: 43%"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-300 mt-1.5">
+                <span>0 roll</span>
+                <span id="hero-mid-label">100 roll</span>
+                <span id="hero-max-label">200 roll</span>
               </div>
             </div>
           </div>
 
-          <div class="mt-3 pt-2 border-t border-slate-200/70">
-            <p class="text-[11px] font-bold text-slate-500 mb-1.5">Đặt nhanh mục tiêu tích roll:</p>
-            <div class="flex flex-wrap gap-1.5">
-              <button type="button" onclick="window.setQuickGoal('C0R0', 90)" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C0 (90)</button>
-              <button type="button" onclick="window.setQuickGoal('C0R1', 160)" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C0R1 (160)</button>
-              <button type="button" onclick="window.setQuickGoal('C1R1', 250)" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C1R1 (250)</button>
-              <button type="button" onclick="window.setQuickGoal('C2R1', 340)" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C2R1 (340)</button>
-              <button type="button" onclick="window.setQuickGoal('C6R1', 720)" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C6R1 (720)</button>
+          <!-- Thẻ Cột Mốc & Máy Tính Cung Mệnh -->
+          <div class="glass-card rounded-3xl p-5 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">
+                <span>🚩 CỘT MỐC & ƯỚC TÍNH CUNG MỆNH</span>
+                <span class="text-sky-500">Tự động</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="next-milestone-num" class="text-4xl font-extrabold">100</span>
+                <span class="text-sm font-semibold text-slate-500">roll (mốc kế tiếp)</span>
+              </div>
+              <p id="next-milestone-diff" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Chỉ còn 14 roll nữa để chạm mốc này.</p>
+
+              <div class="mt-3 p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-white space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-400">Dự kiến đạt (Kỳ vọng 55/45):</span>
+                  <span id="calc-expected-cr" class="px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 font-extrabold text-sm">C0 R0</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-400">Đảm bảo 100% (Bảo hiểm):</span>
+                  <span id="calc-guaranteed-cr" class="font-bold text-emerald-400">Chưa đủ Pity 90</span>
+                </div>
+                <div class="pt-2 border-t border-slate-800 grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <label class="text-slate-400 block">Pity NV đã tích:</label>
+                    <input id="char-pity-input" type="number" min="0" max="89" value="0" onchange="updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold" />
+                  </div>
+                  <div>
+                    <label class="text-slate-400 block">Trạng thái 50/50:</label>
+                    <select id="guaranteed-select" onchange="updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold">
+                      <option value="false">Chưa bảo hiểm</option>
+                      <option value="true">Có bảo hiểm 100%</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <p class="text-[11px] font-bold text-slate-500 mb-1.5">Đặt nhanh mục tiêu tích roll:</p>
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="setQuickGoal('C0R0', 90)" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C0 (90)</button>
+                <button type="button" onclick="setQuickGoal('C0R1', 160)" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C0R1 (160)</button>
+                <button type="button" onclick="setQuickGoal('C1R1', 250)" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C1R1 (250)</button>
+                <button type="button" onclick="setQuickGoal('C2R1', 340)" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C2R1 (340)</button>
+                <button type="button" onclick="setQuickGoal('C6R1', 720)" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C6R1 (720)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HÀNG 2: 4 THẺ CHỈ SỐ -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+          <div class="glass-card rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between text-xs text-slate-500 font-semibold"><span>Còn thiếu</span><span>✦</span></div>
+            <div class="text-2xl sm:text-3xl font-extrabold mt-1"><span id="stat-remaining">114</span> <span class="text-xs font-normal text-slate-500">roll</span></div>
+            <p id="stat-remaining-sub" class="text-[11px] text-slate-500 mt-1">Để đạt mục tiêu 200 roll</p>
+          </div>
+          <div class="glass-card rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between text-xs text-slate-500 font-semibold"><span>Tăng từ mốc trước</span><span>📈</span></div>
+            <div id="stat-last-diff" class="text-2xl sm:text-3xl font-extrabold text-emerald-500 mt-1">+5 <span class="text-xs font-normal text-slate-500">roll</span></div>
+            <p id="stat-last-info" class="text-[11px] text-slate-500 mt-1">Cập nhật gần nhất</p>
+          </div>
+          <div class="glass-card rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between text-xs text-slate-500 font-semibold"><span>KPI mỗi ngày</span><span class="text-sky-500">Mục tiêu</span></div>
+            <div class="flex items-baseline gap-1 mt-1">
+              <input id="kpi-input" type="number" min="1" max="100" value="5" onchange="updateKpi(this.value)" class="w-16 text-2xl sm:text-3xl font-extrabold bg-transparent border-b border-slate-400 focus:outline-none" />
+              <span class="text-xs text-slate-500">roll / ngày</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-1">Bấm vào số để sửa KPI</p>
+          </div>
+          <div class="glass-card rounded-2xl p-4 shadow-sm">
+            <div class="flex justify-between text-xs text-slate-500 font-semibold"><span>Dự kiến đạt mục tiêu</span><span>📅</span></div>
+            <div id="stat-eta-date" class="text-2xl sm:text-3xl font-extrabold mt-1">08/11/2026</div>
+            <p id="stat-eta-days" class="text-[11px] text-slate-500 mt-1">Theo KPI hiện tại</p>
+          </div>
+        </div>
+
+        <!-- HÀNG 3: CẬP NHẬT QUỸ ROLL & LỊCH SỬ PAIMON -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-2 space-y-5">
+            <div class="glass-card rounded-3xl p-5 shadow-sm">
+              <h3 class="text-base font-extrabold mb-1">➕ Thêm một bước tiến</h3>
+              <p class="text-xs text-slate-500 mb-3">Nhập Tổng số roll mới hoặc số roll cộng thêm hôm nay:</p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="text-xs font-bold text-slate-500 block mb-1">Đặt Tổng roll mới</label>
+                  <input id="form-total-rolls" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-bold" placeholder="VD: 90" />
+                </div>
+                <div>
+                  <label class="text-xs font-bold text-slate-500 block mb-1">Hoặc Cộng thêm (+ roll)</label>
+                  <input id="form-add-rolls" type="number" class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-bold text-emerald-500" placeholder="VD: 5" />
+                </div>
+                <div>
+                  <label class="text-xs font-bold text-slate-500 block mb-1">Ghi chú</label>
+                  <input id="form-note" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm" placeholder="VD: Daily + Sự kiện" />
+                </div>
+              </div>
+              <div class="mt-3 flex justify-end">
+                <button type="button" onclick="saveRollProgress()" class="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-md transition cursor-pointer">
+                  ✦ Cập nhật quỹ & Lưu lịch sử
+                </button>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <img src="[https://api.ambr.top/assets/UI/UI_EmotionIcon1.png](https://api.ambr.top/assets/UI/UI_EmotionIcon1.png)" referrerpolicy="no-referrer" class="w-8 h-8 object-contain" onerror="this.style.display='none'" />
+                  <div>
+                    <h3 class="text-sm font-extrabold">Nhật Ký Đồng Hành Cùng Paimon</h3>
+                    <p class="text-[11px] text-slate-500">Mọi lần nhận Nguyên Thạch từ Lịch sự kiện hay nhập tay đều lưu tại đây</p>
+                  </div>
+                </div>
+              </div>
+              <div id="history-list" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+            </div>
+          </div>
+
+          <!-- Cột phải: Truy cập nhanh Khiêu chiến Tháng -->
+          <div class="space-y-5">
+            <div class="glass-card rounded-3xl p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-extrabold">🌙 Khiêu Chiến Định Kỳ</h3>
+                <button type="button" onclick="switchMainView('calendar')" class="text-xs text-sky-400 hover:underline font-bold">Mở Chi Tiết Lịch ➔</button>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Đi xong chế độ nào bấm 1 phát để cộng thẳng Nguyên Thạch (quy đổi ra Roll) vào quỹ của nhân vật đang chọn:</p>
+              <div id="mini-endgame-box" class="space-y-2.5"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- HÀNG 2: 4 THẺ CHỈ SỐ THỐNG KÊ NHANH -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        <div class="glass-card rounded-2xl p-4 shadow-sm">
-          <div class="flex justify-between text-xs text-slate-500 font-semibold">
-            <span>Còn thiếu</span><span>✦</span>
-          </div>
-          <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1"><span id="stat-remaining">114</span> <span class="text-xs font-normal text-slate-500">roll</span></div>
-          <p id="stat-remaining-sub" class="text-[11px] text-slate-500 mt-1">Để đạt mục tiêu 200 roll</p>
-        </div>
-
-        <div class="glass-card rounded-2xl p-4 shadow-sm">
-          <div class="flex justify-between text-xs text-slate-500 font-semibold">
-            <span>Tăng từ mốc trước</span><span>📈</span>
-          </div>
-          <div id="stat-last-diff" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">+5 <span class="text-xs font-normal text-slate-500">roll</span></div>
-          <p id="stat-last-info" class="text-[11px] text-slate-500 mt-1">Cập nhật gần nhất</p>
-        </div>
-
-        <div class="glass-card rounded-2xl p-4 shadow-sm">
-          <div class="flex justify-between text-xs text-slate-500 font-semibold">
-            <span>KPI mỗi ngày</span><span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 text-[10px]">Mục tiêu</span>
-          </div>
-          <div class="flex items-baseline gap-1 mt-1">
-            <input id="kpi-input" type="number" min="1" max="100" value="5" onchange="window.updateKpi(this.value)" class="w-16 text-2xl sm:text-3xl font-extrabold text-slate-900 bg-transparent border-b border-slate-300 focus:outline-none" />
-            <span class="text-xs text-slate-500">roll / ngày</span>
-          </div>
-          <p class="text-[11px] text-slate-500 mt-1">Bấm vào số để đổi KPI</p>
-        </div>
-
-        <div class="glass-card rounded-2xl p-4 shadow-sm">
-          <div class="flex justify-between text-xs text-slate-500 font-semibold">
-            <span>Dự kiến đạt mục tiêu</span><span>📅</span>
-          </div>
-          <div id="stat-eta-date" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">08/11/2026</div>
-          <p id="stat-eta-days" class="text-[11px] text-slate-500 mt-1">Còn 23 ngày • Theo KPI 5 roll/ngày</p>
-        </div>
-      </div>
-
-      <!-- HÀNG 3: CẬP NHẬT BƯỚC TIẾN + LỊCH SỬ & SHOWCASE UID -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        
-        <div class="lg:col-span-2 space-y-5">
-          <div class="glass-card rounded-3xl p-5 shadow-sm">
-            <div class="flex items-center justify-between mb-3">
+      <!-- =============================================================== -->
+      <!-- VIEW 2: CHI TIẾT LỊCH SỰ KIỆN CHUẨN HOYOLAB (7.1)               -->
+      <!-- =============================================================== -->
+      <div id="view-calendar" class="hidden">
+        <div class="max-w-4xl mx-auto hoyolab-panel rounded-3xl p-5 sm:p-8 text-white">
+          <!-- Thanh tiêu đề Chi Tiết Lịch -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-white/10">
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="switchMainView('tracker')" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm font-bold">←</button>
               <div>
-                <h3 class="text-base font-extrabold text-slate-900">➕ Thêm một bước tiến</h3>
-                <p class="text-xs text-slate-500">Ghi lại quỹ roll của bạn hôm nay (có thể nhập Tổng roll mới hoặc Cộng thêm).</p>
+                <h2 class="text-lg sm:text-xl font-extrabold flex items-center gap-2">
+                  <span>Chi Tiết Lịch</span>
+                  <span class="px-2 py-0.5 rounded bg-rose-500/80 text-xs font-extrabold">7.1</span>
+                </h2>
+                <p class="text-xs text-slate-400">Bấm vào nút Nhận Nguyên Thạch ở từng sự kiện để tự động cộng Roll cho <strong id="cal-target-char-name" class="text-sky-400">Tsaritsa</strong></p>
               </div>
             </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label class="text-xs font-bold text-slate-600 block mb-1">Tổng roll hiện có</label>
-                <input id="form-total-rolls" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-sm font-bold text-slate-900 focus:outline-none focus:border-sky-500" placeholder="VD: 90" />
-              </div>
-              <div>
-                <label class="text-xs font-bold text-slate-600 block mb-1">Hoặc cộng thêm (+ roll)</label>
-                <input id="form-add-rolls" type="number" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-sm font-bold text-emerald-700 focus:outline-none focus:border-emerald-500" placeholder="VD: +5" />
-              </div>
-              <div>
-                <label class="text-xs font-bold text-slate-600 block mb-1">Ghi chú (La Hoàn, Sự kiện...)</label>
-                <input id="form-note" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-sm text-slate-800 focus:outline-none focus:border-sky-500" placeholder="VD: Quét map + Daily" />
-              </div>
-            </div>
-
-            <div class="mt-3 flex justify-end">
-              <button type="button" onclick="window.saveRollProgress()" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md transition">
-                ✦ Cập nhật quỹ & Lưu lịch sử
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="resetMonthlyEndgame()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-amber-300 text-xs font-bold cursor-pointer">
+                🔄 Reset Kỳ Mới (Tháng mới)
               </button>
             </div>
           </div>
 
-          <div class="glass-card rounded-3xl p-5 shadow-sm">
+          <!-- PHẦN 1: SỰ KIỆN CẦU NGUYỆN -->
+          <div class="mb-8">
+            <div class="flex items-center gap-2 text-sm font-bold text-amber-200 mb-3">
+              <span>✦ Sự Kiện Cầu Nguyện</span>
+              <span class="px-1.5 py-0.5 rounded bg-rose-500/80 text-[10px] text-white">7.1</span>
+            </div>
+
+            <!-- Tabs Nhân Vật / Vũ Khí -->
+            <div class="grid grid-cols-2 bg-slate-950/60 p-1 rounded-full mb-4 max-w-md border border-white/10 text-xs font-bold">
+              <button type="button" id="wish-tab-char" onclick="switchWishTab('char')" class="py-2 rounded-full bg-[#fdf6e9] text-slate-900 transition">Nhân Vật</button>
+              <button type="button" id="wish-tab-weapon" onclick="switchWishTab('weapon')" class="py-2 rounded-full text-slate-400 hover:text-white transition">Vũ Khí</button>
+            </div>
+
+            <div id="wish-banners-container" class="space-y-3"></div>
+          </div>
+
+          <!-- PHẦN 2: KHIÊU CHIẾN ĐỊNH KỲ (LA HOÀN, NHÀ HÁT, ẢO CẢNH) -->
+          <div class="mb-8">
             <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-2">
-                <span class="text-xl">🧚‍♀️</span>
-                <div>
-                  <h3 class="text-sm font-extrabold text-slate-900">Nhật Ký Đồng Hành Cùng Paimon</h3>
-                  <p class="text-[11px] text-slate-500">Lịch sử cập nhật quỹ roll của riêng nhân vật này</p>
-                </div>
-              </div>
+              <span class="text-sm font-bold text-amber-200">✦ Khiêu Chiến Định Kỳ (Reset Hàng Tháng)</span>
+              <span class="text-xs text-slate-400">160 Nguyên Thạch = 1 Roll (Số NT lẻ được bảo lưu tự động)</span>
             </div>
-            <div id="history-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1"></div>
+            <div id="calendar-endgame-list" class="space-y-3"></div>
+          </div>
+
+          <!-- PHẦN 3: TỔNG QUAN SỰ KIỆN TRONG PHIÊN BẢN -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm font-bold text-amber-200">✦ Tổng Quan Sự Kiện</span>
+              <button type="button" onclick="promptAddCustomEvent()" class="px-3 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/30 text-sky-300 text-xs font-bold">➕ Thêm sự kiện mới</button>
+            </div>
+            <div id="calendar-events-list" class="space-y-3"></div>
           </div>
         </div>
-
-        <div class="space-y-5">
-          <div class="glass-card rounded-3xl p-5 shadow-sm">
-            <h3 class="text-sm font-extrabold text-slate-900 mb-1">🎯 Nhịp tích lũy của <span id="rhythm-user-name">Yorrn</span></h3>
-            <p class="text-xs text-slate-500 mb-3">Giữ nhịp nhỏ, chạm mục tiêu lớn</p>
-            <div class="p-3.5 rounded-2xl bg-sky-50 border border-sky-200/80 mb-3">
-              <span class="text-xs text-sky-900 font-semibold">✦ Tốc độ hiện tại: <strong id="rhythm-kpi">5</strong> roll / ngày</span>
-            </div>
-            <div class="space-y-2 text-xs text-slate-600">
-              <p>⏳ <strong id="rhythm-days-left">23 ngày nữa</strong> là đủ quỹ mục tiêu.</p>
-              <p>📌 Hẹn mốc <strong id="rhythm-eta">08/11/2026</strong> đón nhân vật về đội!</p>
-            </div>
-          </div>
-
-          <div class="glass-card rounded-3xl p-5 shadow-sm">
-            <div class="flex items-center justify-between mb-2">
-              <h3 class="text-sm font-extrabold text-slate-900">🛡️ Tủ Trưng Bày In-Game (UID)</h3>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">Enka API</span>
-            </div>
-            <p class="text-[11px] text-slate-500 mb-3">Nhập UID ở góc trái dưới để xem thông tin hồ sơ Genshin của bạn.</p>
-            <div id="uid-showcase-list" class="space-y-2 text-xs text-slate-600">
-              <div class="p-3 rounded-xl bg-slate-100 text-slate-500 text-center">Chưa đồng bộ UID.</div>
-            </div>
-          </div>
-        </div>
-
       </div>
+
     </main>
   </div>
 
   <script>
     // =========================================================================
-    // 1. BỘ LƯU TRỮ AN TOÀN (KHÔNG BAO GIỜ BỊ LỖI TRÊN ĐIỆN THOẠI)
+    // 1. ICON NGUYÊN TỐ CHÍNH THỨC TRONG GAME (CDN + VECTOR FALLBACK)
     // =========================================================================
-    const memoryFallback = {};
-    function safeGetItem(key) {
-      try {
-        return localStorage.getItem(key) || memoryFallback[key] || null;
-      } catch (e) {
-        return memoryFallback[key] || null;
+    const ELEMENT_CONFIG = {
+      All: {
+        label: 'Tất cả',
+        iconUrl: '[https://api.ambr.top/assets/UI/UI_Icon_Item_Primogem.png](https://api.ambr.top/assets/UI/UI_Icon_Item_Primogem.png)',
+        color: '#38bdf8'
+      },
+      Cryo: {
+        label: 'Băng',
+        iconUrl: '[https://rerollcdn.com/GENSHIN/Elements/Element_Cryo.png](https://rerollcdn.com/GENSHIN/Elements/Element_Cryo.png)',
+        color: '#38bdf8',
+        bg: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)',
+        hero: 'linear-gradient(135deg, #0b1c31 0%, #1d3b5c 60%, #2a5d84 100%)',
+        particle: '❄️'
+      },
+      Pyro: {
+        label: 'Hỏa',
+        iconUrl: '[https://rerollcdn.com/GENSHIN/Elements/Element_Pyro.png](https://rerollcdn.com/GENSHIN/Elements/Element_Pyro.png)',
+        color: '#f97316',
+        bg: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%)',
+        hero: 'linear-gradient(135deg, #3b0d0c 0%, #7c1d18 60%, #b43c25 100%)',
+        particle: '🔥'
+      },
+      Hydro: {
+        label: 'Thủy',
+        iconUrl: '[https://rerollcdn.com/GENSHIN/Elements/Element_Hydro.png](https://rerollcdn.com/GENSHIN/Elements/Element_Hydro.png)',
+        color: '#0ea5e9',
+        bg: 'linear-gradient(135deg, #e0e7ff 0%, #bae6fd 100%)',
+        hero: 'linear-gradient(135deg, #091534 0%, #16336b 60%, #1f5f99 100%)',
+        particle: '💧'
+      },
+      Dendro: {
+        label: 'Thảo',
+        iconUrl: '[https://rerollcdn.com/GENSHIN/Elements/Element_Dendro.png](https://rerollcdn.com/GENSHIN/Elements/Element_Dendro.png)',
+        color: '#22c55e',
+        bg: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+        hero: 'linear-gradient(135deg, #092618 0%, #174e32 60%, #247549 100%)',
+        particle: '🌿'
+      },
+      Electro: {
+        label: 'Lôi',
+        iconUrl: '[https://rerollcdn.com/GENSHIN/Elements/Element_Electro.png](https://rerollcdn.com/GENSHIN/Elements/Element_Electro.png)',
+        color: '#a855f7',
+        bg: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%)',
+        hero: 'linear-gradient(135deg, #210d3b 0%, #441c75 60%, #662ca6 100%)',
+        particle: '⚡'
+      },
+      Anemo: {
+        label: 'Phong',
+        iconUrl: '[https://rerollcdn.com/GENSHIN/Elements/Element_Anemo.png](https://rerollcdn.com/GENSHIN/Elements/Element_Anemo.png)',
+        color: '#14b8a6',
+        bg: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)',
+        hero: 'linear-gradient(135deg, #082927 0%, #14544f 60%, #1f7a73 100%)',
+        particle: '🍃'
+      },
+      Geo: {
+        label: 'Nham',
+        iconUrl: '[https://rerollcdn.com/GENSHIN/Elements/Element_Geo.png](https://rerollcdn.com/GENSHIN/Elements/Element_Geo.png)',
+        color: '#eab308',
+        bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+        hero: 'linear-gradient(135deg, #2b1d07 0%, #5c3f11 60%, #8a621c 100%)',
+        particle: '🪨'
       }
-    }
-    function safeSetItem(key, val) {
-      memoryFallback[key] = val;
-      try {
-        localStorage.setItem(key, val);
-      } catch (e) {}
-    }
-    function safeRemoveItem(key) {
-      delete memoryFallback[key];
-      try {
-        localStorage.removeItem(key);
-      } catch (e) {}
+    };
+
+    function getElementIconHTML(elementKey, sizeClass = 'w-5 h-5') {
+      const cfg = ELEMENT_CONFIG[elementKey] || ELEMENT_CONFIG.Cryo;
+      return `<img src="${cfg.iconUrl}" referrerpolicy="no-referrer" alt="${cfg.label}" class="${sizeClass} object-contain inline-block" onerror="this.outerHTML='<span style=\\'color:${cfg.color}\\'>✦</span>'" />`;
     }
 
     // =========================================================================
-    // 2. DANH SÁCH TOÀN BỘ NHÂN VẬT 5 SAO
+    // 2. DANH SÁCH NHÂN VẬT 5 SAO MẶC ĐỊNH
     // =========================================================================
-    const CHARACTERS = [
-      // BĂNG (CRYO)
+    const DEFAULT_CHARACTERS = [
+      // CRYO
       { id: 'tsaritsa', name: 'Tsaritsa', title: 'Băng Thần • Snezhnaya', element: 'Cryo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'Queen', lore: 'Nữ hoàng Băng giá trị vì Snezhnaya. Mọi quân cờ Fatui đều hướng về ngài.' },
       { id: 'skirk', name: 'Skirk', title: 'Kiếm Khách Vực Sâu', element: 'Cryo', region: 'Vực Sâu', weapon: 'Kiếm Đơn', icon: 'Skirk', lore: 'Sư phụ của Tartaglia, nữ kiếm khách bí ẩn sống nơi Vực Sâu.' },
-      { id: 'citlali', name: 'Citlali', title: 'Bà Ngoại Itztli • Natlan', element: 'Cryo', region: 'Natlan', weapon: 'Pháp Khí', icon: 'Citlali', lore: 'Đại pháp sư bộ tộc Chủ Nhân Gió Đêm tại Natlan.' },
       { id: 'escoffier', name: 'Escoffier', title: 'Đầu Bếp Fontaine', element: 'Cryo', region: 'Fontaine', weapon: 'Vũ Khí Cán Dài', icon: 'Escoffier', lore: 'Bậc thầy ẩm thực trứ danh đến từ Fontaine.' },
+      { id: 'citlali', name: 'Citlali', title: 'Bà Ngoại Itztli • Natlan', element: 'Cryo', region: 'Natlan', weapon: 'Pháp Khí', icon: 'Citlali', lore: 'Đại pháp sư bộ tộc Chủ Nhân Gió Đêm tại Natlan.' },
       { id: 'sandrone', name: 'Sandrone', title: 'Quan Chấp Hành • Marionette', element: 'Cryo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'Sandrone', lore: 'Quan Chấp Hành thứ 7 của Fatui, bậc thầy cơ khí và rối tự động.' },
-      { id: 'odette', name: 'Odette', title: 'Hồ Thiên Nga Băng Giá', element: 'Cryo', region: 'Snezhnaya', weapon: 'Kiếm Đơn', icon: 'Odette', lore: 'Tinh linh băng giá mang vẻ đẹp thanh khiết.' },
-      { id: 'lohen', name: 'Lohen', title: 'Kỵ Sĩ Băng Sương', element: 'Cryo', region: 'Mondstadt', weapon: 'Trọng Kiếm', icon: 'Lohen', lore: 'Chiến binh phương bắc mang sức mạnh băng giá.' },
-      { id: 'wriothesley', name: 'Wriothesley', title: 'Công Tước Pháo Đài Meropide', element: 'Cryo', region: 'Fontaine', weapon: 'Pháp Khí', icon: 'Wriothesley', lore: 'Chúa tể tối cao cai quản Pháo Đài Meropide dưới đáy biển Fontaine.' },
+      { id: 'wriothesley', name: 'Wriothesley', title: 'Công Tước Meropide', element: 'Cryo', region: 'Fontaine', weapon: 'Pháp Khí', icon: 'Wriothesley', lore: 'Chúa tể tối cao cai quản Pháo Đài Meropide.' },
       { id: 'ayaka', name: 'Kamisato Ayaka', title: 'Bạch Hạc Sương Hoa', element: 'Cryo', region: 'Inazuma', weapon: 'Kiếm Đơn', icon: 'Ayaka', lore: 'Đại tiểu thư nhà Kamisato thuộc Hiệp Hội Yashiro.' },
       { id: 'shenhe', name: 'Shenhe', title: 'Cô Thần Độc Lữ', element: 'Cryo', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'Shenhe', lore: 'Đệ tử chân truyền của Lưu Vân Tá Phong Chân Quân.' },
       { id: 'ganyu', name: 'Ganyu', title: 'Người Bảo Vệ Tận Tâm', element: 'Cryo', region: 'Liyue', weapon: 'Cung', icon: 'Ganyu', lore: 'Tổng thư ký Nguyệt Hải Đình mang dòng máu Kỳ Lân.' },
       { id: 'eula', name: 'Eula', title: 'Vũ Điệu Bọt Biển', element: 'Cryo', region: 'Mondstadt', weapon: 'Trọng Kiếm', icon: 'Eula', lore: 'Đội trưởng Đội Du Kích thuộc Đội Kỵ Sĩ Tây Phong.' },
-
-      // HỎA (PYRO)
-      { id: 'mavuika', name: 'Mavuika', title: 'Hỏa Thần • Haborym', element: 'Pyro', region: 'Natlan', weapon: 'Trọng Kiếm', icon: 'Mavuika', lore: 'Vị Hỏa Thần rực cháy dẫn dắt 6 bộ tộc Natlan vượt qua Vực Sâu.' },
+      // PYRO
+      { id: 'mavuika', name: 'Mavuika', title: 'Hỏa Thần • Haborym', element: 'Pyro', region: 'Natlan', weapon: 'Trọng Kiếm', icon: 'Mavuika', lore: 'Vị Hỏa Thần rực cháy dẫn dắt 6 bộ tộc Natlan.' },
       { id: 'arlecchino', name: 'Arlecchino', title: 'Quan Chấp Hành • The Knave', element: 'Pyro', region: 'Snezhnaya', weapon: 'Vũ Khí Cán Dài', icon: 'Arlecchino', lore: 'Cha của Căn Nhà Hơi Ấm, Quan Chấp Hành thứ 4 của Fatui.' },
-      { id: 'nicole', name: 'Nicole', title: 'Hội Ma Nữ Hexenzirkel • N', element: 'Pyro', region: 'Mondstadt', weapon: 'Pháp Khí', icon: 'Nicole', lore: 'Thành viên bí ẩn mang mật danh N của Hội Ma Nữ Hexenzirkel.' },
-      { id: 'durin', name: 'Durin', title: 'Trái Tim Rồng Tái Sinh', element: 'Pyro', region: 'Mondstadt', weapon: 'Kiếm Đơn', icon: 'Durin', lore: 'Hậu duệ rồng mang sức mạnh giả kim thuật từ Rhinedottir.' },
+      { id: 'nicole', name: 'Nicole', title: 'Hội Ma Nữ Hexenzirkel • N', element: 'Pyro', region: 'Mondstadt', weapon: 'Pháp Khí', icon: 'Nicole', lore: 'Thành viên bí ẩn mang mật danh N của Hội Ma Nữ.' },
+      { id: 'durin', name: 'Durin', title: 'Trái Tim Rồng Tái Sinh', element: 'Pyro', region: 'Mondstadt', weapon: 'Kiếm Đơn', icon: 'Durin', lore: 'Hậu duệ rồng mang sức mạnh giả kim thuật.' },
       { id: 'lyney', name: 'Lyney', title: 'Ảo Thuật Gia Tuyệt Đỉnh', element: 'Pyro', region: 'Fontaine', weapon: 'Cung', icon: 'Liney', lore: 'Đại ảo thuật gia lừng danh của Đại Viện Kịch Epiclese.' },
-      { id: 'hutao', name: 'Hu Tao', title: 'Đường Chủ Vãng Sinh Đường', element: 'Pyro', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'Hutao', lore: 'Đường chủ đời thứ 77 của Vãng Sinh Đường tại cảng Liyue.' },
-      { id: 'yoimiya', name: 'Yoimiya', title: 'Vũ Điệu Bão Lửa', element: 'Pyro', region: 'Inazuma', weapon: 'Cung', icon: 'Yoimiya', lore: 'Chủ tiệm pháo hoa Naganohara mang nụ cười rực rỡ.' },
-      { id: 'klee', name: 'Klee', title: 'Mặt Trời Chạy Trốn', element: 'Pyro', region: 'Mondstadt', weapon: 'Pháp Khí', icon: 'Klee', lore: 'Kỵ Sĩ Tia Lửa của Đội Kỵ Sĩ Tây Phong, con gái của Alice.' },
-
-      // THỦY (HYDRO)
-      { id: 'furina', name: 'Furina', title: 'Ngôi Sao Vĩnh Cửu Fontaine', element: 'Hydro', region: 'Fontaine', weapon: 'Kiếm Đơn', icon: 'Furina', lore: 'Tâm điểm của sân khấu Fontaine, người đã hy sinh 500 năm vì vận mệnh quốc gia.' },
-      { id: 'neuvillette', name: 'Neuvillette', title: 'Thẩm Phán Tối Cao • Thủy Long', element: 'Hydro', region: 'Fontaine', weapon: 'Pháp Khí', icon: 'Neuvillette', lore: 'Thủy Long Vương cổ đại nắm giữ trọn vẹn Quyền Năng Thủy.' },
+      { id: 'hutao', name: 'Hu Tao', title: 'Đường Chủ Vãng Sinh Đường', element: 'Pyro', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'Hutao', lore: 'Đường chủ đời thứ 77 của Vãng Sinh Đường.' },
+      { id: 'yoimiya', name: 'Yoimiya', title: 'Vũ Điệu Bão Lửa', element: 'Pyro', region: 'Inazuma', weapon: 'Cung', icon: 'Yoimiya', lore: 'Chủ tiệm pháo hoa Naganohara.' },
+      { id: 'klee', name: 'Klee', title: 'Mặt Trời Chạy Trốn', element: 'Pyro', region: 'Mondstadt', weapon: 'Pháp Khí', icon: 'Klee', lore: 'Kỵ Sĩ Tia Lửa của Đội Kỵ Sĩ Tây Phong.' },
+      // HYDRO
+      { id: 'furina', name: 'Furina', title: 'Ngôi Sao Vĩnh Cửu Fontaine', element: 'Hydro', region: 'Fontaine', weapon: 'Kiếm Đơn', icon: 'Furina', lore: 'Tâm điểm của sân khấu Fontaine.' },
+      { id: 'neuvillette', name: 'Neuvillette', title: 'Thẩm Phán Tối Cao • Thủy Long', element: 'Hydro', region: 'Fontaine', weapon: 'Pháp Khí', icon: 'Neuvillette', lore: 'Thủy Long Vương cổ đại nắm giữ Quyền Năng Thủy.' },
       { id: 'columbina', name: 'Columbina', title: 'Quan Chấp Hành • Damselette', element: 'Hydro', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'Columbina', lore: 'Thiếu Nữ đứng vị trí thứ 3 trong Quan Chấp Hành Fatui.' },
-      { id: 'vodyanitsa', name: 'Vodyanitsa', title: 'Thánh Nữ Thủy Triều', element: 'Hydro', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'Vodyanitsa', lore: 'Người canh giữ dòng nước băng giá phương bắc.' },
-      { id: 'mualani', name: 'Mualani', title: 'Người Đuổi Sóng • Natlan', element: 'Hydro', region: 'Natlan', weapon: 'Pháp Khí', icon: 'Mualani', lore: 'Hướng dẫn viên lướt sóng năng động của Cư Dân Suối Nước.' },
-      { id: 'sigewinne', name: 'Sigewinne', title: 'Y Tá Trưởng Meropide', element: 'Hydro', region: 'Fontaine', weapon: 'Cung', icon: 'Sigewinne', lore: 'Melusine nhân hậu chăm sóc sức khỏe cho toàn Pháo Đài Meropide.' },
+      { id: 'mualani', name: 'Mualani', title: 'Người Đuổi Sóng • Natlan', element: 'Hydro', region: 'Natlan', weapon: 'Pháp Khí', icon: 'Mualani', lore: 'Hướng dẫn viên lướt sóng của Cư Dân Suối Nước.' },
+      { id: 'sigewinne', name: 'Sigewinne', title: 'Y Tá Trưởng Meropide', element: 'Hydro', region: 'Fontaine', weapon: 'Cung', icon: 'Sigewinne', lore: 'Melusine nhân hậu của Pháo Đài Meropide.' },
       { id: 'yelan', name: 'Yelan', title: 'Lan Sinh U Cốc', element: 'Hydro', region: 'Liyue', weapon: 'Cung', icon: 'Yelan', lore: 'Người nắm giữ mạng lưới tình báo bí mật tại Liyue.' },
-      { id: 'nilou', name: 'Nilou', title: 'Vũ Điệu Ánh Sen', element: 'Hydro', region: 'Sumeru', weapon: 'Kiếm Đơn', icon: 'Nilou', lore: 'Vũ công tỏa sáng của Nhà Hát Zubayr tại Sumeru.' },
-      { id: 'tartaglia', name: 'Tartaglia', title: 'Quan Chấp Hành • Childe', element: 'Hydro', region: 'Snezhnaya', weapon: 'Cung', icon: 'Tartaglia', lore: 'Quan Chấp Hành thứ 11 của Fatui, luôn khao khát những trận chiến đỉnh cao.' },
+      { id: 'nilou', name: 'Nilou', title: 'Vũ Điệu Ánh Sen', element: 'Hydro', region: 'Sumeru', weapon: 'Kiếm Đơn', icon: 'Nilou', lore: 'Vũ công tỏa sáng của Nhà Hát Zubayr.' },
+      { id: 'tartaglia', name: 'Tartaglia', title: 'Quan Chấp Hành • Childe', element: 'Hydro', region: 'Snezhnaya', weapon: 'Cung', icon: 'Tartaglia', lore: 'Quan Chấp Hành thứ 11 của Fatui.' },
       { id: 'ayato', name: 'Kamisato Ayato', title: 'Trụ Cột Vững Chãi', element: 'Hydro', region: 'Inazuma', weapon: 'Kiếm Đơn', icon: 'Ayato', lore: 'Gia chủ nhà Kamisato đứng đầu Hiệp Hội Yashiro.' },
       { id: 'kokomi', name: 'Sangonomiya Kokomi', title: 'Trí Tuệ Trân Châu', element: 'Hydro', region: 'Inazuma', weapon: 'Pháp Khí', icon: 'Kokomi', lore: 'Thánh Pháp Sư tối cao của đảo Watatsumi.' },
-
-      // THẢO (DENDRO)
-      { id: 'nahida', name: 'Nahida', title: 'Thảo Thần • Tiểu Vương Kusanali', element: 'Dendro', region: 'Sumeru', weapon: 'Pháp Khí', icon: 'Nahida', lore: 'Vị thần trí tuệ kết nối mọi giấc mơ của Sumeru qua Cây Thế Giới Irminsul.' },
-      { id: 'kinich', name: 'Kinich', title: 'Thợ Săn Hồi Hỏa • Ajaw', element: 'Dendro', region: 'Natlan', weapon: 'Trọng Kiếm', icon: 'Kinich', lore: 'Thợ săn Saurian đồng hành cùng Thánh Long Toàn Năng Ajaw.' },
-      { id: 'nefer', name: 'Nefer', title: 'Nữ Hoàng Sa Mạc Cổ', element: 'Dendro', region: 'Sumeru', weapon: 'Pháp Khí', icon: 'Nefer', lore: 'Người nắm giữ bí mật cổ đại của ốc đảo Sumeru.' },
-      { id: 'lauma', name: 'Lauma', title: 'Tinh Linh Rừng Sâu', element: 'Dendro', region: 'Snezhnaya', weapon: 'Cung', icon: 'Lauma', lore: 'Người bảo hộ những cánh rừng phương bắc.' },
-      { id: 'emilie', name: 'Emilie', title: 'Nhà Điều Hương Fontaine', element: 'Dendro', region: 'Fontaine', weapon: 'Vũ Khí Cán Dài', icon: 'Emilie', lore: 'Chuyên gia nước hoa kiêm điều tra viên hiện trường tại Fontaine.' },
+      // DENDRO
+      { id: 'nahida', name: 'Nahida', title: 'Thảo Thần • Kusanali', element: 'Dendro', region: 'Sumeru', weapon: 'Pháp Khí', icon: 'Nahida', lore: 'Vị thần trí tuệ kết nối Sumeru qua Cây Thế Giới.' },
+      { id: 'kinich', name: 'Kinich', title: 'Thợ Săn Hồi Hỏa • Ajaw', element: 'Dendro', region: 'Natlan', weapon: 'Trọng Kiếm', icon: 'Kinich', lore: 'Thợ săn Saurian đồng hành cùng Thánh Long Ajaw.' },
+      { id: 'emilie', name: 'Emilie', title: 'Nhà Điều Hương Fontaine', element: 'Dendro', region: 'Fontaine', weapon: 'Vũ Khí Cán Dài', icon: 'Emilie', lore: 'Chuyên gia nước hoa tại Fontaine.' },
       { id: 'alhaitham', name: 'Alhaitham', title: 'Quan Thư Ký Giáo Viện', element: 'Dendro', region: 'Sumeru', weapon: 'Kiếm Đơn', icon: 'Alhatham', lore: 'Quan Thư Ký sắc bén của Giáo Viện Sumeru.' },
-      { id: 'baizhu', name: 'Baizhu', title: 'Chủ Nhân Nhà Thuốc Bubu', element: 'Dendro', region: 'Liyue', weapon: 'Pháp Khí', icon: 'Baizhuer', lore: 'Thầy thuốc nổi tiếng của Nhà Thuốc Bubu cùng bạch xà Changsheng.' },
-
-      // LÔI (ELECTRO)
-      { id: 'raiden', name: 'Raiden Shogun', title: 'Lôi Thần • Beelzebul', element: 'Electro', region: 'Inazuma', weapon: 'Vũ Khí Cán Dài', icon: 'Shougun', lore: 'Tướng Quân tối cao của Inazuma với nhát đao Musou no Hitotachi.' },
+      { id: 'baizhu', name: 'Baizhu', title: 'Chủ Nhân Nhà Thuốc Bubu', element: 'Dendro', region: 'Liyue', weapon: 'Pháp Khí', icon: 'Baizhuer', lore: 'Thầy thuốc nổi tiếng của Nhà Thuốc Bubu.' },
+      // ELECTRO
+      { id: 'raiden', name: 'Raiden Shogun', title: 'Lôi Thần • Beelzebul', element: 'Electro', region: 'Inazuma', weapon: 'Vũ Khí Cán Dài', icon: 'Shougun', lore: 'Tướng Quân tối cao của Inazuma.' },
       { id: 'clorinde', name: 'Clorinde', title: 'Đấu Sĩ Đại Diện Bất Bại', element: 'Electro', region: 'Fontaine', weapon: 'Kiếm Đơn', icon: 'Clorinde', lore: 'Đấu sĩ đại diện mạnh nhất của tòa án Fontaine.' },
       { id: 'varesa', name: 'Varesa', title: 'Chiến Binh Cộng Đồng Trù Phú', element: 'Electro', region: 'Natlan', weapon: 'Trọng Kiếm', icon: 'Varesa', lore: 'Nhà vô địch đấu vật tràn đầy năng lượng của Natlan.' },
-      { id: 'flins', name: 'Flins', title: 'Thợ Săn Ánh Chớp', element: 'Electro', region: 'Snezhnaya', weapon: 'Kiếm Đơn', icon: 'Flins', lore: 'Kiếm sĩ tia chớp mang phong thái lạnh lùng.' },
-      { id: 'ineffa', name: 'Ineffa', title: 'Kỹ Sư Điện Từ', element: 'Electro', region: 'Fontaine', weapon: 'Pháp Khí', icon: 'Ineffa', lore: 'Nhà phát minh công nghệ xung điện tiên tiến.' },
-      { id: 'yaemiko', name: 'Yae Miko', title: 'Guuji Đền Narukami', element: 'Electro', region: 'Inazuma', weapon: 'Pháp Khí', icon: 'Yae', lore: 'Đại Vu Nữ đền Grand Narukami kiêm Tổng biên tập Nhà Xuất Bản Yae.' },
-      { id: 'cyno', name: 'Cyno', title: 'Tổng Quản Mahamatra', element: 'Electro', region: 'Sumeru', weapon: 'Vũ Khí Cán Dài', icon: 'Cyno', lore: 'Người đứng đầu các Mahamatra giữ gìn kỷ luật học thuật Sumeru.' },
-
-      // PHONG (ANEMO)
-      { id: 'venti', name: 'Venti', title: 'Phong Thần • Barbatos', element: 'Anemo', region: 'Mondstadt', weapon: 'Cung', icon: 'Venti', lore: 'Nhà thơ lang thang yêu tự do và rượu táo của thành Mondstadt.' },
-      { id: 'varka', name: 'Varka', title: 'Đại Đội Trưởng Kỵ Sĩ Tây Phong', element: 'Anemo', region: 'Mondstadt', weapon: 'Trọng Kiếm', icon: 'Varka', lore: 'Huyền thoại Bắc Phong Kỵ Sĩ dẫn đầu đoàn viễn chinh Mondstadt.' },
-      { id: 'vesna', name: 'Vesna', title: 'Gió Xuân Phương Bắc', element: 'Anemo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'Vesna', lore: 'Sứ giả mang làn gió ấm áp giữa mùa đông vĩnh cửu.' },
-      { id: 'mizuki', name: 'Yumemizuki Mizuki', title: 'Bác Sĩ Tâm Lý Giấc Mơ', element: 'Anemo', region: 'Inazuma', weapon: 'Pháp Khí', icon: 'Mizuki', lore: 'Yêu quái Baku thanh lọc những cơn ác mộng tại Inazuma.' },
-      { id: 'chasca', name: 'Chasca', title: 'Người Hòa Giải Bầu Trời', element: 'Anemo', region: 'Natlan', weapon: 'Cung', icon: 'Chasca', lore: 'Xạ thủ cưỡi súng bay lượn trên bầu trời Hội Hoa Vũ.' },
-      { id: 'xianyun', name: 'Xianyun', title: 'Lưu Vân Tá Phong Chân Quân', element: 'Anemo', region: 'Liyue', weapon: 'Pháp Khí', icon: 'Liuyun', lore: 'Tiên nhân cơ quan tinh xảo hóa thân thành cư dân Liyue.' },
-      { id: 'wanderer', name: 'Kẻ Lang Thang', title: 'Kiếp Trước Không Tên', element: 'Anemo', region: 'Sumeru', weapon: 'Pháp Khí', icon: 'Wanderer', lore: 'Người lữ khách tự do bước đi trên con đường của riêng mình.' },
-      { id: 'kazuha', name: 'Kaedehara Kazuha', title: 'Lá Đỏ Đuổi Sóng', element: 'Anemo', region: 'Inazuma', weapon: 'Kiếm Đơn', icon: 'Kazuha', lore: 'Samurai lãng khách lắng nghe tiếng nói của thiên nhiên.' },
-      { id: 'xiao', name: 'Xiao', title: 'Hộ Pháp Dạ Xoa • Kim Bằng', element: 'Anemo', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'Xiao', lore: 'Tiên nhân Dạ Xoa cuối cùng bảo vệ bình yên cho Liyue.' },
-
-      // NHAM (GEO)
-      { id: 'zhongli', name: 'Zhongli', title: 'Nham Thần • Morax', element: 'Geo', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'Zhongli', lore: 'Vị thần của Khế Ước với tấm khiên Nham kiên cố nhất Teyvat.' },
-      { id: 'xilonen', name: 'Xilonen', title: 'Thợ Rèn Tên Cổ • Natlan', element: 'Geo', region: 'Natlan', weapon: 'Kiếm Đơn', icon: 'Xilonen', lore: 'Nghệ nhân rèn Tên Cổ kiêm DJ sành điệu của Đứa Con Của Tiếng Vang.' },
-      { id: 'linnea', name: 'Linnea', title: 'Đóa Hoa Thạch Anh', element: 'Geo', region: 'Fontaine', weapon: 'Pháp Khí', icon: 'Linnea', lore: 'Nhà giả kim đá quý tinh xảo.' },
-      { id: 'zibai', name: 'Zibai', title: 'Bạch Thạch Tông Sư', element: 'Geo', region: 'Liyue', weapon: 'Kiếm Đơn', icon: 'Zibai', lore: 'Cao thủ võ học ẩn cư nơi núi đá Liyue.' },
-      { id: 'navia', name: 'Navia', title: 'Hội Trưởng Spina di Rosula', element: 'Geo', region: 'Fontaine', weapon: 'Trọng Kiếm', icon: 'Navia', lore: 'Tiểu thư lạc quan dẫn dắt tổ chức Spina di Rosula.' },
-      { id: 'chiori', name: 'Chiori', title: 'Nhà Thiết Kế Chioriya', element: 'Geo', region: 'Fontaine', weapon: 'Kiếm Đơn', icon: 'Chiori', lore: 'Nhà thiết kế thời trang thẳng thắn nổi danh khắp Fontaine.' },
-      { id: 'itto', name: 'Arataki Itto', title: 'Quỷ Vương Bang Arataki', element: 'Geo', region: 'Inazuma', weapon: 'Trọng Kiếm', icon: 'Itto', lore: 'Thủ lĩnh hào sảng của Bang Arataki tại Hanamizaka.' },
-      { id: 'albedo', name: 'Albedo', title: 'Giả Kim Thuật Sĩ Kreideprinz', element: 'Geo', region: 'Mondstadt', weapon: 'Kiếm Đơn', icon: 'Albedo', lore: 'Đội trưởng Đội Điều Tra kiêm thiên tài giả kim thuật Mondstadt.' }
+      { id: 'flins', name: 'Flins', title: 'Thợ Săn Ánh Chớp', element: 'Electro', region: 'Snezhnaya', weapon: 'Kiếm Đơn', icon: 'Flins', lore: 'Kiếm sĩ tia chớp phương bắc.' },
+      { id: 'yaemiko', name: 'Yae Miko', title: 'Guuji Đền Narukami', element: 'Electro', region: 'Inazuma', weapon: 'Pháp Khí', icon: 'Yae', lore: 'Đại Vu Nữ đền Grand Narukami.' },
+      { id: 'cyno', name: 'Cyno', title: 'Tổng Quản Mahamatra', element: 'Electro', region: 'Sumeru', weapon: 'Vũ Khí Cán Dài', icon: 'Cyno', lore: 'Người đứng đầu các Mahamatra tại Sumeru.' },
+      // ANEMO
+      { id: 'venti', name: 'Venti', title: 'Phong Thần • Barbatos', element: 'Anemo', region: 'Mondstadt', weapon: 'Cung', icon: 'Venti', lore: 'Nhà thơ lang thang yêu tự do của thành Mondstadt.' },
+      { id: 'varka', name: 'Varka', title: 'Đại Đội Trưởng Tây Phong', element: 'Anemo', region: 'Mondstadt', weapon: 'Trọng Kiếm', icon: 'Varka', lore: 'Huyền thoại Bắc Phong Kỵ Sĩ dẫn đầu đoàn viễn chinh.' },
+      { id: 'mizuki', name: 'Yumemizuki Mizuki', title: 'Bác Sĩ Tâm Lý Giấc Mơ', element: 'Anemo', region: 'Inazuma', weapon: 'Pháp Khí', icon: 'Mizuki', lore: 'Yêu quái Baku thanh lọc những cơn ác mộng.' },
+      { id: 'chasca', name: 'Chasca', title: 'Người Hòa Giải Bầu Trời', element: 'Anemo', region: 'Natlan', weapon: 'Cung', icon: 'Chasca', lore: 'Xạ thủ bay lượn trên bầu trời Hội Hoa Vũ.' },
+      { id: 'xianyun', name: 'Xianyun', title: 'Lưu Vân Tá Phong Chân Quân', element: 'Anemo', region: 'Liyue', weapon: 'Pháp Khí', icon: 'Liuyun', lore: 'Tiên nhân cơ quan tinh xảo tại Liyue.' },
+      { id: 'wanderer', name: 'Kẻ Lang Thang', title: 'Kiếp Trước Không Tên', element: 'Anemo', region: 'Sumeru', weapon: 'Pháp Khí', icon: 'Wanderer', lore: 'Người lữ khách tự do bước đi trên con đường riêng.' },
+      { id: 'kazuha', name: 'Kaedehara Kazuha', title: 'Lá Đỏ Đuổi Sóng', element: 'Anemo', region: 'Inazuma', weapon: 'Kiếm Đơn', icon: 'Kazuha', lore: 'Samurai lãng khách lắng nghe tiếng gió.' },
+      { id: 'xiao', name: 'Xiao', title: 'Hộ Pháp Dạ Xoa', element: 'Anemo', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'Xiao', lore: 'Tiên nhân Dạ Xoa bảo vệ bình yên cho Liyue.' },
+      // GEO
+      { id: 'zhongli', name: 'Zhongli', title: 'Nham Thần • Morax', element: 'Geo', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'Zhongli', lore: 'Vị thần của Khế Ước tại Liyue.' },
+      { id: 'xilonen', name: 'Xilonen', title: 'Thợ Rèn Tên Cổ • Natlan', element: 'Geo', region: 'Natlan', weapon: 'Kiếm Đơn', icon: 'Xilonen', lore: 'Nghệ nhân rèn Tên Cổ kiêm DJ của Natlan.' },
+      { id: 'navia', name: 'Navia', title: 'Hội Trưởng Spina di Rosula', element: 'Geo', region: 'Fontaine', weapon: 'Trọng Kiếm', icon: 'Navia', lore: 'Tiểu thư dẫn dắt tổ chức Spina di Rosula.' },
+      { id: 'chiori', name: 'Chiori', title: 'Nhà Thiết Kế Chioriya', element: 'Geo', region: 'Fontaine', weapon: 'Kiếm Đơn', icon: 'Chiori', lore: 'Nhà thiết kế thời trang nổi danh khắp Fontaine.' },
+      { id: 'itto', name: 'Arataki Itto', title: 'Quỷ Vương Bang Arataki', element: 'Geo', region: 'Inazuma', weapon: 'Trọng Kiếm', icon: 'Itto', lore: 'Thủ lĩnh hào sảng của Bang Arataki.' },
+      { id: 'albedo', name: 'Albedo', title: 'Giả Kim Thuật Sĩ', element: 'Geo', region: 'Mondstadt', weapon: 'Kiếm Đơn', icon: 'Albedo', lore: 'Thiên tài giả kim thuật của Đội Kỵ Sĩ Tây Phong.' }
     ];
 
-    const ELEMENT_CONFIG = {
-      All:     { label: 'Tất cả', emoji: '✦', color: '#38bdf8' },
-      Cryo:    { label: 'Băng', emoji: '❄️', color: '#38bdf8', bg: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #f0f9ff 100%)', hero: 'linear-gradient(135deg, #0b1c31 0%, #1d3b5c 60%, #2a5d84 100%)', particle: '❄️' },
-      Pyro:    { label: 'Hỏa', emoji: '🔥', color: '#f97316', bg: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 50%, #fff7ed 100%)', hero: 'linear-gradient(135deg, #3b0d0c 0%, #7c1d18 60%, #b43c25 100%)', particle: '🔥' },
-      Hydro:   { label: 'Thủy', emoji: '💧', color: '#0ea5e9', bg: 'linear-gradient(135deg, #e0e7ff 0%, #bae6fd 50%, #f0f9ff 100%)', hero: 'linear-gradient(135deg, #091534 0%, #16336b 60%, #1f5f99 100%)', particle: '🫧' },
-      Dendro:  { label: 'Thảo', emoji: '🌿', color: '#22c55e', bg: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 50%, #f0fdf4 100%)', hero: 'linear-gradient(135deg, #092618 0%, #174e32 60%, #247549 100%)', particle: '🍃' },
-      Electro: { label: 'Lôi', emoji: '⚡', color: '#a855f7', bg: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #faf5ff 100%)', hero: 'linear-gradient(135deg, #210d3b 0%, #441c75 60%, #662ca6 100%)', particle: '⚡' },
-      Anemo:   { label: 'Phong', emoji: '🍃', color: '#14b8a6', bg: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 50%, #f0fdfa 100%)', hero: 'linear-gradient(135deg, #082927 0%, #14544f 60%, #1f7a73 100%)', particle: '🍃' },
-      Geo:     { label: 'Nham', emoji: '🪨', color: '#eab308', bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fffbeb 100%)', hero: 'linear-gradient(135deg, #2b1d07 0%, #5c3f11 60%, #8a621c 100%)', particle: '✨' }
-    };
+    // Dữ liệu Lịch sự kiện HoYoLAB mặc định (y hệt ảnh chụp của Yorrn)
+    const DEFAULT_ENDGAME_MODES = [
+      { id: 'abyss', name: 'Ánh Trăng Vực Sâu (La Hoàn)', timeLeft: 'Thời gian còn: 29 ngày 14 giờ', primogems: 800, badge: '36/36 ⭐', claimed: false },
+      { id: 'theater', name: 'Nhà Hát Giả Tưởng', timeLeft: 'Thời gian còn: 14 ngày 14 giờ', primogems: 1000, badge: 'Màn 8 • Sâu Nhất Đến Được', claimed: false },
+      { id: 'perilous', name: 'Ảo Cảnh Hiểm Ác', timeLeft: 'Thời gian còn: 16 ngày 5 giờ', primogems: 450, badge: '⚡ 108 Giây', claimed: false }
+    ];
+
+    const DEFAULT_VERSION_EVENTS = [
+      { id: 'ev_1', name: 'Bản Chất Của Chiến Thắng', timeLeft: 'Thời gian còn: 6 ngày 11 giờ', primogems: 420, rewardType: 'primogem', statusText: 'Đang Tiến Hành', claimed: false },
+      { id: 'ev_2', name: 'Chế Độ Nhiệt Huyết: Chiến Lược Tự Động', timeLeft: 'Thời gian còn: 9 ngày 5 giờ', primogems: 0, rewardLabel: '3000 Xu', rewardType: 'coin', statusText: 'Đang Tiến Hành', claimed: false },
+      { id: 'ev_3', name: 'Nghiên Cứu Tập Luyện - Cuộc Chiến Sách Lược', timeLeft: 'Thời gian còn: 18 ngày 8 giờ', primogems: 0, rewardLabel: '8000 Xu', rewardType: 'coin', statusText: 'Đang Tiến Hành', claimed: false },
+      { id: 'ev_4', name: 'Tuần Tra Vùng Tuyết, Rèn Giữa Bản Lĩnh', timeLeft: 'Thời gian còn: 17 ngày 16 giờ', primogems: 420, rewardType: 'crown', statusText: 'Hoàn Thành', claimed: true },
+      { id: 'ev_5', name: 'Đoàn Kịch Trên Bản - Tiệc Đêm Trước Mạo Hiểm', timeLeft: 'Thời gian còn: 17 ngày 16 giờ', primogems: 420, rewardType: 'crown', statusText: 'Hoàn Thành', claimed: true },
+      { id: 'ev_6', name: 'Đại Chiến Ném Tuyết Vô Ưu', timeLeft: 'Sắp mở trong phiên bản 7.1', primogems: 420, rewardType: 'primogem', statusText: 'Chưa Mở', claimed: false },
+      { id: 'ev_7', name: 'Dòng Chảy Chúc Phúc', timeLeft: 'Sắp mở trong phiên bản 7.1', primogems: 0, rewardType: 'Mora/Sách', statusText: 'Chưa Mở', claimed: false }
+    ];
 
     // =========================================================================
-    // 3. QUẢN LÝ TÀI KHOẢN & ĐĂNG NHẬP
+    // 3. QUẢN LÝ TRẠNG THÁI TẬP TRUNG (KHÔNG BAO GIỜ RESET SỐ ROLL)
     // =========================================================================
+    const STORAGE_KEY = 'teyvat_ultimate_state_v5';
     let authMode = 'login';
-    let currentUser = null;
     let selectedElement = 'All';
-    let selectedCharId = 'tsaritsa';
+    let onlyFavorites = false;
+    let charDropdownOpen = false;
+    let currentMainView = 'tracker';
+    let currentWishTab = 'char';
+    let charModalMode = 'create';
+    let uploadedAvatarDataUrl = '';
 
-    function getAllAccounts() {
+    let appState = loadFullState();
+
+    function loadFullState() {
       try {
-        const raw = safeGetItem('teyvat_accounts_v3');
-        return raw ? JSON.parse(raw) : {};
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return {
+        activeUser: null,
+        theme: 'dark',
+        accounts: {}
+      };
+    }
+
+    function persistState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
       } catch (e) {
-        return {};
+        console.warn('Bộ nhớ đầy hoặc bị chặn:', e);
       }
     }
 
-    function saveAllAccounts(accounts) {
-      safeSetItem('teyvat_accounts_v3', JSON.stringify(accounts));
-    }
-
-    function getCurrentAccountData() {
-      const accounts = getAllAccounts();
-      if (!currentUser || !accounts[currentUser]) {
-        currentUser = 'yorrn';
-        accounts[currentUser] = {
-          username: 'yorrn',
-          password: '',
-          nickname: 'Yorrn',
-          uid: '',
+    function ensureUserAccount(username, password = '', nickname = '') {
+      if (!appState.accounts[username]) {
+        appState.accounts[username] = {
+          username,
+          password,
+          nickname: nickname || username.toUpperCase(),
           selectedCharId: 'tsaritsa',
-          characters: {}
+          customCharacters: [],
+          favorites: ['tsaritsa', 'skirk', 'furina', 'mavuika'],
+          extraPrimogems: 0, // Số Nguyên Thạch lẻ (<160) tích lũy từ sự kiện
+          characters: {},
+          endgameModes: JSON.parse(JSON.stringify(DEFAULT_ENDGAME_MODES)),
+          versionEvents: JSON.parse(JSON.stringify(DEFAULT_VERSION_EVENTS)),
+          stickers: [
+            { id: 'st_default_paimon', url: '[https://api.ambr.top/assets/UI/UI_EmotionIcon1.png](https://api.ambr.top/assets/UI/UI_EmotionIcon1.png)', x: window.innerWidth - 110, y: window.innerHeight - 120, size: 76 }
+          ]
         };
-        saveAllAccounts(accounts);
+        persistState();
       }
-      return accounts[currentUser];
+      return appState.accounts[username];
     }
 
-    function saveCurrentAccountData(data) {
-      const accounts = getAllAccounts();
-      accounts[currentUser] = data;
-      saveAllAccounts(accounts);
+    function getActiveAccount() {
+      const user = appState.activeUser || 'yorrn';
+      return ensureUserAccount(user);
+    }
+
+    function getAllCharactersList() {
+      const acc = getActiveAccount();
+      const customs = acc.customCharacters || [];
+      return [...customs, ...DEFAULT_CHARACTERS];
+    }
+
+    function getCharacterById(charId) {
+      const all = getAllCharactersList();
+      return all.find(c => c.id === charId) || all[0];
     }
 
     function getCharRecord(charId) {
-      const acc = getCurrentAccountData();
-      if (!acc.characters) acc.characters = {};
+      const acc = getActiveAccount();
       if (!acc.characters[charId]) {
-        const baseChar = CHARACTERS.find(c => c.id === charId);
+        const base = getCharacterById(charId);
         acc.characters[charId] = {
           currentRolls: charId === 'tsaritsa' ? 86 : 0,
           targetRolls: 200,
@@ -594,131 +1649,138 @@
           kpi: 5,
           pity: 0,
           guaranteed: false,
-          weaponType: baseChar ? baseChar.weapon : 'Kiếm Đơn',
-          customImage: '',
+          weaponType: base ? base.weapon : 'Kiếm Đơn',
+          customImage: base && base.customImage ? base.customImage : '',
+          customName: '',
+          customTitle: '',
+          customLore: '',
           history: [
-            { time: '16/10/2026', total: charId === 'tsaritsa' ? 86 : 0, diff: '+5', note: 'Khởi tạo quỹ tích lũy' }
+            { time: '16/10/2026', total: charId === 'tsaritsa' ? 86 : 0, diff: '+5 roll', note: 'Khởi tạo quỹ tích lũy' }
           ]
         };
-        saveCurrentAccountData(acc);
+        persistState();
       }
       return acc.characters[charId];
     }
 
-    window.switchAuthTab = function(mode) {
+    // =========================================================================
+    // 4. ĐĂNG NHẬP / ĐĂNG KÝ & CHẾ ĐỘ SÁNG TỐI
+    // =========================================================================
+    function switchAuthTab(mode) {
       authMode = mode;
-      const loginBtn = document.getElementById('tab-login');
-      const regBtn = document.getElementById('tab-register');
-      const nickWrap = document.getElementById('register-nickname-wrap');
-      const title = document.getElementById('auth-title');
-      const submitBtn = document.getElementById('auth-submit-btn');
-      const errEl = document.getElementById('auth-error');
-      errEl.classList.add('hidden');
+      document.getElementById('auth-title').textContent = mode === 'login' ? 'Đăng Nhập Tài Khoản' : 'Tạo Tài Khoản Mới';
+      document.getElementById('tab-login').className = mode === 'login' ? 'py-2.5 rounded-lg bg-sky-500 text-white cursor-pointer' : 'py-2.5 rounded-lg text-slate-400 cursor-pointer';
+      document.getElementById('tab-register').className = mode === 'register' ? 'py-2.5 rounded-lg bg-sky-500 text-white cursor-pointer' : 'py-2.5 rounded-lg text-slate-400 cursor-pointer';
+      document.getElementById('register-nickname-wrap').classList.toggle('hidden', mode === 'login');
+      document.getElementById('auth-error').classList.add('hidden');
+    }
 
-      if (mode === 'login') {
-        title.textContent = 'Đăng Nhập Tài Khoản';
-        submitBtn.textContent = 'Vào Không Gian Tích Roll ➔';
-        loginBtn.className = 'py-2.5 rounded-lg bg-sky-500 text-white transition cursor-pointer';
-        regBtn.className = 'py-2.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer';
-        nickWrap.classList.add('hidden');
-      } else {
-        title.textContent = 'Tạo Tài Khoản Mới';
-        submitBtn.textContent = 'Hoàn Tất Tạo Tài Khoản ➔';
-        regBtn.className = 'py-2.5 rounded-lg bg-sky-500 text-white transition cursor-pointer';
-        loginBtn.className = 'py-2.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer';
-        nickWrap.classList.remove('hidden');
-      }
-    };
+    function submitAuth() {
+      const u = (document.getElementById('auth-username').value || '').trim().toLowerCase();
+      const p = document.getElementById('auth-password').value || '';
+      const nick = (document.getElementById('auth-nickname').value || '').trim() || u.toUpperCase();
+      const err = document.getElementById('auth-error');
 
-    window.submitAuth = function() {
-      const usernameEl = document.getElementById('auth-username');
-      const passwordEl = document.getElementById('auth-password');
-      const nicknameEl = document.getElementById('auth-nickname');
-      const errorEl = document.getElementById('auth-error');
-
-      const username = (usernameEl.value || '').trim().toLowerCase();
-      const password = passwordEl.value || '';
-      const nickname = (nicknameEl.value || '').trim() || username.toUpperCase();
-
-      if (!username) {
-        errorEl.textContent = '⚠️ Vui lòng nhập Tên tài khoản!';
-        errorEl.classList.remove('hidden');
-        usernameEl.focus();
-        return;
-      }
-      if (!password) {
-        errorEl.textContent = '⚠️ Vui lòng nhập Mật khẩu!';
-        errorEl.classList.remove('hidden');
-        passwordEl.focus();
+      if (!u || !p) {
+        err.textContent = '⚠️ Vui lòng nhập đầy đủ Tên tài khoản và Mật khẩu!';
+        err.classList.remove('hidden');
         return;
       }
 
-      const accounts = getAllAccounts();
-
-      if (authMode === 'register') {
-        accounts[username] = {
-          username: username,
-          password: password,
-          nickname: nickname,
-          uid: '',
-          selectedCharId: 'tsaritsa',
-          characters: {}
-        };
-        saveAllAccounts(accounts);
-      } else {
-        if (!accounts[username]) {
-          // Tự động tạo tài khoản nếu lần đầu đăng nhập trên thiết bị này
-          accounts[username] = {
-            username: username,
-            password: password,
-            nickname: nickname,
-            uid: '',
-            selectedCharId: 'tsaritsa',
-            characters: {}
-          };
-          saveAllAccounts(accounts);
-        } else if (accounts[username].password && accounts[username].password !== password) {
-          errorEl.textContent = '⚠️ Mật khẩu không đúng! Hãy thử lại.';
-          errorEl.classList.remove('hidden');
-          return;
-        }
+      if (authMode === 'register' && appState.accounts[u]) {
+        err.textContent = '⚠️ Tài khoản này đã tồn tại, hãy chọn tab Đăng nhập!';
+        err.classList.remove('hidden');
+        return;
       }
 
-      currentUser = username;
-      safeSetItem('teyvat_active_user_v3', username);
-      const modal = document.getElementById('auth-modal');
-      modal.style.display = 'none';
-      modal.classList.add('hidden');
-      initDashboardForUser();
-    };
+      if (authMode === 'login' && appState.accounts[u] && appState.accounts[u].password && appState.accounts[u].password !== p) {
+        err.textContent = '⚠️ Mật khẩu không chính xác!';
+        err.classList.remove('hidden');
+        return;
+      }
 
-    window.logoutUser = function() {
-      safeRemoveItem('teyvat_active_user_v3');
-      currentUser = null;
-      const modal = document.getElementById('auth-modal');
-      modal.style.display = 'flex';
-      modal.classList.remove('hidden');
-    };
+      ensureUserAccount(u, p, nick);
+      appState.activeUser = u;
+      persistState();
+
+      document.getElementById('auth-modal').style.display = 'none';
+      initAllViews();
+    }
+
+    function logoutUser() {
+      appState.activeUser = null;
+      persistState();
+      document.getElementById('auth-modal').style.display = 'flex';
+    }
+
+    function applyThemeMode() {
+      const isDark = appState.theme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      const btn = document.getElementById('theme-toggle-btn');
+      if (btn) {
+        btn.innerHTML = isDark ? '<span>🌙</span> <span>Giao diện: Tối</span>' : '<span>☀️</span> <span>Giao diện: Sáng</span>';
+      }
+      renderMainTracker();
+    }
+
+    function toggleThemeMode() {
+      appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+      persistState();
+      applyThemeMode();
+    }
 
     // =========================================================================
-    // 4. HIỂN THỊ GIAO DIỆN & TÍNH TOÁN
+    // 5. SIDEBAR THU GỌN, YÊU THÍCH ⭐ & TẠO/SỬA NHÂN VẬT
     // =========================================================================
     function createAvatarHTML(char, customImg, sizeClass = 'w-10 h-10') {
-      const elem = ELEMENT_CONFIG[char.element] || ELEMENT_CONFIG.Cryo;
-      if (customImg) {
-        return `<img src="${customImg}" class="${sizeClass} rounded-xl object-cover border border-amber-300/60" />`;
-      }
-      const enkaUrl = `https://enka.network/ui/UI_AvatarIcon_${char.icon.trim()}.png`;
+      const imgUrl = customImg || char.customImage || `[https://enka.network/ui/UI_AvatarIcon_$](https://enka.network/ui/UI_AvatarIcon_$){(char.icon || 'Queen').trim()}.png`;
       return `
         <div class="${sizeClass} rounded-xl relative overflow-hidden flex items-center justify-center shrink-0 border border-amber-300/60 shadow" style="background: linear-gradient(145deg, #a86434 0%, #d98e46 100%);">
           <span class="text-white font-extrabold text-xs select-none">${char.name.slice(0, 2).toUpperCase()}</span>
-          <img src="${enkaUrl}" referrerpolicy="no-referrer"
+          <img src="${imgUrl}" referrerpolicy="no-referrer"
                onload="this.previousElementSibling.style.display='none'"
                onerror="this.style.display='none'"
                class="absolute inset-0 w-full h-full object-cover" />
-          <span class="absolute top-0.5 left-0.5 text-[9px] leading-none bg-slate-900/75 rounded-full px-1 py-0.5">${elem.emoji}</span>
+          <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-slate-950/80 p-0.5 flex items-center justify-center">
+            ${getElementIconHTML(char.element, 'w-3 h-3')}
+          </span>
         </div>
       `;
+    }
+
+    function toggleCharDropdown() {
+      charDropdownOpen = !charDropdownOpen;
+      document.getElementById('char-dropdown-body').classList.toggle('hidden', !charDropdownOpen);
+      document.getElementById('dropdown-arrow').style.transform = charDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+      document.getElementById('dropdown-sub-status').textContent = charDropdownOpen
+        ? `Đang mở (${getAllCharactersList().length} nhân vật)`
+        : 'Đang thu gọn • Bấm để mở';
+    }
+
+    function toggleFavFilter() {
+      onlyFavorites = !onlyFavorites;
+      const btn = document.getElementById('fav-filter-btn');
+      btn.className = onlyFavorites
+        ? 'px-2.5 py-1.5 rounded-lg bg-amber-400 text-slate-950 text-xs font-extrabold'
+        : 'px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-amber-400';
+      renderCharacterList();
+    }
+
+    function toggleFavoriteChar(event, charId) {
+      if (event) event.stopPropagation();
+      const acc = getActiveAccount();
+      if (!acc.favorites) acc.favorites = [];
+      const idx = acc.favorites.indexOf(charId);
+      if (idx >= 0) acc.favorites.splice(idx, 1);
+      else acc.favorites.push(charId);
+      persistState();
+      renderCharacterList();
+      renderMainTracker();
+    }
+
+    function toggleFavoriteCurrent() {
+      const acc = getActiveAccount();
+      toggleFavoriteChar(null, acc.selectedCharId);
     }
 
     function renderElementFilterBar() {
@@ -726,76 +1788,300 @@
       bar.innerHTML = Object.keys(ELEMENT_CONFIG).map(key => {
         const active = selectedElement === key;
         return `
-          <button type="button" onclick="window.setElementFilter('${key}')" title="${ELEMENT_CONFIG[key].label}"
-                  class="px-2 py-1 rounded-lg text-xs font-bold transition ${active ? 'bg-sky-500 text-white shadow' : 'text-slate-400 hover:text-white'}">
-            ${ELEMENT_CONFIG[key].emoji}
+          <button type="button" onclick="setElementFilter('${key}')" title="${ELEMENT_CONFIG[key].label}"
+                  class="p-1.5 rounded-lg transition flex items-center justify-center ${active ? 'bg-sky-500/30 border border-sky-400 shadow' : 'opacity-60 hover:opacity-100'}">
+            ${getElementIconHTML(key, 'w-4 h-4')}
           </button>
         `;
       }).join('');
     }
 
-    window.setElementFilter = function(elem) {
+    function setElementFilter(elem) {
       selectedElement = elem;
       renderElementFilterBar();
-      window.renderCharacterList();
-    };
+      renderCharacterList();
+    }
 
-    window.renderCharacterList = function() {
+    function renderCharacterList() {
+      const acc = getActiveAccount();
+      const favs = acc.favorites || [];
       const search = (document.getElementById('char-search').value || '').toLowerCase();
-      const listEl = document.getElementById('character-list');
-      const filtered = CHARACTERS.filter(c => {
+      const allChars = getAllCharactersList();
+
+      const filtered = allChars.filter(c => {
+        const rec = getCharRecord(c.id);
+        const displayName = (rec.customName || c.name).toLowerCase();
         const matchElem = selectedElement === 'All' || c.element === selectedElement;
-        const matchName = c.name.toLowerCase().includes(search) || c.region.toLowerCase().includes(search);
-        return matchElem && matchName;
+        const matchSearch = displayName.includes(search) || (c.region || '').toLowerCase().includes(search);
+        const matchFav = !onlyFavorites || favs.includes(c.id);
+        return matchElem && matchSearch && matchFav;
+      }).sort((a, b) => {
+        const aFav = favs.includes(a.id) ? 1 : 0;
+        const bFav = favs.includes(b.id) ? 1 : 0;
+        return bFav - aFav;
       });
 
+      const listEl = document.getElementById('character-list');
       listEl.innerHTML = filtered.map(c => {
         const rec = getCharRecord(c.id);
-        const isSelected = c.id === selectedCharId;
+        const isSelected = c.id === acc.selectedCharId;
+        const isFav = favs.includes(c.id);
+        const displayName = rec.customName || c.name;
         const pct = Math.min(100, Math.round((rec.currentRolls / Math.max(1, rec.targetRolls)) * 100));
+
         return `
-          <button type="button" onclick="window.selectCharacter('${c.id}')"
-                  class="w-full flex items-center gap-3 p-2 rounded-2xl text-left transition ${isSelected ? 'bg-sky-500/25 border border-sky-400/50 shadow-md' : 'hover:bg-white/5 border border-transparent'}">
-            ${createAvatarHTML(c, rec.customImage, 'w-10 h-10')}
+          <div onclick="selectCharacter('${c.id}')"
+               class="w-full flex items-center gap-2.5 p-2 rounded-xl text-left cursor-pointer transition ${isSelected ? 'bg-sky-500/25 border border-sky-400/50' : 'hover:bg-white/5 border border-transparent'}">
+            ${createAvatarHTML(c, rec.customImage, 'w-9 h-9')}
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
-                <p class="text-xs font-bold text-white truncate">${c.name}</p>
+                <p class="text-xs font-bold text-white truncate">${displayName}</p>
                 <span class="text-[10px] text-sky-300 font-bold">${rec.currentRolls}/${rec.targetRolls}</span>
               </div>
-              <p class="text-[10px] text-slate-400 truncate">${rec.weaponType} • ${c.region}</p>
               <div class="w-full h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
                 <div class="h-full bg-sky-400 rounded-full" style="width:${pct}%"></div>
               </div>
             </div>
-          </button>
+            <button type="button" onclick="toggleFavoriteChar(event, '${c.id}')" class="text-sm px-1 ${isFav ? 'text-amber-400' : 'text-slate-600 hover:text-amber-300'}" title="Đánh dấu yêu thích">
+              ${isFav ? '★' : '☆'}
+            </button>
+          </div>
         `;
       }).join('');
-    };
-
-    window.selectCharacter = function(charId) {
-      selectedCharId = charId;
-      const acc = getCurrentAccountData();
-      acc.selectedCharId = charId;
-      saveCurrentAccountData(acc);
-      window.renderCharacterList();
-      renderMainView();
-      if (window.innerWidth < 1024) window.toggleSidebar(false);
-    };
-
-    function renderWeatherParticles(elementKey) {
-      const container = document.getElementById('weather-container');
-      const cfg = ELEMENT_CONFIG[elementKey] || ELEMENT_CONFIG.Cryo;
-      let html = '';
-      for (let i = 0; i < 15; i++) {
-        const left = Math.random() * 100;
-        const duration = 7 + Math.random() * 10;
-        const delay = Math.random() * 5;
-        const size = 12 + Math.random() * 12;
-        html += `<div class="weather-particle" style="left:${left}%; animation-duration:${duration}s; animation-delay:${delay}s; font-size:${size}px;">${cfg.particle}</div>`;
-      }
-      container.innerHTML = html;
     }
 
+    function selectCharacter(charId) {
+      const acc = getActiveAccount();
+      acc.selectedCharId = charId;
+      persistState();
+      renderCharacterList();
+      renderMainTracker();
+      renderCalendarView();
+      if (window.innerWidth < 1024) toggleSidebar(false);
+    }
+
+    // Modal Tạo / Sửa Nhân Vật
+    function openCharModal(mode) {
+      charModalMode = mode;
+      uploadedAvatarDataUrl = '';
+      document.getElementById('cm-upload-status').textContent = '';
+      const modal = document.getElementById('char-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      if (mode === 'edit') {
+        const acc = getActiveAccount();
+        const char = getCharacterById(acc.selectedCharId);
+        const rec = getCharRecord(char.id);
+        document.getElementById('char-modal-title').textContent = `✏️ Chỉnh Sửa Nhân Vật: ${rec.customName || char.name}`;
+        document.getElementById('cm-name').value = rec.customName || char.name;
+        document.getElementById('cm-title').value = rec.customTitle || char.title;
+        document.getElementById('cm-element').value = char.element;
+        document.getElementById('cm-weapon').value = rec.weaponType || char.weapon;
+        document.getElementById('cm-region').value = char.region || 'Teyvat';
+        document.getElementById('cm-avatar-url').value = rec.customImage || '';
+        document.getElementById('cm-lore').value = rec.customLore || char.lore || '';
+      } else {
+        document.getElementById('char-modal-title').textContent = '✨ Tạo Nhân Vật Chưa Ra Mắt Mới';
+        document.getElementById('cm-name').value = '';
+        document.getElementById('cm-title').value = 'Nhân Vật Sắp Ra Mắt';
+        document.getElementById('cm-element').value = 'Cryo';
+        document.getElementById('cm-weapon').value = 'Kiếm Đơn';
+        document.getElementById('cm-region').value = 'Snezhnaya';
+        document.getElementById('cm-avatar-url').value = '';
+        document.getElementById('cm-lore').value = 'Nhân vật 5 sao mới được tạo bởi Nhà Lữ Hành.';
+      }
+    }
+
+    function closeCharModal() {
+      const modal = document.getElementById('char-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleAvatarFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedAvatarDataUrl = e.target.result;
+        document.getElementById('cm-avatar-url').value = uploadedAvatarDataUrl;
+        document.getElementById('cm-upload-status').textContent = 'Đã tải ảnh ✓';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveCharModal() {
+      const name = document.getElementById('cm-name').value.trim();
+      const title = document.getElementById('cm-title').value.trim() || 'Nhân Vật 5★';
+      const element = document.getElementById('cm-element').value;
+      const weapon = document.getElementById('cm-weapon').value;
+      const region = document.getElementById('cm-region').value.trim() || 'Teyvat';
+      const avatarUrl = uploadedAvatarDataUrl || document.getElementById('cm-avatar-url').value.trim();
+      const lore = document.getElementById('cm-lore').value.trim();
+
+      if (!name) {
+        alert('Vui lòng nhập tên nhân vật!');
+        return;
+      }
+
+      const acc = getActiveAccount();
+      if (charModalMode === 'create') {
+        const newId = 'custom_' + Date.now();
+        const newChar = {
+          id: newId,
+          name,
+          title,
+          element,
+          region,
+          weapon,
+          icon: 'Queen',
+          customImage: avatarUrl,
+          lore: lore || 'Nhân vật tùy chỉnh.'
+        };
+        if (!acc.customCharacters) acc.customCharacters = [];
+        acc.customCharacters.unshift(newChar);
+        acc.selectedCharId = newId;
+        const rec = getCharRecord(newId);
+        rec.customImage = avatarUrl;
+        rec.weaponType = weapon;
+      } else {
+        const char = getCharacterById(acc.selectedCharId);
+        const rec = getCharRecord(char.id);
+        rec.customName = name;
+        rec.customTitle = title;
+        rec.weaponType = weapon;
+        rec.customImage = avatarUrl;
+        rec.customLore = lore;
+        char.element = element;
+        char.region = region;
+      }
+
+      persistState();
+      closeCharModal();
+      renderCharacterList();
+      renderMainTracker();
+    }
+
+    // =========================================================================
+    // 6. CẬP NHẬT SỐ ROLL CHÍNH XÁC (FIX TRIỆT ĐỂ LỖI RESET)
+    // =========================================================================
+    function nowFormatted() {
+      const d = new Date();
+      return d.toLocaleTimeString('vi-VN') + ' ' + d.toLocaleDateString('vi-VN');
+    }
+
+    function handleDirectRollInput(val) {
+      if (val === '') return;
+      const acc = getActiveAccount();
+      const rec = getCharRecord(acc.selectedCharId);
+      rec.currentRolls = Math.max(0, Number(val) || 0);
+      persistState();
+      updateCalculatedStatsOnly();
+    }
+
+    function commitDirectRollInput(val) {
+      const acc = getActiveAccount();
+      const rec = getCharRecord(acc.selectedCharId);
+      const newTotal = Math.max(0, Number(val) || 0);
+      rec.currentRolls = newTotal;
+      rec.history.unshift({
+        time: nowFormatted(),
+        total: newTotal,
+        diff: 'Cập nhật',
+        note: 'Chỉnh trực tiếp trên thẻ Banner'
+      });
+      persistState();
+      renderCharacterList();
+      renderMainTracker();
+    }
+
+    function commitDirectTargetInput(val) {
+      const acc = getActiveAccount();
+      const rec = getCharRecord(acc.selectedCharId);
+      rec.targetRolls = Math.max(1, Number(val) || 200);
+      persistState();
+      renderCharacterList();
+      renderMainTracker();
+    }
+
+    function quickAdjustRolls(delta) {
+      const acc = getActiveAccount();
+      const rec = getCharRecord(acc.selectedCharId);
+      const newTotal = Math.max(0, (Number(rec.currentRolls) || 0) + delta);
+      rec.currentRolls = newTotal;
+      rec.history.unshift({
+        time: nowFormatted(),
+        total: newTotal,
+        diff: (delta >= 0 ? '+' : '') + delta + ' roll',
+        note: 'Điều chỉnh nhanh trên thẻ'
+      });
+      persistState();
+      renderCharacterList();
+      renderMainTracker();
+    }
+
+    function saveRollProgress() {
+      const acc = getActiveAccount();
+      const rec = getCharRecord(acc.selectedCharId);
+      const addInput = document.getElementById('form-add-rolls').value.trim();
+      const totalInput = document.getElementById('form-total-rolls').value.trim();
+      const note = document.getElementById('form-note').value.trim() || 'Cập nhật quỹ roll';
+
+      let newTotal = Number(rec.currentRolls) || 0;
+      let diff = 0;
+
+      if (addInput !== '' && Number(addInput) !== 0) {
+        diff = Number(addInput);
+        newTotal = Math.max(0, newTotal + diff);
+      } else if (totalInput !== '') {
+        newTotal = Math.max(0, Number(totalInput));
+        diff = newTotal - (Number(rec.currentRolls) || 0);
+      }
+
+      rec.currentRolls = newTotal;
+      rec.history.unshift({
+        time: nowFormatted(),
+        total: newTotal,
+        diff: (diff >= 0 ? '+' : '') + diff + ' roll',
+        note
+      });
+
+      document.getElementById('form-add-rolls').value = '';
+      document.getElementById('form-note').value = '';
+      persistState();
+      renderCharacterList();
+      renderMainTracker();
+    }
+
+    // Cộng Nguyên Thạch từ Lịch Sự Kiện / La Hoàn / Nhà Hát / Ảo Cảnh
+    function addPrimogemsToActiveChar(primogems, sourceName) {
+      const acc = getActiveAccount();
+      const rec = getCharRecord(acc.selectedCharId);
+
+      const totalPoolPrimos = (Number(acc.extraPrimogems) || 0) + Number(primogems);
+      const addedRolls = Math.floor(totalPoolPrimos / 160);
+      const leftoverPrimos = totalPoolPrimos % 160;
+
+      acc.extraPrimogems = leftoverPrimos;
+      rec.currentRolls = (Number(rec.currentRolls) || 0) + addedRolls;
+
+      rec.history.unshift({
+        time: nowFormatted(),
+        total: rec.currentRolls,
+        diff: `+${primogems} NT (+${addedRolls} roll)`,
+        note: `Nhận từ: ${sourceName}`
+      });
+
+      persistState();
+      renderCharacterList();
+      renderMainTracker();
+      renderCalendarView();
+    }
+
+    // =========================================================================
+    // 7. HIỂN THỊ GIAO DIỆN TÍCH ROLL CHÍNH
+    // =========================================================================
     function calculateConstellationEstimation(rolls, pity, guaranteed) {
       const effectiveRolls = Number(rolls) + Number(pity);
       const avgCharCost = guaranteed ? 55 : 88;
@@ -828,333 +2114,51 @@
       return { expectedLabel, worstLabel };
     }
 
-    function renderMainView() {
-      const char = CHARACTERS.find(c => c.id === selectedCharId) || CHARACTERS[0];
+    function updateCalculatedStatsOnly() {
+      const acc = getActiveAccount();
+      const char = getCharacterById(acc.selectedCharId);
       const rec = getCharRecord(char.id);
-      const elemCfg = ELEMENT_CONFIG[char.element] || ELEMENT_CONFIG.Cryo;
-
-      document.body.style.background = elemCfg.bg;
-      document.getElementById('hero-banner-card').style.background = elemCfg.hero;
-      renderWeatherParticles(char.element);
-
-      document.getElementById('sidebar-region-icon').textContent = elemCfg.emoji;
-      document.getElementById('sidebar-region-name').textContent = char.region;
-      document.getElementById('header-char-title').textContent = `${char.title} • ${char.name}`.toUpperCase();
-      document.getElementById('header-target-badge').textContent = `MỤC TIÊU: ${rec.goalLabel || 'C0R1'}`;
-      document.getElementById('weapon-type-select').value = rec.weaponType || char.weapon;
-      document.getElementById('header-journey-title').textContent = `Hành trình ${char.name}`;
-      document.getElementById('header-element-emoji').textContent = elemCfg.emoji;
-      document.getElementById('header-lore').textContent = char.lore;
-
-      document.getElementById('hero-char-illust').innerHTML = createAvatarHTML(char, rec.customImage, 'w-full h-full');
-
       const cur = Number(rec.currentRolls) || 0;
       const target = Math.max(1, Number(rec.targetRolls) || 200);
       const pct = Math.min(100, Math.round((cur / target) * 100));
-      const primogems = (cur * 160).toLocaleString('vi-VN');
 
-      document.getElementById('direct-current-rolls').value = cur;
-      document.getElementById('direct-target-rolls').value = target;
-      document.getElementById('form-total-rolls').value = cur;
       document.getElementById('hero-progress-text').textContent = `Đã đi được ${pct}% chặng đường. Mỗi roll đều có ý nghĩa.`;
-      document.getElementById('hero-primogems').textContent = primogems;
+      document.getElementById('hero-primogems').textContent = (cur * 160).toLocaleString('vi-VN');
+      document.getElementById('hero-extra-primos').textContent = acc.extraPrimogems > 0 ? `(+${acc.extraPrimogems} NT lẻ đang tích)` : '';
       document.getElementById('hero-progress-bar').style.width = `${pct}%`;
-      document.getElementById('hero-mid-label').textContent = `${Math.round(target / 2)} roll`;
-      document.getElementById('hero-max-label').textContent = `${target} roll`;
+      document.getElementById('stat-remaining').textContent = Math.max(0, target - cur);
 
-      const milestones = [50, 90, 100, 150, 180, 200, 250, 340, 500, 720, target].sort((a,b) => a - b);
-      const nextMilestone = milestones.find(m => m > cur) || target;
-      const diffToMilestone = Math.max(0, nextMilestone - cur);
-      document.getElementById('next-milestone-num').textContent = nextMilestone;
-      document.getElementById('next-milestone-diff').textContent = diffToMilestone > 0
-        ? `Chỉ còn ${diffToMilestone} roll nữa để chạm mốc này.`
-        : `Đã hoàn thành xuất sắc mục tiêu đề ra! 🎉`;
-
-      document.getElementById('char-pity-input').value = rec.pity || 0;
-      document.getElementById('guaranteed-select').value = String(Boolean(rec.guaranteed));
       const est = calculateConstellationEstimation(cur, rec.pity || 0, rec.guaranteed);
       document.getElementById('calc-expected-cr').textContent = est.expectedLabel;
       document.getElementById('calc-guaranteed-cr').textContent = est.worstLabel;
-
-      const remaining = Math.max(0, target - cur);
-      const kpi = Math.max(1, Number(rec.kpi) || 5);
-      const daysLeft = Math.ceil(remaining / kpi);
-      const etaDate = new Date();
-      etaDate.setDate(etaDate.getDate() + daysLeft);
-      const etaStr = etaDate.toLocaleDateString('vi-VN');
-
-      document.getElementById('stat-remaining').textContent = remaining;
-      document.getElementById('stat-remaining-sub').textContent = `Để đạt mục tiêu ${target} roll`;
-      document.getElementById('kpi-input').value = kpi;
-      document.getElementById('stat-eta-date').textContent = etaStr;
-      document.getElementById('stat-eta-days').textContent = `Còn ${daysLeft} ngày • Theo KPI ${kpi} roll/ngày`;
-
-      document.getElementById('rhythm-kpi').textContent = kpi;
-      document.getElementById('rhythm-days-left').textContent = `${daysLeft} ngày nữa`;
-      document.getElementById('rhythm-eta').textContent = etaStr;
-
-      const lastEntry = (rec.history && rec.history[0]) || { diff: '+0', time: 'Chưa có' };
-      document.getElementById('stat-last-diff').innerHTML = `${lastEntry.diff} <span class="text-xs font-normal text-slate-500">roll</span>`;
-      document.getElementById('stat-last-info').textContent = `Lúc: ${lastEntry.time}`;
-
-      const historyEl = document.getElementById('history-list');
-      historyEl.innerHTML = (rec.history || []).map(item => `
-        <div class="p-3 rounded-2xl bg-slate-900/5 border border-slate-200/80 flex items-center justify-between text-xs">
-          <div>
-            <p class="font-bold text-slate-800">${item.note || 'Cập nhật quỹ roll'} • <span class="text-sky-600">${item.total} roll</span> (${(item.total * 160).toLocaleString('vi-VN')} NT)</p>
-            <p class="text-[11px] text-slate-500">${item.time}</p>
-          </div>
-          <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-extrabold">${item.diff} roll</span>
-        </div>
-      `).join('');
     }
 
-    // =========================================================================
-    // 5. CÁC HÀM CẬP NHẬT SỐ ROLL & VŨ KHÍ
-    // =========================================================================
-    function nowFormatted() {
-      const d = new Date();
-      return d.toLocaleTimeString('vi-VN') + ' ' + d.toLocaleDateString('vi-VN');
-    }
+    function renderMainTracker() {
+      const acc = getActiveAccount();
+      const char = getCharacterById(acc.selectedCharId);
+      const rec = getCharRecord(char.id);
+      const elemCfg = ELEMENT_CONFIG[char.element] || ELEMENT_CONFIG.Cryo;
+      const displayName = rec.customName || char.name;
+      const displayTitle = rec.customTitle || char.title;
+      const displayLore = rec.customLore || char.lore;
 
-    window.setDirectCurrentRolls = function(val) {
-      const rec = getCharRecord(selectedCharId);
-      const newTotal = Math.max(0, Number(val) || 0);
-      const diff = newTotal - (rec.currentRolls || 0);
-      rec.currentRolls = newTotal;
-      rec.history.unshift({
-        time: nowFormatted(),
-        total: newTotal,
-        diff: (diff >= 0 ? '+' : '') + diff,
-        note: 'Chỉnh trực tiếp trên thẻ'
-      });
-      saveCurrentAccountData(getCurrentAccountData());
-      window.renderCharacterList();
-      renderMainView();
-    };
-
-    window.setDirectTargetRolls = function(val) {
-      const rec = getCharRecord(selectedCharId);
-      rec.targetRolls = Math.max(1, Number(val) || 200);
-      saveCurrentAccountData(getCurrentAccountData());
-      window.renderCharacterList();
-      renderMainView();
-    };
-
-    window.setQuickGoal = function(label, rolls) {
-      const rec = getCharRecord(selectedCharId);
-      rec.goalLabel = label;
-      rec.targetRolls = rolls;
-      saveCurrentAccountData(getCurrentAccountData());
-      window.renderCharacterList();
-      renderMainView();
-    };
-
-    window.changeWeaponType = function(newWeapon) {
-      const rec = getCharRecord(selectedCharId);
-      rec.weaponType = newWeapon;
-      saveCurrentAccountData(getCurrentAccountData());
-      window.renderCharacterList();
-    };
-
-    window.updatePitySettings = function() {
-      const rec = getCharRecord(selectedCharId);
-      rec.pity = Math.min(89, Math.max(0, Number(document.getElementById('char-pity-input').value) || 0));
-      rec.guaranteed = document.getElementById('guaranteed-select').value === 'true';
-      saveCurrentAccountData(getCurrentAccountData());
-      renderMainView();
-    };
-
-    window.updateKpi = function(val) {
-      const rec = getCharRecord(selectedCharId);
-      rec.kpi = Math.max(1, Number(val) || 5);
-      saveCurrentAccountData(getCurrentAccountData());
-      renderMainView();
-    };
-
-    window.saveRollProgress = function() {
-      const rec = getCharRecord(selectedCharId);
-      const addVal = document.getElementById('form-add-rolls').value;
-      const totalVal = document.getElementById('form-total-rolls').value;
-      const note = document.getElementById('form-note').value.trim() || 'Cập nhật tiến độ ngày';
-
-      let newTotal = rec.currentRolls;
-      let diff = 0;
-
-      if (addVal !== '' && Number(addVal) !== 0) {
-        diff = Number(addVal);
-        newTotal = Math.max(0, rec.currentRolls + diff);
-      } else if (totalVal !== '') {
-        newTotal = Math.max(0, Number(totalVal));
-        diff = newTotal - rec.currentRolls;
-      }
-
-      rec.currentRolls = newTotal;
-      rec.history.unshift({
-        time: nowFormatted(),
-        total: newTotal,
-        diff: (diff >= 0 ? '+' : '') + diff,
-        note: note
-      });
-
-      document.getElementById('form-add-rolls').value = '';
-      document.getElementById('form-note').value = '';
-      saveCurrentAccountData(getCurrentAccountData());
-      window.renderCharacterList();
-      renderMainView();
-    };
-
-    window.promptCustomImage = function() {
-      const url = prompt('Dán đường link ảnh (URL) của nhân vật bạn muốn hiển thị (để trống nếu muốn về mặc định):');
-      if (url === null) return;
-      const rec = getCharRecord(selectedCharId);
-      rec.customImage = url.trim();
-      saveCurrentAccountData(getCurrentAccountData());
-      window.renderCharacterList();
-      renderMainView();
-    };
-
-    // =========================================================================
-    // 6. ĐỒNG BỘ UID & SAO LƯU MÃ TÀI KHOẢN
-    // =========================================================================
-    window.syncUID = async function() {
-      const uid = document.getElementById('uid-input').value.trim();
-      const statusEl = document.getElementById('uid-status');
-      const box = document.getElementById('uid-showcase-list');
-      if (!uid || uid.length < 9) {
-        alert('Vui lòng nhập đúng UID Genshin Impact (9-10 chữ số)!');
-        return;
-      }
-
-      statusEl.textContent = 'Đang tải...';
-      try {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://enka.network/api/uid/${uid}?info`)}`;
-        const res = await fetch(proxyUrl);
-        const raw = await res.json();
-        const data = JSON.parse(raw.contents);
-
-        const acc = getCurrentAccountData();
-        acc.uid = uid;
-        const nickname = data?.playerInfo?.nickname || 'Nhà Lữ Hành';
-        const level = data?.playerInfo?.level || '60';
-        const sig = data?.playerInfo?.signature || 'Không có chữ ký';
-
-        saveCurrentAccountData(acc);
-        statusEl.textContent = 'Đã kết nối ✓';
-        box.innerHTML = `
-          <div class="p-3 rounded-2xl bg-slate-900 text-white space-y-1">
-            <p class="font-bold text-sky-400">✦ ${nickname} (AR ${level})</p>
-            <p class="text-[11px] text-slate-300">UID: ${uid}</p>
-            <p class="text-[11px] text-slate-400 italic">"${sig}"</p>
-          </div>
-        `;
-      } catch (err) {
-        const acc = getCurrentAccountData();
-        acc.uid = uid;
-        saveCurrentAccountData(acc);
-        statusEl.textContent = 'Đã lưu UID ✓';
-        box.innerHTML = `
-          <div class="p-3 rounded-2xl bg-slate-900 text-white">
-            <p class="font-bold text-sky-400">UID: ${uid}</p>
-            <p class="text-[11px] text-slate-300 mt-1">Đã lưu UID vào hồ sơ của bạn.</p>
-          </div>
-        `;
-      }
-    };
-
-    window.openBackupModal = function() {
-      const m = document.getElementById('backup-modal');
-      m.classList.remove('hidden');
-      m.classList.add('flex');
-      if (currentUser) window.exportBackupCode();
-    };
-
-    window.closeBackupModal = function() {
-      const m = document.getElementById('backup-modal');
-      m.classList.add('hidden');
-      m.classList.remove('flex');
-    };
-
-    window.exportBackupCode = function() {
-      const all = getAllAccounts();
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(all))));
-      const box = document.getElementById('backup-code-box');
-      box.value = encoded;
-      box.select();
-    };
-
-    window.importBackupCode = function() {
-      try {
-        const code = document.getElementById('backup-code-box').value.trim();
-        const decoded = JSON.parse(decodeURIComponent(escape(atob(code))));
-        saveAllAccounts(decoded);
-        const firstUser = Object.keys(decoded)[0];
-        if (firstUser) {
-          currentUser = firstUser;
-          safeSetItem('teyvat_active_user_v3', firstUser);
-          window.closeBackupModal();
-          const modal = document.getElementById('auth-modal');
-          modal.style.display = 'none';
-          modal.classList.add('hidden');
-          initDashboardForUser();
-          alert('Đã khôi phục tài khoản & lịch sử roll thành công!');
-        }
-      } catch (e) {
-        alert('Mã sao lưu không hợp lệ!');
-      }
-    };
-
-    window.toggleSidebar = function(force) {
-      const sb = document.getElementById('sidebar');
-      if (typeof force === 'boolean') {
-        sb.classList.toggle('-translate-x-full', !force);
+      // Đổi nền theo chế độ Sáng/Tối
+      if (appState.theme === 'dark') {
+        document.body.style.background = '#0d1017';
       } else {
-        sb.classList.toggle('-translate-x-full');
+        document.body.style.background = elemCfg.bg;
       }
-    };
+      document.getElementById('hero-banner-card').style.background = elemCfg.hero;
 
-    function initDashboardForUser() {
-      const acc = getCurrentAccountData();
-      selectedCharId = acc.selectedCharId || 'tsaritsa';
-      const displayName = acc.nickname || acc.username || 'Yorrn';
+      // Mini card trên Sidebar
+      document.getElementById('active-char-mini-card').innerHTML = `
+        ${createAvatarHTML(char, rec.customImage, 'w-11 h-11')}
+        <div class="min-w-0 flex-1">
+          <p class="text-xs font-extrabold text-white truncate">${displayName}</p>
+          <p class="text-[11px] text-sky-400 font-bold">${rec.currentRolls} / ${rec.targetRolls} roll</p>
+        </div>
+      `;
 
-      document.getElementById('sidebar-user-label').textContent = displayName.toUpperCase();
-      document.getElementById('current-user-name').textContent = displayName;
-      document.getElementById('rhythm-user-name').textContent = displayName;
-      document.getElementById('mobile-user-tag').textContent = `👤 ${displayName}`;
-      document.getElementById('user-avatar-badge').textContent = displayName.slice(0, 1).toUpperCase();
-      document.getElementById('uid-input').value = acc.uid || '';
-
-      renderElementFilterBar();
-      window.renderCharacterList();
-      renderMainView();
-    }
-
-    // Nhấn phím Enter ở ô mật khẩu cũng đăng nhập ngay
-    document.getElementById('auth-password').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') window.submitAuth();
-    });
-
-    // Đồng hồ thời gian thực
-    setInterval(() => {
-      const now = new Date();
-      document.getElementById('clock-time').textContent = now.toLocaleTimeString('vi-VN');
-      document.getElementById('clock-date').textContent = now.toLocaleDateString('vi-VN');
-    }, 1000);
-
-    // Khởi chạy ban đầu
-    window.addEventListener('DOMContentLoaded', () => {
-      renderElementFilterBar();
-      const savedUser = safeGetItem('teyvat_active_user_v3');
-      const accounts = getAllAccounts();
-      if (savedUser && accounts[savedUser]) {
-        currentUser = savedUser;
-        const modal = document.getElementById('auth-modal');
-        modal.style.display = 'none';
-        modal.classList.add('hidden');
-        initDashboardForUser();
-      }
-    });
-  </script>
-</body>
-</html>
+      // Icon hệ chuẩn game
+      document.getElementById('sidebar-elem-icon').innerHTML = getElementIconHTML(char.element, 'w-6 h-6');
+      document.getElementById('sidebar-region-
