@@ -3,50 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hành Trình Teyvat — Quản Lý Quỹ Roll & Tài Nguyên</title>
+  <title>Hành Trình Teyvat — Quản Lý Quỹ Roll</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Be Vietnam Pro', sans-serif; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; overflow-x: hidden; transition: background 0.5s ease; }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.65);
-    }
-    .dark-glass {
-      background: rgba(15, 26, 36, 0.94);
-      backdrop-filter: blur(16px);
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
-    }
+    .glass-card { background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.65); }
+    .dark-glass { background: rgba(15, 26, 36, 0.94); backdrop-filter: blur(16px); border-right: 1px solid rgba(255, 255, 255, 0.08); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.5); border-radius: 9999px; }
     @keyframes floatParticle {
       0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
-      20% { opacity: 0.75; }
-      80% { opacity: 0.75; }
+      20% { opacity: 0.75; } 80% { opacity: 0.75; }
       100% { transform: translateY(105vh) translateX(40px) rotate(360deg); opacity: 0; }
     }
-    .weather-particle {
-      position: fixed;
-      top: -20px;
-      pointer-events: none;
-      z-index: 5;
-      animation: floatParticle linear infinite;
-    }
+    .weather-particle { position: fixed; top: -20px; pointer-events: none; z-index: 5; animation: floatParticle linear infinite; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
-
-  <!-- HIỆU ỨNG THỜI TIẾT ĐỘNG -->
   <div id="weather-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
 
-  <!-- MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ TÀI KHOẢN (ĐÃ FIX 100% CHO MOBILE) -->
+  <!-- MODAL ĐĂNG NHẬP -->
   <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4">
-    <div class="w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden">
-      <div class="absolute -top-20 -right-20 w-44 h-44 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative">
       <div class="flex items-center gap-3 mb-2">
         <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-600 flex items-center justify-center text-xl shadow-lg">✦</div>
         <div>
@@ -54,122 +34,68 @@
           <h2 id="auth-title" class="text-xl font-extrabold">Đăng Nhập Tài Khoản</h2>
         </div>
       </div>
-      <p class="text-xs text-slate-400 mb-5">Mỗi tài khoản lưu riêng quỹ Nguyên Thạch, lịch sử tích lũy, mục tiêu Cung mệnh và UID của bạn.</p>
+      <p class="text-xs text-slate-400 mb-5">Lưu riêng quỹ Nguyên Thạch và tiến độ roll của bạn.</p>
 
-      <!-- Tabs Đăng nhập / Đăng ký -->
       <div class="grid grid-cols-2 gap-1 p-1 bg-slate-800 rounded-xl mb-4 text-xs font-bold">
-        <button id="tab-login" type="button" onclick="window.switchAuthTab('login')" class="py-2.5 rounded-lg bg-sky-500 text-white transition cursor-pointer">Đăng nhập</button>
-        <button id="tab-register" type="button" onclick="window.switchAuthTab('register')" class="py-2.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">Tạo tài khoản mới</button>
+        <button type="button" id="tab-login" onclick="window.switchAuthTab('login')" class="py-2.5 rounded-lg bg-sky-500 text-white transition cursor-pointer">Đăng nhập</button>
+        <button type="button" id="tab-register" onclick="window.switchAuthTab('register')" class="py-2.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">Tạo tài khoản</button>
       </div>
 
       <div class="space-y-3.5">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Tên tài khoản (Username)</label>
-          <input id="auth-username" type="text" autocomplete="username" placeholder="VD: yorrn_teyvat" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
+          <input id="auth-username" type="text" placeholder="VD: yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
         </div>
         <div id="register-nickname-wrap" class="hidden">
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Biệt danh hiển thị (Tên Nhà Lữ Hành)</label>
-          <input id="auth-nickname" type="text" placeholder="VD: Yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Biệt danh hiển thị</label>
+          <input id="auth-nickname" type="text" placeholder="VD: Yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Mật khẩu</label>
-          <input id="auth-password" type="password" autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
+          <input id="auth-password" type="password" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
         </div>
         <p id="auth-error" class="text-xs text-rose-400 font-semibold hidden"></p>
-        
-        <button type="button" id="auth-submit-btn" onclick="window.submitAuth()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 active:scale-[0.99] hover:from-sky-400 hover:to-indigo-500 font-bold text-sm shadow-lg shadow-sky-500/25 transition cursor-pointer">
-          Vào Không Gian Tích Roll ➔
-        </button>
-      </div>
-
-      <div class="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-        <span>Đã có mã sao lưu từ máy khác?</span>
-        <button type="button" onclick="window.openBackupModal()" class="text-sky-400 hover:underline font-semibold cursor-pointer">Nhập mã khôi phục</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL SAO LƯU / ĐỒNG BỘ ĐA THIẾT BỊ -->
-  <div id="backup-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
-    <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-base font-bold flex items-center gap-2">☁️ Sao Lưu & Đồng Bộ Tài Khoản</h3>
-        <button type="button" onclick="window.closeBackupModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
-      </div>
-      <p class="text-xs text-slate-400 mb-3">Copy đoạn mã bên dưới để lưu trữ hoặc dán vào điện thoại/máy tính khác để đồng bộ 100% tài khoản và tiến độ roll của bạn:</p>
-      <textarea id="backup-code-box" rows="5" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-xs font-mono text-emerald-400 mb-3" placeholder="Dán mã sao lưu vào đây..."></textarea>
-      <div class="flex flex-wrap gap-2">
-        <button type="button" onclick="window.exportBackupCode()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-xs font-bold">Lấy mã tài khoản hiện tại</button>
-        <button type="button" onclick="window.importBackupCode()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold">Khôi phục từ mã này</button>
-        <button type="button" onclick="window.closeBackupModal()" class="ml-auto px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs">Đóng</button>
+        <button type="button" id="auth-submit-btn" onclick="window.submitAuth()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 font-bold text-sm shadow-lg cursor-pointer">Vào Không Gian Tích Roll ➔</button>
       </div>
     </div>
   </div>
 
   <!-- GIAO DIỆN CHÍNH -->
   <div class="relative z-10 flex min-h-screen">
-
-    <!-- SIDEBAR TRÁI -->
     <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 dark-glass text-white flex flex-col justify-between transition-transform duration-300 -translate-x-full lg:translate-x-0">
-      <!-- Top Header -->
       <div class="p-4 border-b border-white/10">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div id="sidebar-region-icon" class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-lg">❄️</div>
             <div>
-              <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">HÀNH TRÌNH</p>
+              <p class="text-[10px] uppercase text-slate-400 font-bold">HÀNH TRÌNH</p>
               <h1 id="sidebar-region-name" class="text-sm font-bold text-white">Snezhnaya</h1>
             </div>
           </div>
-          <button type="button" onclick="window.toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white text-xl px-2">✕</button>
+          <button type="button" onclick="window.toggleSidebar(false)" class="lg:hidden text-slate-400 text-xl px-2">✕</button>
         </div>
-
-        <!-- Lọc Nguyên Tố & Tìm kiếm -->
         <div class="mt-4">
-          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-2">KHÔNG GIAN CỦA <span id="sidebar-user-label" class="text-sky-400">YORRN</span></p>
-          <input id="char-search" oninput="window.renderCharacterList()" type="text" placeholder="🔍 Tìm nhân vật 5★..." class="w-full px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-sky-400 mb-2" />
+          <p class="text-[10px] uppercase text-slate-400 font-semibold mb-2">TÀI KHOẢN: <span id="sidebar-user-label" class="text-sky-400">YORRN</span></p>
+          <input id="char-search" oninput="window.renderCharacterList()" type="text" placeholder="🔍 Tìm nhân vật 5★..." class="w-full px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 text-xs text-white placeholder-slate-400 focus:outline-none mb-2" />
           <div id="element-filter-bar" class="flex items-center justify-between gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/5"></div>
         </div>
       </div>
-
-      <!-- Danh sách nhân vật 5 sao (Cuộn) -->
       <div id="character-list" class="flex-1 overflow-y-auto p-3 space-y-1.5"></div>
-
-      <!-- Thẻ Nhân vật đang chọn + Đồng bộ UID + Tài khoản -->
       <div class="p-3 border-t border-white/10 space-y-2.5 bg-slate-950/50">
-        <!-- Đồng bộ UID Enka -->
-        <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
-          <div class="flex items-center justify-between text-[11px] text-slate-300 mb-1.5">
-            <span class="font-semibold">🔗 Đồng bộ UID (Enka/HoYoLAB)</span>
-            <span id="uid-status" class="text-[10px] text-emerald-400"></span>
-          </div>
-          <div class="flex gap-1.5">
-            <input id="uid-input" type="text" placeholder="Nhập UID (VD: 800123456)" class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none" />
-            <button type="button" onclick="window.syncUID()" class="px-2.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-xs font-bold transition">Tải</button>
-          </div>
-        </div>
-
-        <!-- Thông tin tài khoản đang đăng nhập -->
         <div class="flex items-center justify-between px-2 py-1.5 rounded-xl bg-white/5">
-          <div class="flex items-center gap-2 min-w-0">
+          <div class="flex items-center gap-2">
             <div id="user-avatar-badge" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center font-bold text-xs">Y</div>
-            <div class="truncate">
-              <p id="current-user-name" class="text-xs font-bold text-white truncate">Yorrn</p>
+            <div>
+              <p id="current-user-name" class="text-xs font-bold text-white">Yorrn</p>
               <p class="text-[10px] text-slate-400">Đã lưu tự động</p>
             </div>
           </div>
-          <div class="flex items-center gap-1">
-            <button type="button" onclick="window.openBackupModal()" title="Sao lưu / Đồng bộ" class="p-1.5 rounded-lg hover:bg-white/10 text-xs">☁️</button>
-            <button type="button" onclick="window.logoutUser()" title="Đổi tài khoản / Đăng xuất" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 text-xs font-bold">Thoát</button>
-          </div>
+          <button type="button" onclick="window.logoutUser()" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 text-xs font-bold">Thoát</button>
         </div>
       </div>
     </aside>
 
-    <!-- KHU VỰC NỘI DUNG CHÍNH -->
-    <main id="main-content" class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 relative overflow-y-auto">
-      
-      <!-- Nút mở menu trên điện thoại -->
+    <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 relative overflow-y-auto">
       <div class="flex lg:hidden items-center justify-between mb-4 glass-card p-3 rounded-2xl shadow-sm">
         <button type="button" onclick="window.toggleSidebar(true)" class="flex items-center gap-2 text-sm font-bold text-slate-800">
           <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white">☰</span>
@@ -178,126 +104,383 @@
         <span id="mobile-user-tag" class="text-xs font-bold text-sky-700"></span>
       </div>
 
-      <!-- HEADER TRÊN CÙNG -->
       <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
-          <div class="flex flex-wrap items-center gap-2 text-xs font-bold tracking-wider uppercase text-slate-500 mb-1">
+          <div class="flex items-center gap-2 text-xs font-bold uppercase text-slate-500 mb-1">
             <span id="header-char-title">BĂNG THẦN • TSARITSA</span>
-            <span>•</span>
-            <span id="header-target-badge" class="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800">MỤC TIÊU: C0R1</span>
-            <select id="weapon-type-select" onchange="window.changeWeaponType(this.value)" class="px-2 py-0.5 rounded-md bg-white/90 border border-slate-300 text-slate-700 font-semibold text-xs cursor-pointer">
+            <select id="weapon-type-select" onchange="window.changeWeaponType(this.value)" class="px-2 py-0.5 rounded bg-white border border-slate-300 text-slate-700 text-xs">
               <option value="Kiếm Đơn">⚔️ Kiếm Đơn</option>
               <option value="Trọng Kiếm">🗡️ Trọng Kiếm</option>
-              <option value="Vũ Khí Cán Dài">🔱 Vũ Khí Cán Dài</option>
+              <option value="Vũ Khí Cán Dài">🔱 Cán Dài</option>
               <option value="Pháp Khí">📖 Pháp Khí</option>
               <option value="Cung">🏹 Cung</option>
             </select>
           </div>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-2">
-            <span id="header-journey-title">Hành trình Snezhnaya</span>
+            <span id="header-journey-title">Hành trình Tsaritsa</span>
             <span id="header-element-emoji">❄️</span>
           </h2>
           <p id="header-lore" class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl"></p>
         </div>
-
-        <!-- Đồng hồ thời gian thực -->
         <div class="glass-card px-4 py-2.5 rounded-2xl text-right shadow-sm">
-          <div class="text-xs text-slate-500 font-medium flex items-center justify-end gap-1.5">
-            <span>📅</span>
-            <span id="clock-date">16/10/2026</span>
-          </div>
-          <div id="clock-time" class="text-xl font-extrabold text-slate-900 tracking-tight">02:32:27</div>
-          <div class="text-[10px] text-slate-400">Giờ Việt Nam • UTC+7</div>
+          <div class="text-xs text-slate-500 font-medium" id="clock-date">16/10/2026</div>
+          <div id="clock-time" class="text-xl font-extrabold text-slate-900">02:32:27</div>
         </div>
       </div>
 
-      <!-- HÀNG 1: THẺ BANNER TIẾN ĐỘ LỚN + CỘT MỐC TIẾP THEO -->
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
-        
-        <!-- Thẻ Banner Chính (2 cột) -->
         <div id="hero-banner-card" class="xl:col-span-2 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl min-h-[240px] flex flex-col justify-between" style="background: linear-gradient(135deg, #0c192c 0%, #1e3a5f 60%, #2b5876 100%);">
           <div class="absolute right-3 bottom-0 top-0 w-44 sm:w-60 pointer-events-none flex items-end justify-end opacity-90">
             <div id="hero-char-illust" class="w-36 h-36 sm:w-48 sm:h-48 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl mb-4 mr-2 bg-slate-800/60 flex items-center justify-center"></div>
           </div>
-
           <div class="relative z-10 max-w-lg">
             <div class="flex items-center gap-2 text-xs uppercase tracking-widest text-sky-200 font-bold mb-2">
               <span>✦ QUỸ ROLL NHÂN VẬT</span>
-              <button type="button" onclick="window.promptCustomImage()" class="px-2 py-0.5 rounded bg-white/15 hover:bg-white/25 text-[10px] font-normal transition">🖼️ Đổi ảnh NV</button>
+              <button type="button" onclick="window.promptCustomImage()" class="px-2 py-0.5 rounded bg-white/15 text-[10px]">🖼️ Đổi ảnh NV</button>
             </div>
-
             <div class="flex items-baseline gap-2 flex-wrap">
               <span class="text-3xl">✦</span>
-              <input id="direct-current-rolls" type="number" min="0" onchange="window.setDirectCurrentRolls(this.value)" class="w-28 sm:w-36 bg-transparent border-b-2 border-white/30 focus:border-sky-300 text-5xl sm:text-6xl font-extrabold text-white focus:outline-none" value="86" title="Bấm để sửa trực tiếp tổng số roll hiện có" />
+              <input id="direct-current-rolls" type="number" min="0" onchange="window.setDirectCurrentRolls(this.value)" class="w-28 sm:w-36 bg-transparent border-b-2 border-white/30 text-5xl sm:text-6xl font-extrabold text-white focus:outline-none" value="86" />
               <span class="text-2xl text-slate-300 font-semibold">/</span>
-              <input id="direct-target-rolls" type="number" min="1" onchange="window.setDirectTargetRolls(this.value)" class="w-20 bg-transparent border-b border-white/30 focus:border-sky-300 text-2xl font-bold text-sky-200 focus:outline-none" value="200" title="Bấm để sửa mục tiêu roll" />
-              <span class="text-sm text-slate-200 font-medium">roll</span>
+              <input id="direct-target-rolls" type="number" min="1" onchange="window.setDirectTargetRolls(this.value)" class="w-20 bg-transparent border-b border-white/30 text-2xl font-bold text-sky-200 focus:outline-none" value="200" />
+              <span class="text-sm text-slate-200">roll</span>
             </div>
-
-            <p id="hero-progress-text" class="text-xs sm:text-sm text-slate-200 mt-2 font-medium">
-              Đã đi được 43% chặng đường. Mỗi roll đều có ý nghĩa.
-            </p>
-
+            <p id="hero-progress-text" class="text-xs sm:text-sm text-slate-200 mt-2">Đã đi được 43% chặng đường.</p>
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-950/45 border border-white/15 text-xs text-sky-200 mt-2">
               <span>✦ Tương đương <strong id="hero-primogems" class="text-white">13.760</strong> Nguyên Thạch</span>
             </div>
           </div>
-
           <div class="relative z-10 mt-6">
             <div class="h-3 w-full rounded-full bg-slate-950/50 overflow-hidden p-0.5">
-              <div id="hero-progress-bar" class="h-full rounded-full bg-gradient-to-r from-sky-300 via-cyan-300 to-white transition-all duration-500" style="width: 43%"></div>
+              <div id="hero-progress-bar" class="h-full rounded-full bg-gradient-to-r from-sky-300 to-white transition-all duration-500" style="width: 43%"></div>
             </div>
             <div class="flex justify-between text-[11px] text-slate-300 mt-1.5">
               <span>0 roll</span>
-              <span id="hero-mid-label">100</span>
               <span id="hero-max-label">200 roll</span>
             </div>
           </div>
         </div>
 
-        <!-- Thẻ Cột Mốc Tiếp Theo & Máy Tính Cung Mệnh (C) / Tinh Luyện (R) -->
         <div class="glass-card rounded-3xl p-5 shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between text-xs font-bold text-slate-500 uppercase mb-2">
-              <span>🚩 CỘT MỐC & ƯỚC TÍNH CUNG MỆNH</span>
-              <span class="text-sky-600">Tự động tính</span>
+              <span>🚩 MỐC & ƯỚC TÍNH CUNG MỆNH</span>
             </div>
             <div class="flex items-baseline gap-2">
               <span id="next-milestone-num" class="text-4xl font-extrabold text-slate-900">100</span>
-              <span class="text-sm font-semibold text-slate-500">roll (mốc gần nhất)</span>
+              <span class="text-sm font-semibold text-slate-500">roll</span>
             </div>
-            <p id="next-milestone-diff" class="text-xs text-slate-500 mt-0.5">Chỉ còn 14 roll nữa để chạm mốc này.</p>
-
+            <p id="next-milestone-diff" class="text-xs text-slate-500 mt-0.5">Chỉ còn 14 roll nữa.</p>
             <div class="mt-3 p-3 rounded-2xl bg-slate-900 text-white space-y-2">
               <div class="flex items-center justify-between text-xs">
-                <span class="text-slate-400">Dự kiến đạt (Kỳ vọng 55/45):</span>
+                <span class="text-slate-400">Dự kiến đạt:</span>
                 <span id="calc-expected-cr" class="px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 font-extrabold text-sm">C0 R0</span>
               </div>
               <div class="flex items-center justify-between text-xs">
-                <span class="text-slate-400">Chắc chắn 100% (Bảo hiểm):</span>
-                <span id="calc-guaranteed-cr" class="font-bold text-emerald-400">Chưa đủ Pity 90</span>
+                <span class="text-slate-400">100% Bảo hiểm:</span>
+                <span id="calc-guaranteed-cr" class="font-bold text-emerald-400">Chưa đủ</span>
               </div>
               <div class="pt-1.5 border-t border-slate-800 grid grid-cols-2 gap-2 text-[11px]">
                 <div>
                   <label class="text-slate-400 block">Pity NV đã tích:</label>
-                  <input id="char-pity-input" type="number" min="0" max="89" value="0" onchange="window.updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold" />
+                  <input id="char-pity-input" type="number" min="0" max="89" value="0" onchange="window.updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 text-white font-bold" />
                 </div>
                 <div>
                   <label class="text-slate-400 block">Trạng thái 50/50:</label>
-                  <select id="guaranteed-select" onchange="window.updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold">
+                  <select id="guaranteed-select" onchange="window.updatePitySettings()" class="w-full mt-0.5 px-2 py-1 rounded bg-slate-800 text-white font-bold">
                     <option value="false">Chưa bảo hiểm</option>
-                    <option value="true">Có bảo hiểm 100%</option>
+                    <option value="true">Có bảo hiểm</option>
                   </select>
                 </div>
               </div>
             </div>
           </div>
-
           <div class="mt-3 pt-2 border-t border-slate-200/70">
-            <p class="text-[11px] font-bold text-slate-500 mb-1.5">Đặt nhanh mục tiêu tích roll:</p>
+            <p class="text-[11px] font-bold text-slate-500 mb-1.5">Đặt nhanh mục tiêu:</p>
             <div class="flex flex-wrap gap-1.5">
-              <button type="button" onclick="window.setQuickGoal('C0R0', 90)" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C0 (90)</button>
-              <button type="button" onclick="window.setQuickGoal('C0R1', 160)" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C0R1 (160)</button>
-              <button type="button" onclick="window.setQuickGoal('C1R1', 250)" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C1R1 (250)</button>
-              <button type="button" onclick="window.setQuickGoal('C2R1', 340)" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-sky-500 hover:text-white text-[11px] font-bold transition">C2R1 (340)</button>
-              <button type="bu
+              <button type="button" onclick="window.setQuickGoal('C0R0', 90)" class="px-2 py-1 rounded-lg bg-slate-200 text-[11px] font-bold">C0 (90)</button>
+              <button type="button" onclick="window.setQuickGoal('C0R1', 160)" class="px-2 py-1 rounded-lg bg-slate-200 text-[11px] font-bold">C0R1 (160)</button>
+              <button type="button" onclick="window.setQuickGoal('C2R1', 340)" class="px-2 py-1 rounded-lg bg-slate-200 text-[11px] font-bold">C2R1 (340)</button>
+              <button type="button" onclick="window.setQuickGoal('C6R1', 720)" class="px-2 py-1 rounded-lg bg-slate-200 text-[11px] font-bold">C6R1 (720)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+        <div class="glass-card rounded-2xl p-4 shadow-sm">
+          <div class="text-xs text-slate-500 font-semibold">Còn thiếu</div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1"><span id="stat-remaining">114</span> roll</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 shadow-sm">
+          <div class="text-xs text-slate-500 font-semibold">Tăng gần nhất</div>
+          <div id="stat-last-diff" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">+5 roll</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 shadow-sm">
+          <div class="text-xs text-slate-500 font-semibold">KPI mỗi ngày</div>
+          <input id="kpi-input" type="number" min="1" max="100" value="5" onchange="window.updateKpi(this.value)" class="w-16 text-2xl font-extrabold bg-transparent border-b border-slate-300 mt-1" />
+        </div>
+        <div class="glass-card rounded-2xl p-4 shadow-sm">
+          <div class="text-xs text-slate-500 font-semibold">Dự kiến đạt</div>
+          <div id="stat-eta-date" class="text-2xl font-extrabold text-slate-900 mt-1">08/11/2026</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="lg:col-span-2 space-y-5">
+          <div class="glass-card rounded-3xl p-5 shadow-sm">
+            <h3 class="text-base font-extrabold text-slate-900 mb-3">➕ Thêm một bước tiến</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1">Tổng roll hiện có</label>
+                <input id="form-total-rolls" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-sm font-bold" />
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1">Cộng thêm (+ roll)</label>
+                <input id="form-add-rolls" type="number" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-sm font-bold text-emerald-700" placeholder="+5" />
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1">Ghi chú</label>
+                <input id="form-note" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-sm" placeholder="Daily, Event..." />
+              </div>
+            </div>
+            <div class="mt-3 flex justify-end">
+              <button type="button" onclick="window.saveRollProgress()" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold">✦ Lưu lịch sử</button>
+            </div>
+          </div>
+          <div class="glass-card rounded-3xl p-5 shadow-sm">
+            <h3 class="text-sm font-extrabold text-slate-900 mb-3">🧚‍♀️ Nhật Ký Paimon</h3>
+            <div id="history-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+        <div class="space-y-5">
+          <div class="glass-card rounded-3xl p-5 shadow-sm">
+            <h3 class="text-sm font-extrabold text-slate-900 mb-1">🎯 Nhịp tích lũy</h3>
+            <p class="text-xs text-slate-500 mb-3">Tốc độ: <strong id="rhythm-kpi">5</strong> roll/ngày</p>
+            <p class="text-xs">⏳ Còn <strong id="rhythm-days-left">23 ngày</strong> là đủ quỹ mục tiêu.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+    <script>
+    const memoryFallback = {};
+    function safeGetItem(k) { try { return localStorage.getItem(k) || memoryFallback[k] || null; } catch(e) { return memoryFallback[k] || null; } }
+    function safeSetItem(k, v) { memoryFallback[k] = v; try { localStorage.setItem(k, v); } catch(e) {} }
+    function safeRemoveItem(k) { delete memoryFallback[k]; try { localStorage.removeItem(k); } catch(e) {} }
+
+    const CHARACTERS = [
+      { id: 'tsaritsa', name: 'Tsaritsa', title: 'Băng Thần • Snezhnaya', element: 'Cryo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'Queen', lore: 'Nữ hoàng Băng giá trị vì Snezhnaya.' },
+      { id: 'mavuika', name: 'Mavuika', title: 'Hỏa Thần • Haborym', element: 'Pyro', region: 'Natlan', weapon: 'Trọng Kiếm', icon: 'Mavuika', lore: 'Vị Hỏa Thần rực cháy dẫn dắt Natlan.' },
+      { id: 'furina', name: 'Furina', title: 'Ngôi Sao Vĩnh Cửu', element: 'Hydro', region: 'Fontaine', weapon: 'Kiếm Đơn', icon: 'Furina', lore: 'Ngôi sao sân khấu Fontaine.' },
+      { id: 'nahida', name: 'Nahida', title: 'Thảo Thần • Kusanali', element: 'Dendro', region: 'Sumeru', weapon: 'Pháp Khí', icon: 'Nahida', lore: 'Vị thần trí tuệ Sumeru.' },
+      { id: 'raiden', name: 'Raiden Shogun', title: 'Lôi Thần • Beelzebul', element: 'Electro', region: 'Inazuma', weapon: 'Vũ Khí Cán Dài', icon: 'Shougun', lore: 'Tướng Quân Inazuma.' },
+      { id: 'venti', name: 'Venti', title: 'Phong Thần • Barbatos', element: 'Anemo', region: 'Mondstadt', weapon: 'Cung', icon: 'Venti', lore: 'Nhà thơ lang thang Mondstadt.' },
+      { id: 'zhongli', name: 'Zhongli', title: 'Nham Thần • Morax', element: 'Geo', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'Zhongli', lore: 'Vị thần Khế Ước Liyue.' }
+    ];
+
+    const ELEMENT_CONFIG = {
+      All:     { label: 'Tất cả', emoji: '✦' },
+      Cryo:    { label: 'Băng', emoji: '❄️', bg: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)', hero: 'linear-gradient(135deg, #0b1c31 0%, #1d3b5c 100%)', particle: '❄️' },
+      Pyro:    { label: 'Hỏa', emoji: '🔥', bg: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%)', hero: 'linear-gradient(135deg, #3b0d0c 0%, #7c1d18 100%)', particle: '🔥' },
+      Hydro:   { label: 'Thủy', emoji: '💧', bg: 'linear-gradient(135deg, #e0e7ff 0%, #bae6fd 100%)', hero: 'linear-gradient(135deg, #091534 0%, #16336b 100%)', particle: '🫧' },
+      Dendro:  { label: 'Thảo', emoji: '🌿', bg: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)', hero: 'linear-gradient(135deg, #092618 0%, #174e32 100%)', particle: '🍃' },
+      Electro: { label: 'Lôi', emoji: '⚡', bg: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%)', hero: 'linear-gradient(135deg, #210d3b 0%, #441c75 100%)', particle: '⚡' },
+      Anemo:   { label: 'Phong', emoji: '🍃', bg: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)', hero: 'linear-gradient(135deg, #082927 0%, #14544f 100%)', particle: '🍃' },
+      Geo:     { label: 'Nham', emoji: '🪨', bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', hero: 'linear-gradient(135deg, #2b1d07 0%, #5c3f11 100%)', particle: '✨' }
+    };
+
+    let authMode = 'login', currentUser = null, selectedElement = 'All', selectedCharId = 'tsaritsa';
+
+    function getAllAccounts() {
+      try { return JSON.parse(safeGetItem('teyvat_accounts_v4') || '{}'); } catch(e) { return {}; }
+    }
+    function saveAllAccounts(accs) { safeSetItem('teyvat_accounts_v4', JSON.stringify(accs)); }
+
+    function getCurrentAccountData() {
+      const accs = getAllAccounts();
+      if (!currentUser || !accs[currentUser]) {
+        currentUser = 'yorrn';
+        accs[currentUser] = { username: 'yorrn', password: '', nickname: 'Yorrn', selectedCharId: 'tsaritsa', characters: {} };
+        saveAllAccounts(accs);
+      }
+      return accs[currentUser];
+    }
+    function saveCurrentAccountData(data) {
+      const accs = getAllAccounts();
+      accs[currentUser] = data;
+      saveAllAccounts(accs);
+    }
+
+    function getCharRecord(charId) {
+      const acc = getCurrentAccountData();
+      if (!acc.characters) acc.characters = {};
+      if (!acc.characters[charId]) {
+        const base = CHARACTERS.find(c => c.id === charId) || CHARACTERS[0];
+        acc.characters[charId] = {
+          currentRolls: charId === 'tsaritsa' ? 86 : 0,
+          targetRolls: 200, goalLabel: 'C0R1', kpi: 5, pity: 0, guaranteed: false,
+          weaponType: base.weapon, customImage: '',
+          history: [{ time: '16/10/2026', total: charId === 'tsaritsa' ? 86 : 0, diff: '+5', note: 'Khởi tạo' }]
+        };
+        saveCurrentAccountData(acc);
+      }
+      return acc.characters[charId];
+    }
+
+    window.switchAuthTab = function(mode) {
+      authMode = mode;
+      document.getElementById('auth-title').textContent = mode === 'login' ? 'Đăng Nhập Tài Khoản' : 'Tạo Tài Khoản Mới';
+      document.getElementById('tab-login').className = mode === 'login' ? 'py-2.5 rounded-lg bg-sky-500 text-white cursor-pointer' : 'py-2.5 rounded-lg text-slate-400 cursor-pointer';
+      document.getElementById('tab-register').className = mode === 'register' ? 'py-2.5 rounded-lg bg-sky-500 text-white cursor-pointer' : 'py-2.5 rounded-lg text-slate-400 cursor-pointer';
+      document.getElementById('register-nickname-wrap').classList.toggle('hidden', mode === 'login');
+    };
+
+    window.submitAuth = function() {
+      const u = (document.getElementById('auth-username').value || '').trim().toLowerCase();
+      const p = document.getElementById('auth-password').value || '';
+      const nick = (document.getElementById('auth-nickname').value || '').trim() || u.toUpperCase();
+      const err = document.getElementById('auth-error');
+
+      if (!u || !p) { err.textContent = '⚠️ Vui lòng nhập tài khoản và mật khẩu!'; err.classList.remove('hidden'); return; }
+      const accs = getAllAccounts();
+      if (!accs[u]) {
+        accs[u] = { username: u, password: p, nickname: nick, selectedCharId: 'tsaritsa', characters: {} };
+        saveAllAccounts(accs);
+      }
+      currentUser = u;
+      safeSetItem('teyvat_active_v4', u);
+      document.getElementById('auth-modal').style.display = 'none';
+      initApp();
+    };
+
+    window.logoutUser = function() {
+      safeRemoveItem('teyvat_active_v4');
+      currentUser = null;
+      document.getElementById('auth-modal').style.display = 'flex';
+    };
+
+    function createAvatarHTML(char, customImg) {
+      if (customImg) return `<img src="${customImg}" class="w-10 h-10 rounded-xl object-cover border border-amber-300" />`;
+      return `<div class="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-600 text-white font-bold text-xs">${char.name.slice(0,2)}</div>`;
+    }
+
+    window.setElementFilter = function(elem) {
+      selectedElement = elem;
+      renderFilterBar();
+      window.renderCharacterList();
+    };
+
+    function renderFilterBar() {
+      document.getElementById('element-filter-bar').innerHTML = Object.keys(ELEMENT_CONFIG).map(k => `
+        <button type="button" onclick="window.setElementFilter('${k}')" class="px-2 py-1 rounded-lg text-xs font-bold ${selectedElement === k ? 'bg-sky-500 text-white' : 'text-slate-400'}">${ELEMENT_CONFIG[k].emoji}</button>
+      `).join('');
+    }
+
+    window.renderCharacterList = function() {
+      const list = CHARACTERS.filter(c => selectedElement === 'All' || c.element === selectedElement);
+      document.getElementById('character-list').innerHTML = list.map(c => {
+        const rec = getCharRecord(c.id);
+        const sel = c.id === selectedCharId;
+        return `
+          <button type="button" onclick="window.selectChar('${c.id}')" class="w-full flex items-center gap-3 p-2 rounded-2xl text-left transition ${sel ? 'bg-sky-500/25 border border-sky-400' : 'hover:bg-white/5'}">
+            ${createAvatarHTML(c, rec.customImage)}
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-bold text-white truncate">${c.name}</p>
+              <p class="text-[10px] text-sky-300">${rec.currentRolls}/${rec.targetRolls} roll</p>
+            </div>
+          </button>
+        `;
+      }).join('');
+    };
+
+    window.selectChar = function(id) {
+      selectedCharId = id;
+      window.renderCharacterList();
+      renderMain();
+      if (window.innerWidth < 1024) window.toggleSidebar(false);
+    };
+
+    window.toggleSidebar = function(isOpen) {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full', !isOpen);
+    };
+
+    function renderMain() {
+      const char = CHARACTERS.find(c => c.id === selectedCharId) || CHARACTERS[0];
+      const rec = getCharRecord(char.id);
+      const cfg = ELEMENT_CONFIG[char.element] || ELEMENT_CONFIG.Cryo;
+
+      document.body.style.background = cfg.bg;
+      document.getElementById('hero-banner-card').style.background = cfg.hero;
+      document.getElementById('header-char-title').textContent = `${char.title} • ${char.name}`.toUpperCase();
+      document.getElementById('header-journey-title').textContent = `Hành trình ${char.name}`;
+      document.getElementById('header-element-emoji').textContent = cfg.emoji;
+      document.getElementById('header-lore').textContent = char.lore;
+      document.getElementById('hero-char-illust').innerHTML = createAvatarHTML(char, rec.customImage);
+
+      const cur = Number(rec.currentRolls) || 0;
+      const target = Number(rec.targetRolls) || 200;
+      document.getElementById('direct-current-rolls').value = cur;
+      document.getElementById('direct-target-rolls').value = target;
+      document.getElementById('form-total-rolls').value = cur;
+      document.getElementById('hero-primogems').textContent = (cur * 160).toLocaleString('vi-VN');
+      document.getElementById('hero-progress-bar').style.width = `${Math.min(100, (cur/target)*100)}%`;
+      document.getElementById('stat-remaining').textContent = Math.max(0, target - cur);
+
+      document.getElementById('history-list').innerHTML = (rec.history || []).map(h => `
+        <div class="p-2 rounded-xl bg-slate-100 text-xs flex justify-between">
+          <span>${h.note} (${h.total} roll)</span>
+          <span class="font-bold text-emerald-600">${h.diff}</span>
+        </div>
+      `).join('');
+    }
+
+    window.setDirectCurrentRolls = function(v) {
+      const rec = getCharRecord(selectedCharId);
+      rec.currentRolls = Math.max(0, Number(v) || 0);
+      saveCurrentAccountData(getCurrentAccountData());
+      window.renderCharacterList();
+      renderMain();
+    };
+
+    window.setDirectTargetRolls = function(v) {
+      const rec = getCharRecord(selectedCharId);
+      rec.targetRolls = Math.max(1, Number(v) || 200);
+      saveCurrentAccountData(getCurrentAccountData());
+      window.renderCharacterList();
+      renderMain();
+    };
+
+    window.saveRollProgress = function() {
+      const rec = getCharRecord(selectedCharId);
+      const val = Number(document.getElementById('form-total-rolls').value) || 0;
+      const diff = val - rec.currentRolls;
+      rec.currentRolls = val;
+      rec.history.unshift({ time: 'Hôm nay', total: val, diff: (diff >= 0 ? '+' : '') + diff, note: document.getElementById('form-note').value || 'Cập nhật' });
+      saveCurrentAccountData(getCurrentAccountData());
+      window.renderCharacterList();
+      renderMain();
+    };
+
+    function initApp() {
+      const acc = getCurrentAccountData();
+      selectedCharId = acc.selectedCharId || 'tsaritsa';
+      renderFilterBar();
+      window.renderCharacterList();
+      renderMain();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = safeGetItem('teyvat_active_v4');
+      if (saved && getAllAccounts()[saved]) {
+        currentUser = saved;
+        document.getElementById('auth-modal').style.display = 'none';
+        initApp();
+      } else {
+        renderFilterBar();
+        window.renderCharacterList();
+      }
+    });
+  </script>
+</body>
+</html>
