@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hành Trình Teyvat — Quản Lý Quỹ Roll & Lịch HoYoLAB</title>
+
+  <!-- FAVICON TRÊN TAB TRÌNH DUYỆT (ICON NGUYÊN THẠCH LẤP LÁNH) -->
+  <link id="dynamic-favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='50%25' stop-color='%23f472b6'/%3E%3Cstop offset='100%25' stop-color='%2338bdf8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='%230f172a' stroke='%2338bdf8' stroke-width='4'/%3E%3Cpath d='M50 8 L63 37 L92 50 L63 63 L50 92 L37 63 L8 50 L37 37 Z' fill='url(%23g1)' stroke='%23ffffff' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23ffffff'/%3E%3C/svg%3E" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -17,9 +21,9 @@
 
     /* Giao diện thẻ Sáng / Tối */
     .card-surface {
-      background: rgba(255, 255, 255, 0.90);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(14px);
-      border: 1px solid rgba(203, 213, 225, 0.85);
+      border: 1px solid rgba(203, 213, 225, 0.9);
       color: #0f172a;
     }
     html.dark .card-surface {
@@ -91,13 +95,13 @@
   <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4">
     <div class="w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative">
       <div class="flex items-center gap-3 mb-2">
-        <img src="https://rerollcdn.com/GENSHIN/UI/primogem.png" class="w-10 h-10 object-contain" alt="Primo" />
+        <img id="auth-primo-logo" src="" class="w-11 h-11 object-contain drop-shadow" alt="Primo" />
         <div>
           <p class="text-xs uppercase tracking-widest text-sky-400 font-semibold">CỔNG THIÊN LÝ • TEYVAT</p>
           <h2 id="auth-title" class="text-xl font-extrabold">Đăng Nhập Tài Khoản</h2>
         </div>
       </div>
-      <p class="text-xs text-slate-400 mb-5">Mỗi tài khoản lưu riêng quỹ Roll, Lịch Sự Kiện, Nhân vật tự tạo và vị trí Sticker trang trí.</p>
+      <p class="text-xs text-slate-400 mb-5">Mỗi tài khoản lưu riêng quỹ Roll, Lịch Sự Kiện thời gian thực, Nhân vật tự tạo và Sticker trang trí.</p>
 
       <div class="grid grid-cols-2 gap-1 p-1 bg-slate-800 rounded-xl mb-4 text-xs font-bold">
         <button type="button" id="tab-login" onclick="window.switchAuthTab('login')" class="py-2.5 rounded-lg bg-sky-500 text-white transition cursor-pointer">Đăng nhập</button>
@@ -110,7 +114,7 @@
           <input id="auth-username" type="text" placeholder="VD: yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
         </div>
         <div id="register-nickname-wrap" class="hidden">
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Biệt danh hiển thị</label>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Tên hiển thị (Nickname)</label>
           <input id="auth-nickname" type="text" placeholder="VD: Yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-400" />
         </div>
         <div>
@@ -126,7 +130,61 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 2. MODAL TẠO NHÂN VẬT CHƯA RA MẮT / CHỈNH SỬA AVATAR & VŨ KHÍ -->
+  <!-- 2. MODAL CÀI ĐẶT TÀI KHOẢN (ĐỔI TÊN HIỂN THỊ, ĐỔI AVATAR, ĐỔI MẬT KHẨU) -->
+  <!-- ===================================================================== -->
+  <div id="account-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-extrabold text-sky-400 flex items-center gap-2">⚙️ Cài Đặt Tài Khoản</h3>
+        <button type="button" onclick="window.closeAccountModal()" class="text-slate-400 hover:text-white text-xl">✕</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <!-- Xem trước Avatar & Tên -->
+        <div class="flex items-center gap-3.5 p-3 rounded-2xl bg-slate-950 border border-slate-800">
+          <div id="acc-modal-avatar-preview" class="w-14 h-14 rounded-2xl bg-sky-600 flex items-center justify-center font-extrabold text-xl overflow-hidden shrink-0 border border-white/20">Y</div>
+          <div class="min-w-0 flex-1">
+            <p class="text-[11px] text-slate-400">Tài khoản đăng nhập: <strong id="acc-modal-username" class="text-sky-400">@yorrn</strong></p>
+            <p id="acc-modal-nick-preview" class="text-base font-extrabold text-white truncate">Yorrn</p>
+          </div>
+        </div>
+
+        <!-- Đổi Tên hiển thị -->
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Tên hiển thị (Biệt danh Nhà Lữ Hành)</label>
+          <input id="acc-edit-nickname" type="text" placeholder="VD: Yorrn" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-400" />
+        </div>
+
+        <!-- Đổi Avatar tài khoản -->
+        <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+          <label class="font-bold text-sky-400 block">🖼️ Đổi Avatar Tài Khoản</label>
+          <input id="acc-edit-avatar-url" type="text" placeholder="Dán link ảnh Avatar hoặc chọn ảnh từ máy..." class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white" />
+          <div class="flex flex-wrap items-center gap-2 pt-1">
+            <label class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 cursor-pointer font-semibold">
+              📂 Tải ảnh từ máy tính
+              <input type="file" accept="image/*" onchange="window.handleUserAvatarUpload(event)" class="hidden" />
+            </label>
+            <button type="button" onclick="window.clearUserAvatar()" class="px-2.5 py-1.5 rounded-xl bg-rose-500/15 text-rose-300 hover:bg-rose-500/25">Xóa ảnh</button>
+            <span id="user-avatar-upload-status" class="text-[11px] text-emerald-400"></span>
+          </div>
+        </div>
+
+        <!-- Đổi Mật khẩu -->
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Đổi mật khẩu mới (Để trống nếu giữ nguyên)</label>
+          <input id="acc-edit-password" type="password" placeholder="Nhập mật khẩu mới..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-400" />
+        </div>
+      </div>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" onclick="window.closeAccountModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold">Đóng</button>
+        <button type="button" onclick="window.saveAccountSettings()" class="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold shadow-lg">💾 Lưu Thay Đổi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 3. MODAL TẠO NHÂN VẬT CHƯA RA MẮT / CHỈNH SỬA AVATAR & VŨ KHÍ -->
   <!-- ===================================================================== -->
   <div id="char-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl">
@@ -199,7 +257,7 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 3. MODAL QUẢN LÝ & TỰ TẠO STICKER TRANG TRÍ -->
+  <!-- 4. MODAL QUẢN LÝ & TỰ TẠO STICKER TRANG TRÍ -->
   <!-- ===================================================================== -->
   <div id="sticker-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl">
@@ -216,8 +274,8 @@
             <img src="https://enka.network/ui/UI_AvatarIcon_Paimon.png" referrerpolicy="no-referrer" class="w-10 h-10 object-contain" />
             <span>Paimon</span>
           </button>
-          <button type="button" onclick="window.addStickerToScreen('https://rerollcdn.com/GENSHIN/UI/primogem.png', 70)" class="p-2 rounded-2xl bg-slate-800 hover:bg-slate-700 flex flex-col items-center gap-1 text-[10px]">
-            <img src="https://rerollcdn.com/GENSHIN/UI/primogem.png" class="w-10 h-10 object-contain" />
+          <button type="button" onclick="window.addStickerToScreen(window.PRIMOGEM_SVG, 70)" class="p-2 rounded-2xl bg-slate-800 hover:bg-slate-700 flex flex-col items-center gap-1 text-[10px]">
+            <img id="sticker-primo-preview" src="" class="w-10 h-10 object-contain" />
             <span>Nguyên Thạch</span>
           </button>
           <button type="button" onclick="window.addStickerToScreen('https://enka.network/ui/UI_AvatarIcon_Furina.png', 85)" class="p-2 rounded-2xl bg-slate-800 hover:bg-slate-700 flex flex-col items-center gap-1 text-[10px]">
@@ -265,7 +323,7 @@
         <!-- Quốc gia & Hệ -->
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
           <div class="flex items-center gap-2.5">
-            <img id="sidebar-element-img" src="https://rerollcdn.com/GENSHIN/Elements/Element_Cryo.png" class="w-8 h-8 object-contain" alt="Element" />
+            <img id="sidebar-element-img" src="" class="w-8 h-8 object-contain" alt="Element" />
             <div>
               <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">HÀNH TRÌNH</p>
               <h1 id="sidebar-region-name" class="text-sm font-extrabold text-white">Snezhnaya</h1>
@@ -282,8 +340,8 @@
             <span>•</span>
           </button>
           <button type="button" id="nav-btn-calendar" onclick="window.switchMainTab('calendar')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition">
-            <span class="flex items-center gap-2">📅 Chi Tiết Lịch (HoYoLAB)</span>
-            <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">+NT</span>
+            <span class="flex items-center gap-2">📅 Chi Tiết Lịch (Real-time)</span>
+            <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">LIVE</span>
           </button>
         </div>
 
@@ -319,7 +377,7 @@
         <div class="p-3.5 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-white/10 text-center space-y-2">
           <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">ĐÍCH ĐẾN CỦA CHÚNG MÌNH</p>
           <div class="flex justify-center">
-            <img id="dest-element-icon" src="https://rerollcdn.com/GENSHIN/Elements/Element_Cryo.png" class="w-7 h-7 object-contain" />
+            <img id="dest-element-icon" src="" class="w-7 h-7 object-contain" />
           </div>
           <p id="dest-char-name" class="text-xs font-extrabold text-white">Băng Thần - Tsaritsa</p>
           <p id="dest-goal-badge" class="text-[11px] text-sky-400 font-bold">MỤC TIÊU: C0R1</p>
@@ -333,7 +391,7 @@
         </div>
       </div>
 
-      <!-- CÀI ĐẶT GIAO DIỆN SÁNG/TỐI, STICKER & TÀI KHOẢN -->
+      <!-- CÀI ĐẶT GIAO DIỆN SÁNG/TỐI, STICKER & CÀI ĐẶT TÀI KHOẢN -->
       <div class="p-3 border-t border-white/10 space-y-2 bg-slate-950">
         <div class="grid grid-cols-2 gap-1.5">
           <button type="button" onclick="window.toggleThemeMode()" class="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-bold flex items-center justify-center gap-1.5">
@@ -344,15 +402,18 @@
           </button>
         </div>
 
-        <div class="flex items-center justify-between px-2.5 py-2 rounded-xl bg-white/5">
-          <div class="flex items-center gap-2 min-w-0">
-            <div id="user-avatar-badge" class="w-7 h-7 rounded-full bg-sky-600 flex items-center justify-center font-bold text-xs">Y</div>
+        <div class="flex items-center justify-between px-2.5 py-2 rounded-xl bg-white/5 border border-white/5">
+          <div onclick="window.openAccountModal()" class="flex items-center gap-2 min-w-0 cursor-pointer hover:opacity-85" title="Bấm để Cài đặt Tài khoản">
+            <div id="user-avatar-badge" class="w-8 h-8 rounded-xl bg-sky-600 flex items-center justify-center font-bold text-xs overflow-hidden shrink-0 border border-white/20">Y</div>
             <div class="truncate">
               <p id="current-user-name" class="text-xs font-bold text-white truncate">Yorrn</p>
-              <p class="text-[10px] text-emerald-400">Đã lưu tự động ✓</p>
+              <p class="text-[10px] text-sky-400">⚙️ Cài đặt TK</p>
             </div>
           </div>
-          <button type="button" onclick="window.logoutUser()" class="px-2 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[11px] font-bold">Đổi TK</button>
+          <div class="flex items-center gap-1">
+            <button type="button" onclick="window.openAccountModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs" title="Đổi Tên / Mật khẩu / Avatar">⚙️</button>
+            <button type="button" onclick="window.logoutUser()" class="px-2 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[11px] font-bold">Thoát</button>
+          </div>
         </div>
       </div>
     </aside>
@@ -364,11 +425,11 @@
       <div class="flex lg:hidden items-center justify-between mb-4 card-surface p-3 rounded-2xl shadow-sm">
         <button type="button" onclick="window.toggleSidebar(true)" class="flex items-center gap-2 text-xs font-bold">
           <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white">☰</span>
-          <span>Menu & Chọn Nhân Vật</span>
+          <span>Menu & Nhân Vật</span>
         </button>
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="window.switchMainTab('calendar')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 text-xs font-bold">📅 Lịch Sự Kiện</button>
-          <button type="button" onclick="window.openStickerModal()" class="px-2 py-1 rounded-lg bg-sky-500/20 text-sky-400 text-xs font-bold">🧚‍♀️</button>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="window.switchMainTab('calendar')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 text-xs font-bold">📅 Lịch</button>
+          <button type="button" onclick="window.openAccountModal()" class="px-2 py-1 rounded-lg bg-slate-500/20 text-xs font-bold">⚙️</button>
         </div>
       </div>
 
@@ -407,7 +468,7 @@
 
             <h2 class="text-2xl sm:text-3xl font-extrabold flex items-center gap-2.5">
               <span id="header-journey-title">Hành trình Tsaritsa</span>
-              <img id="header-element-img" src="https://rerollcdn.com/GENSHIN/Elements/Element_Cryo.png" class="w-7 h-7 object-contain" alt="Elem" />
+              <img id="header-element-img" src="" class="w-7 h-7 object-contain" alt="Elem" />
             </h2>
             <p id="header-lore" class="text-xs sm:text-sm opacity-75 mt-1 max-w-2xl"></p>
           </div>
@@ -416,10 +477,10 @@
           <div class="card-surface px-4 py-2.5 rounded-2xl text-right shadow-sm">
             <div class="text-xs opacity-70 font-medium flex items-center justify-end gap-1.5">
               <span>📅</span>
-              <span id="clock-date">16/10/2026</span>
+              <span id="clock-date">--/--/----</span>
             </div>
-            <div id="clock-time" class="text-xl font-extrabold tracking-tight">22:54:00</div>
-            <div class="text-[10px] opacity-60">Giờ Việt Nam • UTC+7</div>
+            <div id="clock-time" class="text-xl font-extrabold tracking-tight">--:--:--</div>
+            <div class="text-[10px] opacity-60">Giờ Việt Nam • Thời Gian Thực</div>
           </div>
         </div>
 
@@ -438,9 +499,9 @@
                 <button type="button" onclick="window.openEditCurrentCharModal()" class="px-2 py-0.5 rounded bg-white/15 hover:bg-white/25 text-[10px] font-semibold transition">🖼️ Đổi Avatar</button>
               </div>
 
-              <!-- Chỉnh trực tiếp số Roll hiện có & Mục tiêu -->
-              <div class="flex items-baseline gap-2 flex-wrap">
-                <img src="https://rerollcdn.com/GENSHIN/UI/primogem.png" class="w-8 h-8 object-contain self-center" />
+              <!-- Chỉnh trực tiếp số Roll hiện có & Mục tiêu (ICON NGUYÊN THẠCH SVG CHUẨN 100%) -->
+              <div class="flex items-baseline gap-2.5 flex-wrap">
+                <img id="hero-primo-icon" src="" class="w-10 h-10 object-contain self-center drop-shadow-md" alt="Primo" />
                 <input id="direct-current-rolls" type="number" min="0" onchange="window.updateDirectCurrentRolls(this.value)" class="w-28 sm:w-36 bg-transparent border-b-2 border-white/35 focus:border-sky-300 text-5xl sm:text-6xl font-extrabold text-white focus:outline-none" value="86" />
                 <span class="text-2xl text-slate-300 font-semibold">/</span>
                 <input id="direct-target-rolls" type="number" min="1" onchange="window.updateDirectTargetRolls(this.value)" class="w-20 bg-transparent border-b border-white/35 focus:border-sky-300 text-2xl font-bold text-sky-200 focus:outline-none" value="200" />
@@ -623,7 +684,7 @@
             <div class="hoyolab-panel rounded-3xl p-5 shadow-xl">
               <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
-                  <img src="https://rerollcdn.com/GENSHIN/UI/primogem.png" class="w-6 h-6" />
+                  <img id="widget-primo-icon" src="" class="w-6 h-6 object-contain" alt="Primo" />
                   <h3 class="text-sm font-extrabold text-amber-200">Nhận Nhanh La Hoàn & Sự Kiện</h3>
                 </div>
                 <button type="button" onclick="window.switchMainTab('calendar')" class="text-xs text-sky-400 hover:underline font-bold">Mở Chi Tiết Lịch ➔</button>
@@ -648,7 +709,7 @@
       </div>
 
       <!-- =============================================================== -->
-      <!-- TAB 2: CHI TIẾT LỊCH TRONG GAME (CHUẨN GIAO DIỆN HOYOLAB) -->
+      <!-- TAB 2: CHI TIẾT LỊCH TRONG GAME (CẬP NHẬT THEO THỜI GIAN THỰC) -->
       <!-- =============================================================== -->
       <div id="tab-view-calendar" class="hidden max-w-4xl mx-auto space-y-6">
         
@@ -656,12 +717,15 @@
           <div class="flex items-center gap-3">
             <button type="button" onclick="window.switchMainTab('overview')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm font-bold">←</button>
             <div>
-              <h2 class="text-base sm:text-lg font-extrabold text-white">Chi Tiết Lịch • HoYoLAB Teyvat</h2>
+              <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                <span>Chi Tiết Lịch • HoYoLAB</span>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">● Đếm ngược thời gian thực</span>
+              </h2>
               <p class="text-[11px] text-slate-400">Click vào biểu tượng Nguyên Thạch khi hoàn thành để tự động cộng Roll cho <strong id="cal-active-char" class="text-sky-400">Tsaritsa</strong></p>
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="window.resetMonthlyEvents()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-amber-300" title="Làm mới trạng thái nhận thưởng khi sang tháng/kỳ mới">🔄 Reset Kỳ Mới</button>
+            <button type="button" onclick="window.resetMonthlyEvents()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-amber-300" title="Làm mới trạng thái nhận thưởng khi sang tháng/kỳ mới">🔄 Reset Trạng Thái Nhận</button>
           </div>
         </div>
 
@@ -669,10 +733,13 @@
 
           <!-- PHẦN 1: SỰ KIỆN CẦU NGUYỆN -->
           <div>
-            <div class="flex items-center gap-2 mb-3">
-              <span class="text-amber-300">✦</span>
-              <h3 class="text-sm font-extrabold text-amber-100">Sự Kiện Cầu Nguyện</h3>
-              <span class="px-1.5 py-0.5 rounded bg-rose-500/80 text-white text-[10px] font-extrabold">7.1</span>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-amber-300">✦</span>
+                <h3 class="text-sm font-extrabold text-amber-100">Sự Kiện Cầu Nguyện</h3>
+                <span class="px-1.5 py-0.5 rounded bg-rose-500/80 text-white text-[10px] font-extrabold">LIVE</span>
+              </div>
+              <button type="button" onclick="window.promptSetBannerEndDate()" class="text-[11px] text-sky-400 hover:underline font-semibold">🕒 Chỉnh hạn Banner</button>
             </div>
 
             <div class="grid grid-cols-2 p-1 rounded-full bg-slate-900/90 border border-white/10 mb-4 text-xs font-bold">
@@ -684,11 +751,11 @@
               <div class="hoyolab-row rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
                 <div class="space-y-2">
                   <p class="text-sm font-bold text-white">Cầu Nguyện Nhân Vật</p>
-                  <p class="text-xs text-slate-400">🕒 Thời gian còn: <span class="text-amber-200 font-semibold">17 ngày 15 giờ 20 phút</span></p>
+                  <p class="text-xs text-slate-400">🕒 Thời gian còn: <span class="live-banner-countdown text-amber-300 font-bold font-mono">Đang tính...</span></p>
                   <div class="flex items-center gap-2 pt-1">
                     <div onclick="window.selectCharacter('skirk'); window.switchMainTab('overview');" class="cursor-pointer relative" title="Bấm để chuyển sang tích roll cho Skirk">
                       <img src="https://enka.network/ui/UI_AvatarIcon_Skirk.png" onerror="this.src='https://enka.network/ui/UI_AvatarIcon_Ayaka.png'" referrerpolicy="no-referrer" class="w-12 h-12 rounded-xl bg-amber-600/80 object-cover border border-amber-300" />
-                      <img src="https://rerollcdn.com/GENSHIN/Elements/Element_Cryo.png" class="w-4 h-4 absolute -top-1 -left-1" />
+                      <img class="elem-icon-cryo w-4 h-4 absolute -top-1 -left-1 rounded-full bg-slate-900 p-0.5" src="" />
                     </div>
                     <img src="https://enka.network/ui/UI_AvatarIcon_Dahlia.png" onerror="this.src='https://enka.network/ui/UI_AvatarIcon_Barbara.png'" referrerpolicy="no-referrer" class="w-12 h-12 rounded-xl bg-purple-700/80 object-cover" />
                     <img src="https://enka.network/ui/UI_AvatarIcon_Candace.png" referrerpolicy="no-referrer" class="w-12 h-12 rounded-xl bg-purple-700/80 object-cover" />
@@ -701,11 +768,11 @@
               <div class="hoyolab-row rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
                 <div class="space-y-2">
                   <p class="text-sm font-bold text-white">Cầu Nguyện Nhân Vật 2</p>
-                  <p class="text-xs text-slate-400">🕒 Thời gian còn: <span class="text-amber-200 font-semibold">17 ngày 15 giờ 20 phút</span></p>
+                  <p class="text-xs text-slate-400">🕒 Thời gian còn: <span class="live-banner-countdown text-amber-300 font-bold font-mono">Đang tính...</span></p>
                   <div class="flex items-center gap-2 pt-1">
                     <div onclick="window.selectCharacter('escoffier'); window.switchMainTab('overview');" class="cursor-pointer relative" title="Bấm để chuyển sang tích roll cho Escoffier">
                       <img src="https://enka.network/ui/UI_AvatarIcon_Escoffier.png" onerror="this.src='https://enka.network/ui/UI_AvatarIcon_Navia.png'" referrerpolicy="no-referrer" class="w-12 h-12 rounded-xl bg-amber-600/80 object-cover border border-amber-300" />
-                      <img src="https://rerollcdn.com/GENSHIN/Elements/Element_Cryo.png" class="w-4 h-4 absolute -top-1 -left-1" />
+                      <img class="elem-icon-cryo w-4 h-4 absolute -top-1 -left-1 rounded-full bg-slate-900 p-0.5" src="" />
                     </div>
                     <img src="https://enka.network/ui/UI_AvatarIcon_Dahlia.png" onerror="this.src='https://enka.network/ui/UI_AvatarIcon_Barbara.png'" referrerpolicy="no-referrer" class="w-12 h-12 rounded-xl bg-purple-700/80 object-cover" />
                     <img src="https://enka.network/ui/UI_AvatarIcon_Candace.png" referrerpolicy="no-referrer" class="w-12 h-12 rounded-xl bg-purple-700/80 object-cover" />
@@ -720,7 +787,7 @@
               <div class="hoyolab-row rounded-2xl p-4 flex items-center justify-between">
                 <div>
                   <p class="text-sm font-bold text-white">Thân Hình Thần Đúc • Vũ Khí Giới Hạn 5★</p>
-                  <p class="text-xs text-slate-400 mt-1">🕒 Thời gian còn: <span class="text-amber-200 font-semibold">17 ngày 15 giờ 20 phút</span></p>
+                  <p class="text-xs text-slate-400 mt-1">🕒 Thời gian còn: <span class="live-banner-countdown text-amber-300 font-bold font-mono">Đang tính...</span></p>
                 </div>
                 <span class="text-xs font-bold text-slate-300">Đang Tiến Hành ›</span>
               </div>
@@ -739,11 +806,14 @@
             <div id="hoyolab-events-list" class="space-y-2.5"></div>
           </div>
 
-          <!-- PHẦN 3: KHIÊU CHIẾN ĐỊNH KỲ (LA HOÀN & NHÀ HÁT GIẢ TƯỞNG) -->
+          <!-- PHẦN 3: KHIÊU CHIẾN ĐỊNH KỲ (LA HOÀN RESET NGÀY 16 & NHÀ HÁT RESET NGÀY 1 HẰNG THÁNG) -->
           <div>
-            <div class="flex items-center gap-2 mb-3">
-              <span class="text-amber-300">✦</span>
-              <h3 class="text-sm font-extrabold text-amber-100">Khiêu Chiến Định Kỳ (Reset Mỗi Tháng)</h3>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-amber-300">✦</span>
+                <h3 class="text-sm font-extrabold text-amber-100">Khiêu Chiến Định Kỳ (Tự Động Đếm Ngược Ngày Reset Tháng)</h3>
+              </div>
+              <span class="text-[11px] text-slate-400">La Hoàn: ngày 16 • Nhà Hát: ngày 01</span>
             </div>
             <div id="hoyolab-endgame-list" class="space-y-3"></div>
           </div>
@@ -758,16 +828,65 @@
   <!-- JAVASCRIPT XỬ LÝ TOÀN BỘ HỆ THỐNG -->
   <!-- ===================================================================== -->
   <script>
-    // 1. ICON 7 HỆ CHÍNH GỐC TRONG GAME
+    // =========================================================================
+    // 1. BỘ ICON VECTOR SVG NHÚNG TRỰC TIẾP (KHÔNG BAO GIỜ BỊ LỖI ẢNH RÁCH)
+    // =========================================================================
+    function svgToDataUri(svgStr) {
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svgStr.trim());
+    }
+
+    // Icon Nguyên Thạch (Primogem) chuẩn Genshin 100%
+    window.PRIMOGEM_SVG = svgToDataUri(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="pgMain" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#e0f2fe"/>
+            <stop offset="35%" stop-color="#7dd3fc"/>
+            <stop offset="68%" stop-color="#f472b6"/>
+            <stop offset="100%" stop-color="#38bdf8"/>
+          </linearGradient>
+          <linearGradient id="pgCore" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="60%" stop-color="#bae6fd"/>
+            <stop offset="100%" stop-color="#f9a8d4"/>
+          </linearGradient>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+        <g filter="url(#glow)">
+          <polygon points="60,6 76,44 114,60 76,76 60,114 44,76 6,60 44,44" fill="url(#pgMain)" stroke="#ffffff" stroke-width="2.5"/>
+          <polygon points="60,18 70,48 102,60 70,72 60,102 50,72 18,60 50,48" fill="url(#pgCore)" opacity="0.88"/>
+          <polygon points="60,36 68,52 84,60 68,68 60,84 52,68 36,60 52,52" fill="#ffffff"/>
+          <circle cx="32" cy="32" r="3" fill="#ffffff"/>
+          <circle cx="88" cy="30" r="2.5" fill="#ffffff"/>
+          <circle cx="88" cy="88" r="3" fill="#ffffff"/>
+        </g>
+      </svg>
+    `);
+
+    // 7 Icon Nguyên Tố chuẩn Genshin (SVG nội bộ không bao giờ chết link)
+    const ELEMENT_SVGS = {
+      All: window.PRIMOGEM_SVG,
+      Cryo: svgToDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#0c2d48" stroke="#7dd3fc" stroke-width="4"/><path d="M50 12 L56 36 L50 44 L44 36 Z M50 88 L56 64 L50 56 L44 64 Z M12 50 L36 44 L44 50 L36 56 Z M88 50 L64 44 L56 50 L64 56 Z M23 23 L41 35 L42 42 L35 41 Z M77 77 L59 65 L58 58 L65 59 Z M77 23 L65 41 L58 42 L59 35 Z M23 77 L35 59 L42 58 L41 65 Z" fill="#7dd3fc"/><circle cx="50" cy="50" r="7" fill="#e0f2fe"/></svg>`),
+      Pyro: svgToDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#431407" stroke="#fb923c" stroke-width="4"/><path d="M52 14 C68 32 80 48 74 68 C69 82 54 88 42 84 C26 78 22 58 34 42 C34 52 42 56 45 48 C48 38 42 26 52 14 Z" fill="#fb923c"/><path d="M50 38 C60 48 64 60 58 72 C53 80 42 80 38 72 C35 64 42 52 50 38 Z" fill="#fde047"/></svg>`),
+      Hydro: svgToDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#082f49" stroke="#38bdf8" stroke-width="4"/><path d="M50 14 C68 38 78 54 74 70 C70 83 58 88 50 88 C42 88 30 83 26 70 C22 54 32 38 50 14 Z" fill="#38bdf8"/><path d="M50 32 C60 48 64 60 60 72 C56 78 44 78 40 72 C36 60 40 48 50 32 Z" fill="#bae6fd"/></svg>`),
+      Dendro: svgToDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#052e16" stroke="#4ade80" stroke-width="4"/><path d="M50 16 C72 28 82 52 68 74 C58 86 42 86 32 74 C18 52 28 28 50 16 Z" fill="none" stroke="#4ade80" stroke-width="7"/><path d="M50 26 C62 40 62 60 50 82 C38 60 38 40 50 26 Z" fill="#86efac"/></svg>`),
+      Electro: svgToDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#2e1065" stroke="#c084fc" stroke-width="4"/><polygon points="56,14 26,54 48,54 42,86 74,46 52,46" fill="#c084fc" stroke="#f3e8ff" stroke-width="2"/></svg>`),
+      Anemo: svgToDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#042f2e" stroke="#2dd4bf" stroke-width="4"/><path d="M22 48 Q50 20 78 48 Q50 38 22 48 Z M18 62 Q50 38 82 62 Q50 52 18 62 Z M50 22 L56 78 L50 84 L44 78 Z" fill="#5eead4"/></svg>`),
+      Geo: svgToDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#422006" stroke="#facc15" stroke-width="4"/><polygon points="50,12 82,50 50,88 18,50" fill="none" stroke="#facc15" stroke-width="7"/><polygon points="50,26 68,50 50,74 32,50" fill="#fde047"/></svg>`)
+    };
+
     const ELEMENT_CONFIG = {
-      All:     { label: 'Tất cả', iconUrl: 'https://rerollcdn.com/GENSHIN/UI/primogem.png', bg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', hero: 'linear-gradient(135deg, #0b1c31 0%, #1d3b5c 60%, #2a5d84 100%)', particle: '✦' },
-      Cryo:    { label: 'Băng', iconUrl: 'https://rerollcdn.com/GENSHIN/Elements/Element_Cryo.png', bg: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #f0f9ff 100%)', hero: 'linear-gradient(135deg, #0b1c31 0%, #1d3b5c 60%, #2a5d84 100%)', particle: '❄️' },
-      Pyro:    { label: 'Hỏa', iconUrl: 'https://rerollcdn.com/GENSHIN/Elements/Element_Pyro.png', bg: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 50%, #fff7ed 100%)', hero: 'linear-gradient(135deg, #3b0d0c 0%, #7c1d18 60%, #b43c25 100%)', particle: '🔥' },
-      Hydro:   { label: 'Thủy', iconUrl: 'https://rerollcdn.com/GENSHIN/Elements/Element_Hydro.png', bg: 'linear-gradient(135deg, #e0e7ff 0%, #bae6fd 50%, #f0f9ff 100%)', hero: 'linear-gradient(135deg, #091534 0%, #16336b 60%, #1f5f99 100%)', particle: '🫧' },
-      Dendro:  { label: 'Thảo', iconUrl: 'https://rerollcdn.com/GENSHIN/Elements/Element_Dendro.png', bg: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 50%, #f0fdf4 100%)', hero: 'linear-gradient(135deg, #092618 0%, #174e32 60%, #247549 100%)', particle: '🍃' },
-      Electro: { label: 'Lôi', iconUrl: 'https://rerollcdn.com/GENSHIN/Elements/Element_Electro.png', bg: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #faf5ff 100%)', hero: 'linear-gradient(135deg, #210d3b 0%, #441c75 60%, #662ca6 100%)', particle: '⚡' },
-      Anemo:   { label: 'Phong', iconUrl: 'https://rerollcdn.com/GENSHIN/Elements/Element_Anemo.png', bg: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 50%, #f0fdfa 100%)', hero: 'linear-gradient(135deg, #082927 0%, #14544f 60%, #1f7a73 100%)', particle: '🍃' },
-      Geo:     { label: 'Nham', iconUrl: 'https://rerollcdn.com/GENSHIN/Elements/Element_Geo.png', bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fffbeb 100%)', hero: 'linear-gradient(135deg, #2b1d07 0%, #5c3f11 60%, #8a621c 100%)', particle: '✨' }
+      All:     { label: 'Tất cả', iconUrl: ELEMENT_SVGS.All, bg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', hero: 'linear-gradient(135deg, #0b1c31 0%, #1d3b5c 60%, #2a5d84 100%)', particle: '✦' },
+      Cryo:    { label: 'Băng', iconUrl: ELEMENT_SVGS.Cryo, bg: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #f0f9ff 100%)', hero: 'linear-gradient(135deg, #0b1c31 0%, #1d3b5c 60%, #2a5d84 100%)', particle: '❄️' },
+      Pyro:    { label: 'Hỏa', iconUrl: ELEMENT_SVGS.Pyro, bg: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 50%, #fff7ed 100%)', hero: 'linear-gradient(135deg, #3b0d0c 0%, #7c1d18 60%, #b43c25 100%)', particle: '🔥' },
+      Hydro:   { label: 'Thủy', iconUrl: ELEMENT_SVGS.Hydro, bg: 'linear-gradient(135deg, #e0e7ff 0%, #bae6fd 50%, #f0f9ff 100%)', hero: 'linear-gradient(135deg, #091534 0%, #16336b 60%, #1f5f99 100%)', particle: '🫧' },
+      Dendro:  { label: 'Thảo', iconUrl: ELEMENT_SVGS.Dendro, bg: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 50%, #f0fdf4 100%)', hero: 'linear-gradient(135deg, #092618 0%, #174e32 60%, #247549 100%)', particle: '🍃' },
+      Electro: { label: 'Lôi', iconUrl: ELEMENT_SVGS.Electro, bg: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #faf5ff 100%)', hero: 'linear-gradient(135deg, #210d3b 0%, #441c75 60%, #662ca6 100%)', particle: '⚡' },
+      Anemo:   { label: 'Phong', iconUrl: ELEMENT_SVGS.Anemo, bg: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 50%, #f0fdfa 100%)', hero: 'linear-gradient(135deg, #082927 0%, #14544f 60%, #1f7a73 100%)', particle: '🍃' },
+      Geo:     { label: 'Nham', iconUrl: ELEMENT_SVGS.Geo, bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fffbeb 100%)', hero: 'linear-gradient(135deg, #2b1d07 0%, #5c3f11 60%, #8a621c 100%)', particle: '✨' }
     };
 
     // 2. DANH SÁCH NHÂN VẬT 5 SAO MẶC ĐỊNH
@@ -842,24 +961,61 @@
       { id: 'albedo', name: 'Albedo', title: 'Giả Kim Thuật Sĩ Kreideprinz', element: 'Geo', region: 'Mondstadt', weapon: 'Kiếm Đơn', icon: 'Albedo', lore: 'Đội trưởng Đội Điều Tra Đội Kỵ Sĩ Tây Phong.' }
     ];
 
-    // SỰ KIỆN MẶC ĐỊNH CHUẨN HOYOLAB
-    const DEFAULT_EVENTS = [
-      { id: 'ev_1', name: 'Bản Chất Của Chiến Thắng', timeText: '6 ngày 10 giờ 20 phút', primogems: 420, statusText: 'Đang Tiến Hành ›', type: 'event' },
-      { id: 'ev_2', name: 'Ảo Cảnh Hiểm Ác', timeText: '17 ngày 4 giờ 20 phút', primogems: 450, statusText: '🌪️ 108 Giây ›', type: 'event' },
-      { id: 'ev_3', name: 'Chế Độ Nhiệt Huyết: Chiến Lược Tự Động', timeText: '9 ngày 4 giờ 20 phút', primogems: 0, badgeText: '3000 Xu', statusText: 'Đang Tiến Hành ›', type: 'event' },
-      { id: 'ev_4', name: 'Nghiên Cứu Tập Luyện - Cuộc Chiến Sách Lược', timeText: '18 ngày 7 giờ 20 phút', primogems: 0, badgeText: '8000 Xu', statusText: 'Đang Tiến Hành ›', type: 'event' }
-    ];
+    // =========================================================================
+    // 3. TÍNH TOÁN ĐẾM NGƯỢC THỜI GIAN THỰC (REAL-TIME COUNTDOWN)
+    // =========================================================================
+    // Tự động tính mốc Reset ngày 16 hằng tháng lúc 04:00 sáng (Ánh Trăng Vực Sâu - La Hoàn)
+    function getNextAbyssResetTime() {
+      const now = new Date();
+      let target = new Date(now.getFullYear(), now.getMonth(), 16, 4, 0, 0, 0);
+      if (now >= target) {
+        target = new Date(now.getFullYear(), now.getMonth() + 1, 16, 4, 0, 0, 0);
+      }
+      return target.getTime();
+    }
 
-    const DEFAULT_ENDGAME = [
-      { id: 'end_abyss', name: 'Ánh Trăng Vực Sâu (La Hoàn Thâm Cảnh)', timeText: '30 ngày 4 giờ 20 phút', primogems: 800, progressText: '36/36 ⭐ ›', colorBar: 'bg-emerald-500' },
-      { id: 'end_theater', name: 'Nhà Hát Giả Tưởng', timeText: '15 ngày 4 giờ 20 phút', primogems: 1000, progressText: 'Màn 8 • Sâu Nhất Đến Được ›', colorBar: 'bg-amber-400' }
-    ];
+    // Tự động tính mốc Reset ngày 01 hằng tháng lúc 04:00 sáng (Nhà Hát Giả Tưởng)
+    function getNextTheaterResetTime() {
+      const now = new Date();
+      let target = new Date(now.getFullYear(), now.getMonth(), 1, 4, 0, 0, 0);
+      if (now >= target) {
+        target = new Date(now.getFullYear(), now.getMonth() + 1, 1, 4, 0, 0, 0);
+      }
+      return target.getTime();
+    }
+
+    function formatRemainingTime(endTimestamp) {
+      const diffMs = Math.max(0, endTimestamp - Date.now());
+      if (diffMs <= 0) return 'Đã kết thúc / Làm mới';
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      const pad = n => String(n).padStart(2, '0');
+      return `${days} ngày ${pad(hours)} giờ ${pad(minutes)} phút ${pad(seconds)} giây`;
+    }
+
+    // Sự kiện mặc định với mốc thời gian thực (Neo theo thời điểm tạo hoặc chu kỳ)
+    function getDefaultEventsWithTimestamps() {
+      // Mốc chuẩn từ ngày 17/10/2026 để khớp ảnh HoYoLAB và đếm ngược thực tế từng giây
+      const baseAnchor = new Date('2026-10-17T08:00:00+07:00').getTime();
+      const baseNow = Date.now() > baseAnchor ? baseAnchor : Date.now();
+      const HOUR = 3600 * 1000;
+      const DAY = 24 * HOUR;
+      return [
+        { id: 'ev_1', name: 'Bản Chất Của Chiến Thắng', endTime: baseNow + 6 * DAY + 10 * HOUR + 20 * 60000, primogems: 420, statusText: 'Đang Tiến Hành ›' },
+        { id: 'ev_2', name: 'Ảo Cảnh Hiểm Ác', endTime: baseNow + 17 * DAY + 4 * HOUR + 20 * 60000, primogems: 450, statusText: '🌪️ 108 Giây ›' },
+        { id: 'ev_3', name: 'Chế Độ Nhiệt Huyết: Chiến Lược Tự Động', endTime: baseNow + 9 * DAY + 4 * HOUR + 20 * 60000, primogems: 0, badgeText: '3000 Xu', statusText: 'Đang Tiến Hành ›' },
+        { id: 'ev_4', name: 'Nghiên Cứu Tập Luyện - Cuộc Chiến Sách Lược', endTime: baseNow + 18 * DAY + 7 * HOUR + 20 * 60000, primogems: 0, badgeText: '8000 Xu', statusText: 'Đang Tiến Hành ›' }
+      ];
+    }
 
     // =========================================================================
-    // 3. QUẢN LÝ TRẠNG THÁI TRUNG TÂM (FIX TRIỆT ĐỂ LỖI RESET SỐ ROLL)
+    // 4. QUẢN LÝ TRẠNG THÁI TRUNG TÂM & TÀI KHOẢN
     // =========================================================================
-    const STORAGE_KEY = 'teyvat_hub_accounts_v6';
-    const ACTIVE_USER_KEY = 'teyvat_hub_active_user_v6';
+    const STORAGE_KEY = 'teyvat_hub_accounts_v7';
+    const ACTIVE_USER_KEY = 'teyvat_hub_active_user_v7';
 
     let authMode = 'login';
     let currentUser = null;
@@ -867,6 +1023,7 @@
     let selectedCharId = 'tsaritsa';
     let isCharDropdownOpen = false;
     let tempUploadedAvatar = '';
+    let tempUploadedUserAvatar = '';
     let accountsDB = {};
 
     function loadAccountsFromDisk() {
@@ -884,6 +1041,27 @@
       } catch (e) {}
     }
 
+    function createDefaultUserAccount(username, password, nickname) {
+      const baseAnchor = new Date('2026-10-17T08:00:00+07:00').getTime();
+      return {
+        username,
+        password,
+        nickname: nickname || username.toUpperCase(),
+        userAvatar: '',
+        themeMode: 'dark',
+        selectedCharId: 'tsaritsa',
+        favorites: ['tsaritsa'],
+        customCharacters: [],
+        claimedEvents: {},
+        bannerEndTime: baseAnchor + (17 * 86400 + 15 * 3600 + 20 * 60) * 1000,
+        eventsList: getDefaultEventsWithTimestamps(),
+        stickers: [
+          { id: 'st_paimon', url: 'https://enka.network/ui/UI_AvatarIcon_Paimon.png', x: Math.max(20, window.innerWidth - 130), y: Math.max(80, window.innerHeight - 140), size: 88 }
+        ],
+        characters: {}
+      };
+    }
+
     function getUser() {
       if (!currentUser || !accountsDB[currentUser]) {
         currentUser = 'yorrn';
@@ -896,7 +1074,10 @@
       if (!u.customCharacters) u.customCharacters = [];
       if (!u.favorites) u.favorites = ['tsaritsa'];
       if (!u.claimedEvents) u.claimedEvents = {};
-      if (!u.customEvents) u.customEvents = [];
+      if (!u.eventsList || !u.eventsList.length) u.eventsList = getDefaultEventsWithTimestamps();
+      if (!u.bannerEndTime) {
+        u.bannerEndTime = Date.now() + (17 * 86400 + 15 * 3600 + 20 * 60) * 1000;
+      }
       if (!u.themeMode) u.themeMode = 'dark';
       if (!u.stickers) {
         u.stickers = [
@@ -904,24 +1085,6 @@
         ];
       }
       return u;
-    }
-
-    function createDefaultUserAccount(username, password, nickname) {
-      return {
-        username,
-        password,
-        nickname: nickname || username.toUpperCase(),
-        themeMode: 'dark',
-        selectedCharId: 'tsaritsa',
-        favorites: ['tsaritsa'],
-        customCharacters: [],
-        claimedEvents: {},
-        customEvents: [],
-        stickers: [
-          { id: 'st_paimon', url: 'https://enka.network/ui/UI_AvatarIcon_Paimon.png', x: Math.max(20, window.innerWidth - 130), y: Math.max(80, window.innerHeight - 140), size: 88 }
-        ],
-        characters: {}
-      };
     }
 
     function getAllCharacters() {
@@ -958,7 +1121,7 @@
     }
 
     // =========================================================================
-    // 4. ĐĂNG NHẬP & ĐĂNG KÝ
+    // 5. ĐĂNG NHẬP, ĐĂNG KÝ & CÀI ĐẶT TÀI KHOẢN (ĐỔI TÊN / MẬT KHẨU / AVATAR)
     // =========================================================================
     window.switchAuthTab = function(mode) {
       authMode = mode;
@@ -1007,8 +1170,76 @@
       document.getElementById('auth-modal').style.display = 'flex';
     };
 
+    function renderUserAvatarElement(el, u) {
+      const displayName = u.nickname || u.username || 'Y';
+      if (u.userAvatar) {
+        el.innerHTML = `<img src="${u.userAvatar}" class="w-full h-full object-cover" />`;
+      } else {
+        el.textContent = displayName.slice(0, 1).toUpperCase();
+      }
+    }
+
+    window.openAccountModal = function() {
+      const u = getUser();
+      tempUploadedUserAvatar = '';
+      document.getElementById('acc-modal-username').textContent = '@' + u.username;
+      document.getElementById('acc-modal-nick-preview').textContent = u.nickname || u.username;
+      document.getElementById('acc-edit-nickname').value = u.nickname || u.username;
+      document.getElementById('acc-edit-avatar-url').value = u.userAvatar || '';
+      document.getElementById('acc-edit-password').value = '';
+      document.getElementById('user-avatar-upload-status').textContent = '';
+      renderUserAvatarElement(document.getElementById('acc-modal-avatar-preview'), u);
+
+      const m = document.getElementById('account-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    };
+
+    window.closeAccountModal = function() {
+      const m = document.getElementById('account-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    };
+
+    window.handleUserAvatarUpload = function(ev) {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        tempUploadedUserAvatar = e.target.result;
+        document.getElementById('acc-edit-avatar-url').value = tempUploadedUserAvatar;
+        document.getElementById('user-avatar-upload-status').textContent = 'Đã tải ảnh ✓';
+        document.getElementById('acc-modal-avatar-preview').innerHTML = `<img src="${tempUploadedUserAvatar}" class="w-full h-full object-cover" />`;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.clearUserAvatar = function() {
+      tempUploadedUserAvatar = '';
+      document.getElementById('acc-edit-avatar-url').value = '';
+      const u = getUser();
+      document.getElementById('acc-modal-avatar-preview').textContent = (u.nickname || 'Y').slice(0, 1).toUpperCase();
+    };
+
+    window.saveAccountSettings = function() {
+      const u = getUser();
+      const newNick = document.getElementById('acc-edit-nickname').value.trim();
+      const newAvatar = tempUploadedUserAvatar || document.getElementById('acc-edit-avatar-url').value.trim();
+      const newPass = document.getElementById('acc-edit-password').value;
+
+      if (newNick) u.nickname = newNick;
+      u.userAvatar = newAvatar;
+      if (newPass.trim() !== '') {
+        u.password = newPass;
+      }
+
+      commitDB();
+      window.closeAccountModal();
+      initDashboard();
+    };
+
     // =========================================================================
-    // 5. GIAO DIỆN SÁNG / TỐI & CHUYỂN TAB
+    // 6. GIAO DIỆN SÁNG / TỐI & CHUYỂN TAB
     // =========================================================================
     function applyTheme() {
       const u = getUser();
@@ -1057,7 +1288,7 @@
     };
 
     // =========================================================================
-    // 6. MENU NHÂN VẬT THU GỌN, YÊU THÍCH (⭐) & ICON HỆ TRONG GAME
+    // 7. MENU NHÂN VẬT THU GỌN, YÊU THÍCH (⭐) & ICON HỆ TRONG GAME
     // =========================================================================
     window.toggleCharDropdown = function() {
       isCharDropdownOpen = !isCharDropdownOpen;
@@ -1094,7 +1325,7 @@
         const cfg = ELEMENT_CONFIG[key];
         return `
           <button type="button" onclick="window.setElementFilter('${key}')" title="${cfg.label}"
-                  class="p-1 rounded-lg transition flex items-center justify-center ${active ? 'bg-sky-500/40 ring-1 ring-sky-400' : 'opacity-70 hover:opacity-100'}">
+                  class="p-1 rounded-lg transition flex items-center justify-center ${active ? 'bg-sky-500/40 ring-1 ring-sky-400' : 'opacity-75 hover:opacity-100'}">
             <img src="${cfg.iconUrl}" class="w-4 h-4 object-contain" />
           </button>
         `;
@@ -1182,7 +1413,7 @@
     };
 
     // =========================================================================
-    // 7. HIỂN THỊ TRANG TỔNG QUAN & TÍNH TOÁN CUNG MỆNH
+    // 8. HIỂN THỊ TRANG TỔNG QUAN & TÍNH TOÁN CUNG MỆNH
     // =========================================================================
     function renderWeatherParticles(elementKey) {
       const container = document.getElementById('weather-container');
@@ -1336,7 +1567,7 @@
     }
 
     // =========================================================================
-    // 8. CÁC HÀM SỬA SỐ ROLL (LƯU TRỰC TIẾP VÀO RAM + LOCALSTORAGE)
+    // 9. CÁC HÀM SỬA SỐ ROLL
     // =========================================================================
     function nowFormatted() {
       const d = new Date();
@@ -1449,7 +1680,7 @@
     };
 
     // =========================================================================
-    // 9. LỊCH SỰ KIỆN HOYOLAB & CLICK 1 CHẠM NHẬN NGUYÊN THẠCH
+    // 10. LỊCH SỰ KIỆN HOYOLAB THỜI GIAN THỰC & CLICK 1 CHẠM NHẬN NGUYÊN THẠCH
     // =========================================================================
     window.switchWishBannerTab = function(type) {
       const isChar = type === 'char';
@@ -1459,11 +1690,20 @@
       document.getElementById('wish-tab-weapon').className = !isChar ? 'py-2 rounded-full bg-amber-100 text-slate-900 transition' : 'py-2 rounded-full text-slate-400 hover:text-white transition';
     };
 
+    window.promptSetBannerEndDate = function() {
+      const days = parseFloat(prompt('Nhập số ngày còn lại của Banner Cầu Nguyện hiện tại (VD: 17.5):', '17.6'));
+      if (isNaN(days) || days <= 0) return;
+      const u = getUser();
+      u.bannerEndTime = Date.now() + Math.round(days * 86400 * 1000);
+      commitDB();
+      updateAllRealTimeCountdowns();
+    };
+
     window.claimPrimogemEvent = function(eventId, eventName, primogems) {
       if (!primogems || primogems <= 0) return;
       const u = getUser();
       if (u.claimedEvents[eventId]) {
-        alert('Bạn đã nhận thưởng của chế độ này trong kỳ hiện tại rồi! (Bấm "Reset Kỳ Mới" nếu sang tháng mới).');
+        alert('Bạn đã nhận thưởng của chế độ này trong kỳ hiện tại rồi! (Bấm "Reset Trạng Thái Nhận" nếu sang tháng/kỳ mới).');
         return;
       }
 
@@ -1500,12 +1740,12 @@
       const name = prompt('Nhập tên sự kiện mới (VD: Sự Kiện Chủ Đề Phiên Bản):');
       if (!name) return;
       const primos = parseInt(prompt('Số Nguyên Thạch thưởng của sự kiện này:', '420'), 10) || 420;
-      const days = prompt('Thời gian còn lại:', '12 ngày 5 giờ');
+      const days = parseFloat(prompt('Số ngày còn lại của sự kiện (VD: 12):', '12')) || 12;
       const u = getUser();
-      u.customEvents.push({
+      u.eventsList.push({
         id: 'custom_ev_' + Date.now(),
         name: name.trim(),
-        timeText: days || '10 ngày',
+        endTime: Date.now() + Math.round(days * 86400 * 1000),
         primogems: primos,
         statusText: 'Đang Tiến Hành ›'
       });
@@ -1514,13 +1754,34 @@
       renderMainView();
     };
 
+    function getDynamicEndgameModes() {
+      return [
+        {
+          id: 'end_abyss',
+          name: 'Ánh Trăng Vực Sâu (La Hoàn Thâm Cảnh)',
+          endTime: getNextAbyssResetTime(),
+          primogems: 800,
+          progressText: '36/36 ⭐ ›',
+          colorBar: 'bg-emerald-500'
+        },
+        {
+          id: 'end_theater',
+          name: 'Nhà Hát Giả Tưởng',
+          endTime: getNextTheaterResetTime(),
+          primogems: 1000,
+          progressText: 'Màn 8 • Sâu Nhất Đến Được ›',
+          colorBar: 'bg-amber-400'
+        }
+      ];
+    }
+
     function renderQuickEventsWidget() {
       const u = getUser();
       const box = document.getElementById('overview-quick-events');
+      const endgame = getDynamicEndgameModes();
       const quickList = [
-        ...DEFAULT_ENDGAME,
-        { id: 'ev_1', name: 'Bản Chất Của Chiến Thắng', primogems: 420 },
-        { id: 'ev_2', name: 'Ảo Cảnh Hiểm Ác (108 Giây)', primogems: 450 }
+        ...endgame,
+        ...(u.eventsList || []).filter(e => e.primogems > 0).slice(0, 2)
       ];
 
       box.innerHTML = quickList.map(ev => {
@@ -1529,11 +1790,11 @@
           <div class="hoyolab-row rounded-2xl p-3 flex items-center justify-between gap-2">
             <div class="min-w-0">
               <p class="text-xs font-bold text-white truncate">${ev.name}</p>
-              <p class="text-[11px] text-sky-400 font-semibold">+${ev.primogems} Nguyên Thạch (~${(ev.primogems/160).toFixed(1)} roll)</p>
+              <p class="text-[10px] text-amber-300/90 font-mono live-event-timer" data-endtime="${ev.endTime}">🕒 ${formatRemainingTime(ev.endTime)}</p>
             </div>
             <button type="button" onclick="window.claimPrimogemEvent('${ev.id}', '${ev.name}', ${ev.primogems})"
-                    class="px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1 shrink-0 transition ${claimed ? 'bg-emerald-500/20 text-emerald-400 cursor-default' : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow'}">
-              <img src="https://rerollcdn.com/GENSHIN/UI/primogem.png" class="w-4 h-4" />
+                    class="px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shrink-0 transition ${claimed ? 'bg-emerald-500/20 text-emerald-400 cursor-default' : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow'}">
+              <img src="${window.PRIMOGEM_SVG}" class="w-4 h-4 object-contain" />
               <span>${claimed ? 'Đã nhận ✓' : `+${ev.primogems}`}</span>
             </button>
           </div>
@@ -1547,7 +1808,8 @@
       const char = allChars.find(c => c.id === selectedCharId) || allChars[0];
       document.getElementById('cal-active-char').textContent = char.name;
 
-      const allEvents = [...DEFAULT_EVENTS, ...(u.customEvents || [])];
+      // Render sự kiện phiên bản
+      const allEvents = u.eventsList || [];
       const evContainer = document.getElementById('hoyolab-events-list');
 
       evContainer.innerHTML = allEvents.map(ev => {
@@ -1557,14 +1819,14 @@
           <div class="hoyolab-row rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
             <div>
               <p class="text-sm font-bold text-white">${ev.name}</p>
-              <p class="text-xs text-slate-400 mt-1">🕒 Thời gian còn: <span class="text-slate-300 font-medium">${ev.timeText}</span></p>
+              <p class="text-xs text-slate-400 mt-1">🕒 Thời gian còn: <span class="text-amber-200 font-semibold font-mono live-event-timer" data-endtime="${ev.endTime}">${formatRemainingTime(ev.endTime)}</span></p>
             </div>
             <div class="flex items-center gap-5">
               ${hasPrimos ? `
                 <button type="button" onclick="window.claimPrimogemEvent('${ev.id}', '${ev.name}', ${ev.primogems})"
                         title="Bấm để cộng thẳng ${ev.primogems} Nguyên Thạch vào quỹ"
-                        class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border transition cursor-pointer ${claimed ? 'bg-emerald-900/40 border-emerald-500/50 opacity-70' : 'bg-slate-800/90 hover:bg-slate-700 border-amber-400/40 shadow-md'}">
-                  <img src="https://rerollcdn.com/GENSHIN/UI/primogem.png" class="w-7 h-7 object-contain" />
+                        class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border transition cursor-pointer ${claimed ? 'bg-emerald-900/40 border-emerald-500/50 opacity-75' : 'bg-slate-800/90 hover:bg-slate-700 border-amber-400/50 shadow-md'}">
+                  <img src="${window.PRIMOGEM_SVG}" class="w-7 h-7 object-contain" />
                   <span class="text-[11px] font-extrabold ${claimed ? 'text-emerald-400' : 'text-white'}">${claimed ? 'Đã lấy' : ev.primogems}</span>
                 </button>
               ` : `
@@ -1579,21 +1841,23 @@
         `;
       }).join('');
 
+      // Render La Hoàn & Nhà Hát Giả Tưởng (Đếm ngược ngày 16 và ngày 01 hàng tháng)
+      const endgameModes = getDynamicEndgameModes();
       const endgameContainer = document.getElementById('hoyolab-endgame-list');
-      endgameContainer.innerHTML = DEFAULT_ENDGAME.map(eg => {
+      endgameContainer.innerHTML = endgameModes.map(eg => {
         const claimed = Boolean(u.claimedEvents[eg.id]);
         return `
           <div class="hoyolab-row rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 relative overflow-hidden">
             <div class="absolute left-0 top-0 bottom-0 w-1.5 ${eg.colorBar}"></div>
             <div class="pl-2">
               <p class="text-sm font-extrabold text-white">${eg.name}</p>
-              <p class="text-xs text-slate-400 mt-1">🕒 Thời gian còn: <span class="text-slate-300 font-medium">${eg.timeText}</span></p>
+              <p class="text-xs text-slate-400 mt-1">🕒 Thời gian làm mới: <span class="text-amber-300 font-bold font-mono live-event-timer" data-endtime="${eg.endTime}">${formatRemainingTime(eg.endTime)}</span></p>
             </div>
             <div class="flex items-center gap-5">
               <button type="button" onclick="window.claimPrimogemEvent('${eg.id}', '${eg.name}', ${eg.primogems})"
                       title="Bấm để cộng thẳng ${eg.primogems} Nguyên Thạch vào quỹ"
-                      class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border transition cursor-pointer ${claimed ? 'bg-emerald-900/40 border-emerald-500/50 opacity-70' : 'bg-slate-800/90 hover:bg-slate-700 border-amber-400/50 shadow-lg'}">
-                <img src="https://rerollcdn.com/GENSHIN/UI/primogem.png" class="w-7 h-7 object-contain" />
+                      class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border transition cursor-pointer ${claimed ? 'bg-emerald-900/40 border-emerald-500/50 opacity-75' : 'bg-slate-800/90 hover:bg-slate-700 border-amber-400/50 shadow-lg'}">
+                <img src="${window.PRIMOGEM_SVG}" class="w-7 h-7 object-contain" />
                 <span class="text-[11px] font-extrabold ${claimed ? 'text-emerald-400' : 'text-white'}">${claimed ? 'Đã lấy' : eg.primogems}</span>
               </button>
               <span class="text-xs font-extrabold text-amber-400 min-w-[110px] text-right">${eg.progressText}</span>
@@ -1601,10 +1865,26 @@
           </div>
         `;
       }).join('');
+
+      updateAllRealTimeCountdowns();
+    }
+
+    function updateAllRealTimeCountdowns() {
+      const u = getUser();
+      const bannerText = formatRemainingTime(u.bannerEndTime);
+      document.querySelectorAll('.live-banner-countdown').forEach(el => {
+        el.textContent = bannerText;
+      });
+      document.querySelectorAll('.live-event-timer').forEach(el => {
+        const endTs = Number(el.getAttribute('data-endtime'));
+        if (endTs) {
+          el.textContent = formatRemainingTime(endTs);
+        }
+      });
     }
 
     // =========================================================================
-    // 10. TỰ TẠO NHÂN VẬT CHƯA RA MẮT & CHỈNH SỬA AVATAR / VŨ KHÍ / HỆ
+    // 11. TỰ TẠO NHÂN VẬT CHƯA RA MẮT & CHỈNH SỬA AVATAR / VŨ KHÍ / HỆ
     // =========================================================================
     window.openCreateCharModal = function() {
       tempUploadedAvatar = '';
@@ -1713,7 +1993,7 @@
     };
 
     // =========================================================================
-    // 11. HỆ THỐNG STICKER PAIMON & STICKER TÙY CHỈNH KÉO THẢ
+    // 12. HỆ THỐNG STICKER PAIMON & STICKER TÙY CHỈNH KÉO THẢ
     // =========================================================================
     let draggingStickerId = null;
     let dragOffsetX = 0;
@@ -1892,7 +2172,7 @@
     }
 
     // =========================================================================
-    // 12. KHỞI CHẠY ỨNG DỤNG
+    // 13. KHỞI CHẠY ỨNG DỤNG & VÒNG LẶP THỜI GIAN THỰC MỖI GIÂY
     // =========================================================================
     window.toggleSidebar = function(force) {
       const sb = document.getElementById('sidebar');
@@ -1903,6 +2183,16 @@
       }
     };
 
+    function initStaticIcons() {
+      document.getElementById('auth-primo-logo').src = window.PRIMOGEM_SVG;
+      document.getElementById('hero-primo-icon').src = window.PRIMOGEM_SVG;
+      document.getElementById('widget-primo-icon').src = window.PRIMOGEM_SVG;
+      document.getElementById('sticker-primo-preview').src = window.PRIMOGEM_SVG;
+      document.querySelectorAll('.elem-icon-cryo').forEach(img => {
+        img.src = ELEMENT_SVGS.Cryo;
+      });
+    }
+
     function initDashboard() {
       const u = getUser();
       selectedCharId = u.selectedCharId || 'tsaritsa';
@@ -1911,7 +2201,7 @@
       document.getElementById('sidebar-user-label').textContent = displayName.toUpperCase();
       document.getElementById('current-user-name').textContent = displayName;
       document.getElementById('rhythm-user-name').textContent = displayName;
-      document.getElementById('user-avatar-badge').textContent = displayName.slice(0, 1).toUpperCase();
+      renderUserAvatarElement(document.getElementById('user-avatar-badge'), u);
 
       renderElementFilterBar();
       window.renderCharacterList();
@@ -1920,13 +2210,18 @@
       renderStickersOnScreen();
     }
 
+    // Vòng lặp mỗi 1 giây: cập nhật đồng hồ Việt Nam & toàn bộ bộ đếm ngược sự kiện/La Hoàn/Nhà Hát
     setInterval(() => {
       const now = new Date();
       document.getElementById('clock-time').textContent = now.toLocaleTimeString('vi-VN');
       document.getElementById('clock-date').textContent = now.toLocaleDateString('vi-VN');
+      if (currentUser) {
+        updateAllRealTimeCountdowns();
+      }
     }, 1000);
 
     window.addEventListener('DOMContentLoaded', () => {
+      initStaticIcons();
       loadAccountsFromDisk();
       let savedUser = null;
       try { savedUser = localStorage.getItem(ACTIVE_USER_KEY); } catch (e) {}
