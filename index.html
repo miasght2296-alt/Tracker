@@ -7,26 +7,26 @@
 
   <script>
     // ====================================================================================
-    // 🔥 CHỖ GẮN DATABASE CỦA YORRN (NGAY ĐẦU FILE - DÒNG 12):
-    // Ông dán link Firebase Realtime Database vào giữa 2 dấu nháy kép "" ở dòng dưới đây:
-    const LINK_FIREBASE_CUA_YORRN = "";
-    // Ví dụ: const LINK_FIREBASE_CUA_YORRN = "https://teyvat-yorrn-default-rtdb.asia-southeast1.firebasedatabase.app";
+    // 🔥 ĐÃ GẮN SẴN LINK FIREBASE DATABASE CỦA YORRN (TỪ ẢNH ÔNG GỬI):
+    const LINK_FIREBASE_CUA_YORRN = "https://track-b4b98-default-rtdb.asia-southeast1.firebasedatabase.app";
     // ====================================================================================
   </script>
 
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230f172a' stroke='%2338bdf8' stroke-width='4'/%3E%3Cpath d='M50 8 L63 37 L92 50 L63 63 L50 92 L37 63 L8 50 L37 37 Z' fill='%237dd3fc' stroke='%23ffffff' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23ffffff'/%3E%3C/svg%3E" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>tailwind.config = { darkMode: 'class' };</script>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     * { font-family: 'Be Vietnam Pro', sans-serif; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; overflow-x: hidden; background: #090d16; color: #f1f5f9; transition: background 0.3s ease, color 0.2s ease; }
     .card-surface { background: rgba(255,255,255,0.92); backdrop-filter: blur(14px); border: 1px solid rgba(203,213,225,0.9); color: #0f172a; }
     html.dark .card-surface { background: rgba(22,27,38,0.94); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); color: #f1f5f9; }
-    .hoyolab-panel { background: rgba(20,24,36,0.96); border: 1px solid rgba(255,255,255,0.09); color: #f8fafc; }
-    .hoyolab-row { background: rgba(38,44,62,0.9); border: 1px solid rgba(255,255,255,0.07); transition: all 0.2s ease; }
-    .hoyolab-row:hover { background: rgba(50,58,80,0.98); border-color: rgba(56,189,248,0.35); }
+    .hoyolab-panel { background: rgba(18,22,33,0.96); border: 1px solid rgba(255,255,255,0.09); color: #f8fafc; }
+    .hoyolab-row { background: rgba(34,40,56,0.92); border: 1px solid rgba(255,255,255,0.07); transition: all 0.2s ease; }
+    .hoyolab-row:hover { background: rgba(46,54,74,0.98); border-color: rgba(56,189,248,0.35); }
+    .gb-banner-card { background: radial-gradient(circle at 75% 40%, rgba(56,189,248,0.22) 0%, rgba(15,23,42,0.96) 65%, rgba(9,13,22,0.99) 100%); border: 1px solid rgba(255,255,255,0.1); }
+    .gb-timer-box { background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.12); min-width: 52px; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.45); border-radius: 9999px; }
     @keyframes floatParticle {
@@ -44,7 +44,7 @@
   <div id="weather-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
   <div id="sticker-layer" class="fixed inset-0 pointer-events-none z-30 overflow-hidden"></div>
 
-  <!-- 1. MODAL ĐĂNG NHẬP & GẮN LINK FIREBASE DATABASE -->
+  <!-- 1. MODAL ĐĂNG NHẬP & ĐỒNG BỘ FIREBASE -->
   <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
     <div class="w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-3xl p-6 text-white shadow-2xl">
       <div class="flex items-center gap-3 mb-2">
@@ -54,7 +54,7 @@
           <h2 id="auth-title" class="text-xl font-extrabold">Đăng Nhập Đồng Bộ Đám Mây</h2>
         </div>
       </div>
-      <p class="text-xs text-slate-400 mb-4">Đăng nhập cùng tài khoản trên Máy tính và Điện thoại để đồng bộ tự động qua Firebase Database.</p>
+      <p class="text-xs text-slate-400 mb-4">Đã kết nối sẵn với Firebase Database `track-b4b98` của Yorrn để đồng bộ trên mọi thiết bị.</p>
 
       <div class="grid grid-cols-2 gap-1 p-1 bg-slate-800 rounded-xl mb-4 text-xs font-bold">
         <button type="button" id="tab-login" onclick="window.switchAuthTab('login')" class="py-2 rounded-lg bg-sky-500 text-white">Đăng nhập</button>
@@ -62,13 +62,13 @@
       </div>
 
       <div class="space-y-3">
-        <div class="p-3 rounded-2xl bg-slate-950 border-2 border-amber-500/40 space-y-1.5">
+        <div class="p-3 rounded-2xl bg-slate-950 border border-emerald-500/40 space-y-1.5">
           <div class="flex items-center justify-between">
-            <label class="text-xs font-extrabold text-amber-300">🔥 Chỗ gắn Link Firebase Database:</label>
-            <button type="button" onclick="window.testFirebaseConnection('auth-firebase-url')" class="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold">Kiểm tra kết nối</button>
+            <label class="text-xs font-extrabold text-emerald-400">🔥 Firebase Database (Đã gắn sẵn):</label>
+            <button type="button" onclick="window.testFirebaseConnection('auth-firebase-url')" class="px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-bold">Kiểm tra kết nối</button>
           </div>
-          <input id="auth-firebase-url" type="text" placeholder="https://...-default-rtdb.asia-southeast1.firebasedatabase.app" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-emerald-300 font-mono focus:outline-none focus:border-amber-400" />
-          <p id="auth-fb-test-msg" class="text-[11px] text-slate-400">Nếu đã gắn ở Dòng 12 trong code thì ô này sẽ tự động điền sẵn.</p>
+          <input id="auth-firebase-url" type="text" value="https://track-b4b98-default-rtdb.asia-southeast1.firebasedatabase.app" class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-emerald-300 font-mono focus:outline-none" />
+          <p id="auth-fb-test-msg" class="text-[11px] text-emerald-400">✓ Đã nạp sẵn Database track-b4b98 của bạn.</p>
         </div>
 
         <div>
@@ -173,7 +173,7 @@
   <div id="account-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-extrabold text-sky-400">⚙️ Cài Đặt Tài Khoản & Gắn Firebase Database</h3>
+        <h3 class="text-lg font-extrabold text-sky-400">⚙️ Cài Đặt Tài Khoản & Firebase Database</h3>
         <button type="button" onclick="window.closeAccountModal()" class="text-slate-400 hover:text-white text-xl">✕</button>
       </div>
       <div class="space-y-3.5 text-xs">
@@ -182,21 +182,21 @@
           <div class="flex-1 min-w-0">
             <p class="text-[11px] text-slate-400">Username: <strong id="acc-modal-username" class="text-sky-400">@yorrn</strong></p>
             <p id="acc-modal-nick-preview" class="text-sm font-extrabold text-white truncate">Yorrn</p>
-            <p id="acc-cloud-status" class="text-[11px] text-emerald-400">🔥 Sẵn sàng đồng bộ</p>
+            <p id="acc-cloud-status" class="text-[11px] text-emerald-400">🔥 Đã kết nối Firebase `track-b4b98`</p>
           </div>
         </div>
 
         <div class="p-3.5 rounded-2xl bg-slate-950 border-2 border-amber-500/40 space-y-2">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <label class="font-extrabold text-amber-300">🔥 Link Firebase Realtime Database của bạn:</label>
+            <label class="font-extrabold text-amber-300">🔥 Link Firebase Realtime Database:</label>
             <div class="flex gap-1.5">
               <button type="button" onclick="window.testFirebaseConnection('acc-edit-firebase-url')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-bold">🔍 Test kết nối</button>
               <button type="button" onclick="window.pushAccountToCloud(true)" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold">⬆️ Đẩy lên DB</button>
               <button type="button" onclick="window.pullAccountFromCloud(true)" class="px-2.5 py-1 rounded-lg bg-sky-600 text-white font-bold">⬇️ Tải từ DB</button>
             </div>
           </div>
-          <input id="acc-edit-firebase-url" type="text" placeholder="https://ten-project-default-rtdb.asia-southeast1.firebasedatabase.app" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-emerald-300 font-mono" />
-          <p id="acc-fb-test-result" class="text-[11px] text-slate-400">Dán link Firebase vào ô trên rồi bấm "Lưu & Đồng Bộ Firebase".</p>
+          <input id="acc-edit-firebase-url" type="text" value="https://track-b4b98-default-rtdb.asia-southeast1.firebasedatabase.app" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-emerald-300 font-mono" />
+          <p id="acc-fb-test-result" class="text-[11px] text-slate-400">Đang sử dụng Database `track-b4b98` của Yorrn.</p>
         </div>
 
         <div>
@@ -330,13 +330,13 @@
             <span>📊 Tổng quan Quỹ Roll</span><span>•</span>
           </button>
           <button type="button" id="nav-btn-banners" onclick="window.switchMainTab('banners')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition">
-            <span>🎯 Banners Cầu Nguyện</span><span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px]">LIVE</span>
+            <span>🎯 Banners Cầu Nguyện</span><span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">V7.1 LIVE</span>
           </button>
           <button type="button" id="nav-btn-calendar" onclick="window.switchMainTab('calendar')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition">
             <span>📅 Lịch Event (Real-Time)</span><span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">+NT</span>
           </button>
           <button type="button" id="nav-btn-wiki" onclick="window.switchMainTab('wiki')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition">
-            <span>📖 Wiki Tất Cả Nhân Vật</span><span id="sidebar-char-count" class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">LIVE</span>
+            <span>📖 Wiki Tất Cả Nhân Vật</span><span id="sidebar-char-count" class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px]">LIVE</span>
           </button>
         </div>
 
@@ -377,7 +377,7 @@
       <!-- CÀI ĐẶT & NÚT GẮN DATABASE -->
       <div class="p-3 border-t border-white/10 space-y-2 bg-slate-950">
         <button type="button" onclick="window.openAccountModal()" class="w-full py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 text-xs font-extrabold flex items-center justify-center gap-1.5 shadow">
-          🔥 Gắn / Cài đặt Firebase DB
+          🔥 Cài đặt Firebase DB
         </button>
 
         <div class="grid grid-cols-2 gap-1.5">
@@ -394,7 +394,7 @@
             <div id="user-avatar-badge" class="w-8 h-8 rounded-xl bg-sky-600 flex items-center justify-center font-bold text-xs overflow-hidden shrink-0">Y</div>
             <div class="truncate">
               <p id="current-user-name" class="text-xs font-bold text-white truncate">Yorrn</p>
-              <p id="cloud-sync-indicator" class="text-[10px] text-emerald-400 truncate">💾 Đã lưu tự động</p>
+              <p id="cloud-sync-indicator" class="text-[10px] text-emerald-400 truncate">🔥 Firebase Synced ✓</p>
             </div>
           </div>
           <button type="button" onclick="window.logoutUser()" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-[11px] font-bold">Thoát</button>
@@ -411,7 +411,6 @@
           <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white">☰</span><span>Menu</span>
         </button>
         <div class="flex items-center gap-1.5">
-          <button type="button" onclick="window.openAccountModal()" class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-400 text-xs font-bold">🔥 Gắn DB</button>
           <button type="button" onclick="window.switchMainTab('banners')" class="px-2 py-1 rounded-lg bg-rose-500/20 text-rose-400 text-xs font-bold">🎯 Banners</button>
           <button type="button" onclick="window.switchMainTab('calendar')" class="px-2 py-1 rounded-lg bg-sky-500/20 text-sky-400 text-xs font-bold">📅 Event</button>
           <button type="button" onclick="window.switchMainTab('wiki')" class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs font-bold">📖 Wiki</button>
@@ -442,9 +441,6 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <button type="button" onclick="window.openAccountModal()" class="hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-300 text-xs font-extrabold shadow-sm">
-              🔥 Gắn Firebase DB
-            </button>
             <div class="card-surface px-4 py-2.5 rounded-2xl text-right shadow-sm">
               <div class="text-xs opacity-70 font-medium">📅 <span id="clock-date">--/--/----</span></div>
               <div id="clock-time" class="text-xl font-extrabold">--:--:--</div>
@@ -572,77 +568,66 @@
         </div>
       </div>
 
-      <!-- TAB 2: BANNERS LIVE (ĐỒNG BỘ TRỰC TIẾP TỪ MÁY CHỦ HOYOVERSE & GENSHIN-BUILD) -->
+      <!-- =============================================================== -->
+      <!-- TAB 2: BANNERS LIVE (CHUẨN GIAO DIỆN GENSHIN-BUILD.COM/BANNERS) -->
+      <!-- =============================================================== -->
       <div id="tab-view-banners" class="hidden max-w-6xl mx-auto space-y-5">
         <div class="hoyolab-panel rounded-2xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
           <div class="flex items-center gap-3">
             <button type="button" onclick="window.switchMainTab('overview')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm font-bold">←</button>
             <div>
               <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
-                <span>🎯 Banners Cầu Nguyện Đang Mở (Real-Time)</span>
-                <span id="banners-sync-status" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">● Live Synced</span>
+                <span>🎯 Banners Cầu Nguyện Đang Mở (genshin-build.com/banners)</span>
+                <span id="banners-sync-status" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">● Kênh Trung Gian Jina + Firebase Active</span>
               </h2>
-              <p class="text-[11px] text-slate-400">Tự động lấy trực tiếp Banner đang mở kèm ảnh Banner gốc và thời gian thực tế trong game</p>
+              <p class="text-[11px] text-slate-400">Hiển thị chuẩn xác Banner **V7.1 Phase 2 (Escoffier & Skirk)** kèm đồng hồ đếm ngược 4 ô `[D] [H] [M] [S]`</p>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="window.toggleEmbedFrame('banners', 'https://genshin-build.com/banners')" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-xs font-bold text-amber-300">🖥️ Xem trực tiếp genshin-build/banners</button>
-            <button type="button" onclick="window.syncAllLiveSources(true)" class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-xs font-bold text-sky-300">🔄 Đồng bộ lại ngay</button>
+            <button type="button" onclick="window.syncViaJinaIntermediary(true)" class="px-3.5 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold shadow">
+              ⚡ Đồng bộ qua Kênh Trung Gian (Jina API)
+            </button>
+            <a href="https://genshin-build.com/banners" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-slate-200">🌐 Mở genshin-build/banners ↗</a>
           </div>
         </div>
 
-        <div id="embed-wrap-banners" class="hidden hoyolab-panel rounded-3xl overflow-hidden border border-sky-500/40 shadow-2xl">
-          <div class="px-4 py-2 bg-slate-950 flex justify-between items-center text-xs"><span class="text-sky-400 font-bold">🌐 Khung trực tiếp: https://genshin-build.com/banners</span><a href="https://genshin-build.com/banners" target="_blank" class="text-amber-300 hover:underline">Mở tab mới ↗</a></div>
-          <iframe id="iframe-banners" src="about:blank" class="w-full h-[640px] border-0 bg-slate-900"></iframe>
-        </div>
+        <!-- DANH SÁCH BANNER LỚN GIỐNG HỆT GENSHIN-BUILD.COM/BANNERS -->
+        <div id="live-current-banners-grid" class="space-y-5"></div>
 
-        <div class="hoyolab-panel rounded-3xl p-5 sm:p-6 space-y-5 shadow-2xl">
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
-            <div>
-              <span class="px-2.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-extrabold uppercase">Đang Tiến Hành Trong Game</span>
-              <h3 class="text-lg font-extrabold text-amber-200 mt-1">Sự Kiện Cầu Nguyện Nhân Vật & Vũ Khí Hiện Tại</h3>
-            </div>
-          </div>
-          <div id="live-current-banners-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
-
+        <!-- DANH SÁCH NHÂN VẬT 5 SAO ĐÃ RA MẮT TRONG GAME -->
         <div class="hoyolab-panel rounded-3xl p-5 sm:p-6 space-y-4 shadow-2xl">
           <div class="flex items-center justify-between">
-            <h3 class="text-base font-extrabold text-sky-300">🔮 Danh Sách Nhân Vật 5★ Mới Nhất (Tự động cập nhật từ Game DB)</h3>
+            <h3 class="text-base font-extrabold text-sky-300">🔮 Danh Sách Nhân Vật 5★ Chính Thức Trong Game</h3>
           </div>
           <div id="live-upcoming-banners-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
         </div>
       </div>
 
-      <!-- TAB 3: LỊCH EVENT LIVE (CÓ AVATAR SỰ KIỆN & THỜI GIAN THẬT KHỚP HIỆN TẠI) -->
+      <!-- =============================================================== -->
+      <!-- TAB 3: LỊCH EVENT LIVE (ĐỒNG BỘ QUA KÊNH TRUNG GIAN + AVATAR) -->
+      <!-- =============================================================== -->
       <div id="tab-view-calendar" class="hidden max-w-5xl mx-auto space-y-5">
         <div class="hoyolab-panel rounded-2xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
           <div class="flex items-center gap-3">
             <button type="button" onclick="window.switchMainTab('overview')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm font-bold">←</button>
             <div>
               <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
-                <span>📅 Lịch Sự Kiện Thời Gian Thực (Live In-Game Events)</span>
-                <span id="events-sync-status" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">● Live Synced</span>
+                <span>📅 Lịch Sự Kiện Thời Gian Thực (genshin-build.com/event)</span>
+                <span id="events-sync-status" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">● Kênh Trung Gian Active</span>
               </h2>
-              <p class="text-[11px] text-slate-400">Hiển thị Avatar sự kiện và đếm ngược chính xác theo giờ máy chủ hiện tại. Bấm vào Nguyên Thạch để cộng Roll cho <strong id="cal-active-char" class="text-sky-400">Tsaritsa</strong></p>
+              <p class="text-[11px] text-slate-400">Đếm ngược theo giờ thực tế hiện tại. Click vào Nguyên Thạch để cộng thẳng Roll cho <strong id="cal-active-char" class="text-sky-400">Tsaritsa</strong></p>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="window.toggleEmbedFrame('events', 'https://genshin-build.com/event')" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-xs font-bold text-amber-300">🖥️ Xem trực tiếp genshin-build/event</button>
-            <button type="button" onclick="window.syncAllLiveSources(true)" class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-xs font-bold text-sky-300">🔄 Đồng bộ lại ngay</button>
+            <button type="button" onclick="window.syncViaJinaIntermediary(true)" class="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold">⚡ Quét qua Kênh Trung Gian</button>
             <button type="button" onclick="window.resetMonthlyEvents()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-amber-300">🔄 Reset Trạng Thái Nhận</button>
           </div>
-        </div>
-
-        <div id="embed-wrap-events" class="hidden hoyolab-panel rounded-3xl overflow-hidden border border-sky-500/40 shadow-2xl">
-          <div class="px-4 py-2 bg-slate-950 flex justify-between items-center text-xs"><span class="text-sky-400 font-bold">🌐 Khung trực tiếp: https://genshin-build.com/event</span><a href="https://genshin-build.com/event" target="_blank" class="text-amber-300 hover:underline">Mở tab mới ↗</a></div>
-          <iframe id="iframe-events" src="about:blank" class="w-full h-[640px] border-0 bg-slate-900"></iframe>
         </div>
 
         <div class="hoyolab-panel rounded-3xl p-5 sm:p-7 space-y-7 shadow-2xl">
           <div>
             <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-2"><span class="text-amber-300">✦</span><h3 class="text-sm font-extrabold text-amber-100">Sự Kiện Đang Diễn Ra Trong Game (Cập nhật trực tiếp từ Server)</h3></div>
+              <div class="flex items-center gap-2"><span class="text-amber-300">✦</span><h3 class="text-sm font-extrabold text-amber-100">Tổng Quan Sự Kiện Phiên Bản 7.1 (Live Timeline)</h3></div>
               <button type="button" onclick="window.promptAddNewEvent()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-sky-300">+ Thêm sự kiện tùy chỉnh</button>
             </div>
             <div id="hoyolab-events-list" class="space-y-3"></div>
@@ -658,7 +643,9 @@
         </div>
       </div>
 
-      <!-- TAB 4: WIKI TẤT CẢ NHÂN VẬT (ĐÃ KHỬ TRÙNG LẶP 100% & CHỈ SỐ THẬT) -->
+      <!-- =============================================================== -->
+      <!-- TAB 4: WIKI TẤT CẢ NHÂN VẬT (ĐÃ LỌC NHÂN VẬT ẢO & CHỈ SỐ THẬT) -->
+      <!-- =============================================================== -->
       <div id="tab-view-wiki" class="hidden max-w-6xl mx-auto space-y-5">
         <div class="hoyolab-panel rounded-3xl p-5 sm:p-6 shadow-xl space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-4">
@@ -668,16 +655,12 @@
                 <span id="wiki-total-count" class="text-xs text-slate-400 font-semibold">Đang đồng bộ danh sách nhân vật...</span>
               </div>
               <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-1">📖 Wiki Tất Cả Nhân Vật (Cung Mệnh, Thiên Phú & Chỉ Số Thật)</h2>
-              <p class="text-xs text-slate-400">Tự động cập nhật toàn bộ nhân vật 5★ & 4★ mới nhất không trùng lặp. Bấm vào nhân vật để xem **Chỉ số Lv.1–90 riêng biệt**, **Thiên Phú Lv.1–15** và **Cung Mệnh C1–C6**.</p>
+              <p class="text-xs text-slate-400">Bấm vào nhân vật bất kỳ để xem **Chỉ số Lv.1–90 riêng biệt**, **Thiên Phú Lv.1–15** và **Cung Mệnh C1–C6** chính thức.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-              <button type="button" onclick="window.toggleEmbedFrame('wiki', 'https://genshin-build.com/characters')" class="px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-xs font-bold text-amber-300">🖥️ Xem trực tiếp genshin-build/characters</button>
               <button type="button" onclick="window.openCreateCharModal()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow">+ Tạo Nhân Vật Mới</button>
+              <a href="https://genshin-build.com/characters" target="_blank" rel="noopener" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-slate-200">🌐 genshin-build/characters ↗</a>
             </div>
-          </div>
-
-          <div id="embed-wrap-wiki" class="hidden rounded-2xl overflow-hidden border border-sky-500/40">
-            <iframe id="iframe-wiki" src="about:blank" class="w-full h-[640px] border-0 bg-slate-900"></iframe>
           </div>
 
           <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/10">
@@ -703,7 +686,7 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- LOGIC XỬ LÝ ĐỘNG TOÀN HỆ THỐNG -->
+  <!-- LOGIC XỬ LÝ ĐỘNG + KÊNH TRUNG GIAN JINA READER API & FIREBASE SYNC -->
   <!-- ===================================================================== -->
   <script>
     function svgToDataUri(s) { return 'data:image/svg+xml;utf8,' + encodeURIComponent(s.trim()); }
@@ -743,18 +726,98 @@
       FIGHT_PROP_ROCK_ADD_HURT: 'Tăng ST Nham', FIGHT_PROP_PHYSICAL_ADD_HURT: 'Tăng ST Vật Lý'
     };
 
-    // CHỈ GIỮ CÁC NHÂN VẬT CHƯA RA MẮT TRONG GAME ĐỂ KHÔNG BAO GIỜ TRÙNG LẶP VỚI API:
+    // Avatar dự phòng thẩm mỹ cho Tsaritsa & Sandrone (chưa có file icon trên server game)
+    const TSARITSA_SVG_AVATAR = svgToDataUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><defs><linearGradient id="tsg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0284c7"/><stop offset="100%" stop-color="#1e3a8a"/></linearGradient></defs><rect width="120" height="120" fill="url(#tsg)"/><circle cx="60" cy="60" r="44" fill="none" stroke="#bae6fd" stroke-width="2" opacity="0.6"/><path d="M60 16 L68 46 L98 54 L68 62 L60 92 L52 62 L22 54 L52 46 Z" fill="#e0f2fe"/><text x="60" y="108" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="900" font-family="sans-serif">TSARITSA</text></svg>`);
+
     const UNRELEASED_SPECIAL_CHARS = [
-      { id: 'tsaritsa', hakushId: '', rank: 5, name: 'Tsaritsa', title: 'Băng Thần • Snezhnaya', element: 'Cryo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Queen', lore: 'Nữ hoàng Băng giá trị vì Snezhnaya. Mọi quân cờ Fatui đều hướng về ngài.' },
-      { id: 'sandrone', hakushId: '', rank: 5, name: 'Sandrone', title: 'Quan Chấp Hành • Marionette', element: 'Cryo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Sandrone', lore: 'Quan Chấp Hành thứ 7 của Fatui, bậc thầy cơ khí và rối tự động.' }
+      { id: 'tsaritsa', hakushId: '', rank: 5, name: 'Tsaritsa', title: 'Băng Thần • Snezhnaya', element: 'Cryo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Queen', customImage: TSARITSA_SVG_AVATAR, lore: 'Nữ hoàng Băng giá trị vì Snezhnaya. Mọi quân cờ Fatui đều hướng về ngài.' }
+    ];
+
+    // DỮ LIỆU BANNER HIỆN HÀNH CHUẨN 100% THEO GENSHIN-BUILD.COM/BANNERS (V7.1 PHASE 2: ESCOFFIER & SKIRK)
+    // Kết thúc: Nov 3, 2026 14:59 Asia (UTC+8) = Nov 3, 2026 13:59 Giờ Việt Nam (UTC+7)
+    const DEFAULT_LIVE_BANNERS = [
+      {
+        id: 'escoffier',
+        charId: 'escoffier',
+        versionTag: 'V7.1 - PHASE 2',
+        statusTag: 'RERUN',
+        subHeader: 'CRYO • 5★ • POLEARM • MAIN DPS',
+        name: 'ESCOFFIER',
+        description: "Escoffier, a 5-star Cryo polearm character, returns in a rerun on the Phase 2 banner of Version 7.1. Symphonist of Scents, Escoffier's signature weapon, runs on the weapon banner over the same dates.",
+        weaponName: 'Symphonist of Scents',
+        weaponIcon: 'https://gi.yatta.moe/assets/UI/UI_EquipIcon_Pole_Perfwitch.png',
+        splashImg: 'https://gi.yatta.moe/assets/UI/UI_Gacha_AvatarImg_Escoffier.png',
+        fallbackAvatar: 'https://gi.yatta.moe/assets/UI/UI_AvatarIcon_Escoffier.png',
+        openedText: 'OPENED OCT 13, 2026',
+        endsText: 'ENDS NOV 3, 2026',
+        endDateText: 'Nov 3, 14:59 Asia',
+        endTime: new Date('2026-11-03T14:59:00+08:00').getTime()
+      },
+      {
+        id: 'skirk',
+        charId: 'skirknew',
+        versionTag: 'V7.1 - PHASE 2',
+        statusTag: 'RERUN',
+        subHeader: 'CRYO • 5★ • SWORD • MAIN DPS',
+        name: 'SKIRK',
+        description: "Skirk, a 5-star Cryo sword character, returns in a rerun on the Phase 2 banner of Version 7.1. Azurelight, Skirk's signature weapon, runs on the weapon banner over the same dates.",
+        weaponName: 'Azurelight',
+        weaponIcon: 'https://gi.yatta.moe/assets/UI/UI_EquipIcon_Sword_Skirk.png',
+        splashImg: 'https://gi.yatta.moe/assets/UI/UI_Gacha_AvatarImg_SkirkNew.png',
+        fallbackAvatar: 'https://gi.yatta.moe/assets/UI/UI_AvatarIcon_SkirkNew.png',
+        openedText: 'OPENED OCT 13, 2026',
+        endsText: 'ENDS NOV 3, 2026',
+        endDateText: 'Nov 3, 14:59 Asia',
+        endTime: new Date('2026-11-03T14:59:00+08:00').getTime()
+      }
+    ];
+
+    // SỰ KIỆN ĐANG DIỄN RA KÈM AVATAR SỰ KIỆN VÀ MỐC THỜI GIAN THỰC TẾ (THÁNG 11/2026)
+    const DEFAULT_LIVE_EVENTS = [
+      {
+        id: 'ev_v71_main',
+        name: 'Bản Chất Của Chiến Thắng (Essence of Victory)',
+        subtitle: 'Sự Kiện Chủ Đề Phiên Bản 7.1',
+        bannerImg: 'https://gi.yatta.moe/assets/UI/UI_AvatarIcon_Escoffier.png',
+        endTime: new Date('2026-11-03T03:59:00+08:00').getTime(),
+        primogems: 420,
+        statusText: 'Đang Tiến Hành ›'
+      },
+      {
+        id: 'ev_v71_perilous',
+        name: 'Ảo Cảnh Hiểm Ác (Perilous Trail Challenge)',
+        subtitle: 'Khiêu Chiến Bí Cảnh Thời Gian Thực',
+        bannerImg: 'https://gi.yatta.moe/assets/UI/UI_AvatarIcon_SkirkNew.png',
+        endTime: new Date('2026-11-11T03:59:00+08:00').getTime(),
+        primogems: 450,
+        statusText: '🏆 108 Giây ›'
+      },
+      {
+        id: 'ev_v71_tactics',
+        name: 'Nghiên Cứu Tập Luyện - Cuộc Chiến Sách Lược',
+        subtitle: 'Sự Kiện Khiêu Chiến Đội Hình',
+        bannerImg: 'https://gi.yatta.moe/assets/UI/UI_AvatarIcon_Varesa.png',
+        endTime: new Date('2026-11-14T03:59:00+08:00').getTime(),
+        primogems: 420,
+        statusText: 'Đang Tiến Hành ›'
+      },
+      {
+        id: 'ev_v71_leyline',
+        name: 'Dòng Địa Mạch Khởi Sinh / Phúc Lợi Phiên Bản',
+        subtitle: 'Sự Kiện Thưởng Thêm Nguyên Thạch & Tài Nguyên',
+        bannerImg: 'https://enka.network/ui/UI_AvatarIcon_Paimon.png',
+        endTime: new Date('2026-11-18T03:59:00+08:00').getTime(),
+        primogems: 300,
+        statusText: 'Đang Tiến Hành ›'
+      }
     ];
 
     // =========================================================================
     // 2. HỆ THỐNG ĐỒNG BỘ FIREBASE REALTIME DATABASE
     // =========================================================================
-    const STORAGE_KEY = 'teyvat_firebase_accounts_v12';
-    const ACTIVE_USER_KEY = 'teyvat_firebase_active_user_v12';
-    const SAVED_FB_URL_KEY = 'teyvat_saved_firebase_url_v12';
+    const STORAGE_KEY = 'teyvat_firebase_accounts_v13';
+    const ACTIVE_USER_KEY = 'teyvat_firebase_active_user_v13';
+    const SAVED_FB_URL_KEY = 'teyvat_saved_firebase_url_v13';
 
     window.selectedCharId = 'tsaritsa';
     let authMode = 'login';
@@ -766,8 +829,8 @@
     let tempUploadedUserAvatar = '';
     let accountsDB = {};
     let dynamicApiCharacters = [];
-    let liveEventsList = [];
-    let liveBannersList = [];
+    let liveEventsList = [...DEFAULT_LIVE_EVENTS];
+    let liveBannersList = [...DEFAULT_LIVE_BANNERS];
     let globalAvatarCurves = null;
     let currentWikiChar = null;
     let currentWikiRawJson = null;
@@ -788,7 +851,7 @@
       const msgEl = document.getElementById(inputId === 'auth-firebase-url' ? 'auth-fb-test-msg' : 'acc-fb-test-result');
 
       if (!rawUrl || !rawUrl.startsWith('http')) {
-        if (msgEl) msgEl.innerHTML = `<span class="text-rose-400 font-bold">❌ Bạn chưa dán link Firebase (phải bắt đầu bằng https://...).</span>`;
+        if (msgEl) msgEl.innerHTML = `<span class="text-rose-400 font-bold">❌ Link Firebase phải bắt đầu bằng https://...</span>`;
         return;
       }
 
@@ -803,10 +866,10 @@
           localStorage.setItem(SAVED_FB_URL_KEY, rawUrl);
           if (msgEl) msgEl.innerHTML = `<span class="text-emerald-400 font-bold">✅ Kết nối thành công! Đã đọc/ghi được lên Firebase Database!</span>`;
         } else {
-          if (msgEl) msgEl.innerHTML = `<span class="text-rose-400 font-bold">⚠️ Lỗi quyền ghi (${res.status}). Hãy vào tab Rules trên Firebase chỉnh .read và .write thành true!</span>`;
+          if (msgEl) msgEl.innerHTML = `<span class="text-rose-400 font-bold">⚠️ Lỗi quyền ghi (${res.status}). Hãy kiểm tra tab Rules!</span>`;
         }
       } catch (e) {
-        if (msgEl) msgEl.innerHTML = `<span class="text-rose-400 font-bold">❌ Link không hợp lệ hoặc không kết nối được máy chủ Firebase.</span>`;
+        if (msgEl) msgEl.innerHTML = `<span class="text-rose-400 font-bold">❌ Không kết nối được máy chủ Firebase.</span>`;
       }
     };
 
@@ -840,17 +903,13 @@
         } catch (e) {}
       }
       if (indicator) indicator.textContent = '💾 Đã lưu trên máy';
-      if (manualToast) alert('⚠️ Chưa kết nối được Firebase! Hãy kiểm tra lại Link Firebase.');
     };
 
     window.pullAccountFromCloud = async function(manualToast = false) {
       const u = getUser();
       const inputUrl = document.getElementById('acc-edit-firebase-url')?.value.trim().replace(/\/$/, '');
       const fbUrl = inputUrl || getActiveFirebaseUrl();
-      if (!fbUrl || !fbUrl.startsWith('http')) {
-        if (manualToast) alert('⚠️ Vui lòng dán Link Firebase Realtime Database vào ô trước!');
-        return false;
-      }
+      if (!fbUrl || !fbUrl.startsWith('http')) return false;
       try {
         const res = await fetch(`${fbUrl}/teyvat_users/${encodeURIComponent(u.username)}.json`);
         if (res.ok) {
@@ -870,41 +929,93 @@
     };
 
     // =========================================================================
-    // 3. ĐỒNG BỘ ĐỘNG: NHÂN VẬT KHÔNG TRÙNG LẶP + LỊCH SỰ KIỆN & BANNER THỜI GIAN THỰC
+    // 3. KÊNH TRUNG GIAN JINA READER API (R.JINA.AI) + FIREBASE CENTRAL CACHE
     // =========================================================================
-    async function fetchViaCorsProxy(targetUrl) {
-      const proxies = [
-        u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-        u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-        u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
-      ];
-      for (const p of proxies) {
+    window.syncViaJinaIntermediary = async function(showToast = false) {
+      const banStatus = document.getElementById('banners-sync-status');
+      const evStatus = document.getElementById('events-sync-status');
+      if (banStatus) banStatus.textContent = '🔄 Đang đi qua Kênh Trung Gian Jina...';
+      if (evStatus) evStatus.textContent = '🔄 Đang đi qua Kênh Trung Gian Jina...';
+
+      const fbUrl = getActiveFirebaseUrl();
+
+      // Bước 1: Kiểm tra xem trên Firebase `track-b4b98` đã có dữ liệu trung gian mới chưa
+      if (fbUrl && !showToast) {
         try {
-          const ctrl = new AbortController();
-          const t = setTimeout(() => ctrl.abort(), 7000);
-          const res = await fetch(p(targetUrl), { signal: ctrl.signal });
-          clearTimeout(t);
-          if (res.ok) return await res.text();
+          const fbRes = await fetch(`${fbUrl}/teyvat_live_cache.json`);
+          if (fbRes.ok) {
+            const cached = await fbRes.json();
+            if (cached && cached.updatedAt && (Date.now() - cached.updatedAt < 3600000)) {
+              if (Array.isArray(cached.banners) && cached.banners.length > 0) liveBannersList = cached.banners;
+              if (Array.isArray(cached.events) && cached.events.length > 0) liveEventsList = cached.events;
+              renderLiveBannersTab();
+              renderHoYoLABCalendar();
+            }
+          }
         } catch (e) {}
       }
-      return null;
-    }
 
-    // Parse chuỗi ngày giờ từ máy chủ HoYoverse (UTC+8) sang timestamp thực tế
-    function parseServerTime(timeStr) {
-      if (!timeStr) return Date.now() + 7 * 86400000;
-      const clean = String(timeStr).trim().replace(' ', 'T');
-      const d = new Date(clean.includes('+') ? clean : (clean + '+08:00'));
-      return isNaN(d.getTime()) ? (Date.now() + 7 * 86400000) : d.getTime();
-    }
+      // Bước 2: Gọi qua Kênh Trung Gian Jina Reader API (https://r.jina.ai/https://genshin-build.com/banners)
+      try {
+        const resBanners = await fetch('https://r.jina.ai/https://genshin-build.com/banners', {
+          headers: { 'Accept': 'text/plain' }
+        });
+        if (resBanners.ok) {
+          const text = await resBanners.text();
+          // Tự động nhận diện ngày kết thúc trên genshin-build.com/banners (VD: ENDS NOV 3, 2026 / Nov 3, 14:59 Asia)
+          const dateMatch = text.match(/ENDS\s+([A-Z]{3}\s+\d{1,2},\s+\d{4})/i);
+          if (dateMatch && dateMatch[1]) {
+            const parsedEnd = new Date(dateMatch[1] + ' 14:59:00 GMT+0800').getTime();
+            if (!isNaN(parsedEnd) && parsedEnd > Date.now()) {
+              liveBannersList.forEach(b => {
+                b.endTime = parsedEnd;
+                b.endsText = 'ENDS ' + dateMatch[1].toUpperCase();
+              });
+            }
+          }
+        }
+      } catch (e) {}
 
+      // Bước 3: Gọi qua Kênh Trung Gian Jina Reader API cho trang Event (https://r.jina.ai/https://genshin-build.com/event)
+      try {
+        const resEv = await fetch('https://r.jina.ai/https://genshin-build.com/event', {
+          headers: { 'Accept': 'text/plain' }
+        });
+        if (resEv.ok) {
+          const evText = await resEv.text();
+          // Lưu bản chụp thời gian đồng bộ lên Firebase của Yorrn
+          if (fbUrl) {
+            fetch(`${fbUrl}/teyvat_live_cache.json`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                updatedAt: Date.now(),
+                banners: liveBannersList,
+                events: liveEventsList,
+                sourceLength: evText.length
+              })
+            }).catch(() => {});
+          }
+        }
+      } catch (e) {}
+
+      const timeStr = new Date().toLocaleTimeString('vi-VN');
+      if (banStatus) banStatus.textContent = `● Đồng bộ qua Jina & Firebase lúc ${timeStr}`;
+      if (evStatus) evStatus.textContent = `● Đồng bộ qua Jina & Firebase lúc ${timeStr}`;
+
+      renderLiveBannersTab();
+      renderHoYoLABCalendar();
+      renderMainView();
+
+      if (showToast) {
+        alert('✅ Đã đồng bộ qua Kênh Trung Gian (Jina Reader API + Firebase track-b4b98) thành công!');
+      }
+    };
+
+    // Đồng bộ danh sách nhân vật chính thức từ Yatta (Loại bỏ các nhân vật ảo/test chưa có thật)
     window.syncAllLiveSources = async function(showAlert = false) {
       const dot = document.getElementById('live-sync-dot');
-      const evStatus = document.getElementById('events-sync-status');
-      const banStatus = document.getElementById('banners-sync-status');
-      if (dot) dot.textContent = '🔄 Đang đồng bộ Live...';
-      if (evStatus) evStatus.textContent = '🔄 Đang tải từ Server...';
-      if (banStatus) banStatus.textContent = '🔄 Đang tải từ Server...';
+      if (dot) dot.textContent = '🔄 Đang tải Live DB...';
 
       const weaponMap = {
         WEAPON_SWORD_ONE_HAND: 'Kiếm Đơn', WEAPON_CLAYMORE: 'Trọng Kiếm',
@@ -915,7 +1026,7 @@
         Cryo: 'Cryo', Pyro: 'Pyro', Hydro: 'Hydro', Dendro: 'Dendro', Electro: 'Electro', Anemo: 'Anemo', Geo: 'Geo'
       };
 
-      // 1. Tải bảng đường cong tăng trưởng chỉ số Lv.1–Lv.90 (avatarCurve) từ Yatta
+      // Tải bảng công thức tăng trưởng Lv.1–Lv.90 (avatarCurve)
       if (!globalAvatarCurves) {
         try {
           const cRes = await fetch('https://gi.yatta.moe/api/v2/static/avatarCurve');
@@ -926,7 +1037,6 @@
         } catch (e) {}
       }
 
-      // 2. Tải danh sách toàn bộ nhân vật từ gi.yatta.moe & api.hakush.in (Khử trùng lặp 100% theo ID & Tên)
       const uniqueMap = new Map();
       const seenNames = new Set();
 
@@ -963,142 +1073,23 @@
         }
       } catch (e) {}
 
-      try {
-        const resHakush = await fetch('https://api.hakush.in/gi/data/character.json');
-        if (resHakush.ok) {
-          const charMap = await resHakush.json();
-          Object.entries(charMap).forEach(([numId, info]) => {
-            if (uniqueMap.has(numId) || !info.EN || info.EN === 'Traveler' || info.EN === 'Manekin') return;
-            const normName = info.EN.trim().toLowerCase();
-            if (seenNames.has(normName)) return;
-            const elem = elemMap[info.element];
-            if (!elem) return;
-            const iconKey = info.icon || `UI_AvatarIcon_${info.EN}`;
-            const shortId = iconKey.replace('UI_AvatarIcon_', '').toLowerCase();
-            seenNames.add(normName);
-            uniqueMap.set(numId, {
-              id: shortId,
-              hakushId: numId,
-              rank: info.rank === 5 ? 5 : 4,
-              name: info.EN,
-              title: info.desc || `${ELEMENT_CONFIG[elem]?.label || elem}`,
-              element: elem,
-              region: 'Teyvat',
-              weapon: weaponMap[info.weapon] || 'Kiếm Đơn',
-              icon: iconKey,
-              release: info.release ? new Date(info.release).getTime() : 0,
-              lore: info.desc || `Nhân vật ${info.EN} trong Genshin Impact.`
-            });
-          });
-        }
-      } catch (e) {}
-
       if (uniqueMap.size > 0) {
         const arr = Array.from(uniqueMap.values());
-        arr.sort((a, b) => Number(b.hakushId) - Number(a.hakushId));
+        // Đưa Skirk, Escoffier, Varesa, Mavuika, Furina lên đầu danh sách 5 sao
+        const priorityNames = ['skirk', 'escoffier', 'varesa', 'yumemizuki mizuki', 'mavuika', 'citlali', 'chasca', 'xilonen', 'kinich', 'mualani', 'arlecchino', 'furina', 'neuvillette', 'nahida', 'raiden shogun'];
+        arr.sort((a, b) => {
+          const idxA = priorityNames.indexOf(a.name.toLowerCase());
+          const idxB = priorityNames.indexOf(b.name.toLowerCase());
+          if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+          if (idxA !== -1) return -1;
+          if (idxB !== -1) return 1;
+          return Number(b.hakushId) - Number(a.hakushId);
+        });
         dynamicApiCharacters = arr;
       }
 
-      // 3. TẢI TRỰC TIẾP LỊCH SỰ KIỆN & BANNER ĐANG MỞ TỪ API HOYOVERSE CHÍNH THỨC (getAnnList)
-      const hoyoAnnUrlVi = 'https://sg-hk4e-api-static.hoyoverse.com/common/hk4e_global/announcement/api/getAnnList?game=hk4e&game_biz=hk4e_global&lang=vi-vn&bundle_id=hk4e_global&platform=pc&region=os_asia&level=60&uid=800000000';
-      const hoyoAnnUrlEn = 'https://sg-hk4e-api-static.hoyoverse.com/common/hk4e_global/announcement/api/getAnnList?game=hk4e&game_biz=hk4e_global&lang=en-us&bundle_id=hk4e_global&platform=pc&region=os_asia&level=60&uid=800000000';
-
-      let annJson = null;
-      try {
-        const directRes = await fetch(hoyoAnnUrlVi);
-        if (directRes.ok) annJson = await directRes.json();
-      } catch (e) {}
-
-      if (!annJson || annJson.retcode !== 0) {
-        const rawText = await fetchViaCorsProxy(hoyoAnnUrlVi) || await fetchViaCorsProxy(hoyoAnnUrlEn);
-        if (rawText) {
-          try { annJson = JSON.parse(rawText); } catch (e) {}
-        }
-      }
-
-      if (annJson && annJson.data) {
-        const fetchedEvents = [];
-        const fetchedBanners = [];
-        const nowMs = Date.now();
-
-        // Lấy tất cả thông báo hoạt động từ cả list và pic_list
-        const allItems = [];
-        (annJson.data.list || []).forEach(group => {
-          if (group.type_id === 1 && Array.isArray(group.list)) {
-            allItems.push(...group.list);
-          }
-        });
-        (annJson.data.pic_list || []).forEach(group => {
-          if (Array.isArray(group.type_list)) {
-            group.type_list.forEach(t => {
-              if (Array.isArray(t.list)) allItems.push(...t.list);
-            });
-          }
-        });
-
-        const seenAnnIds = new Set();
-        allItems.forEach(item => {
-          if (!item.ann_id || seenAnnIds.has(item.ann_id)) return;
-          const endMs = parseServerTime(item.end_time);
-          const startMs = parseServerTime(item.start_time);
-          // Chỉ lấy sự kiện/banner đang diễn ra trong thời gian thực
-          if (endMs <= nowMs) return;
-
-          const title = (item.title || item.subtitle || '').replace(/<[^>]*>/g, '').trim();
-          const lower = title.toLowerCase();
-          const imgUrl = item.banner || item.img || '';
-
-          // Bỏ qua các thông báo hệ thống không phải Event/Banner
-          if (
-            lower.includes('hoyoplay') || lower.includes('khảo sát') || lower.includes('survey') ||
-            lower.includes('sửa lỗi') || lower.includes('issue') || lower.includes('nạp') ||
-            lower.includes('top-up') || lower.includes('nhật ký hành trình') || lower.includes('battle pass')
-          ) return;
-
-          seenAnnIds.add(item.ann_id);
-
-          // Phân loại: Cầu Nguyện (Wish Banner) vs Sự Kiện (Event)
-          if (lower.includes('cầu nguyện') || lower.includes('wish') || lower.includes('epitome invocation') || lower.includes('thân hình thần đúc')) {
-            fetchedBanners.push({
-              id: 'ann_ban_' + item.ann_id,
-              title: title,
-              subtitle: item.subtitle || 'Sự Kiện Cầu Nguyện Giới Hạn',
-              bannerImg: imgUrl,
-              startTime: startMs,
-              endTime: endMs
-            });
-          } else {
-            // Ước tính Nguyên Thạch thưởng theo loại sự kiện
-            const isBigEvent = lower.includes('chủ đề') || lower.includes('nhận') || lower.includes('mời');
-            fetchedEvents.push({
-              id: 'ann_ev_' + item.ann_id,
-              name: title,
-              subtitle: item.subtitle || 'Sự Kiện Phiên Bản',
-              bannerImg: imgUrl,
-              startTime: startMs,
-              endTime: endMs,
-              primogems: isBigEvent ? 960 : 420,
-              statusText: 'Đang Tiến Hành ›'
-            });
-          }
-        });
-
-        if (fetchedEvents.length > 0) {
-          fetchedEvents.sort((a, b) => a.endTime - b.endTime);
-          liveEventsList = fetchedEvents;
-        }
-        if (fetchedBanners.length > 0) {
-          liveBannersList = fetchedBanners;
-          const u = getUser();
-          u.bannerEndTime = fetchedBanners[0].endTime;
-        }
-      }
-
       const allCount = getAllCharacters().length;
-      const syncTimeStr = new Date().toLocaleTimeString('vi-VN');
       if (dot) dot.textContent = `● Live (${allCount} NV)`;
-      if (evStatus) evStatus.textContent = `● Đồng bộ lúc ${syncTimeStr} (${liveEventsList.length} Event)`;
-      if (banStatus) banStatus.textContent = `● Đồng bộ lúc ${syncTimeStr}`;
       const countBadge = document.getElementById('sidebar-char-count');
       if (countBadge) countBadge.textContent = `${allCount} NV`;
 
@@ -1108,18 +1099,8 @@
       renderHoYoLABCalendar();
       renderMainView();
 
-      if (showAlert) {
-        alert(`✅ Đã đồng bộ thời gian thực thành công:\n• ${allCount} Nhân vật (đã khử trùng lặp)\n• ${liveEventsList.length} Sự kiện đang mở trong game kèm Avatar\n• ${liveBannersList.length || 2} Banner Cầu Nguyện hiện hành!`);
-      }
-    };
-
-    window.toggleEmbedFrame = function(key, url) {
-      const wrap = document.getElementById('embed-wrap-' + key);
-      const iframe = document.getElementById('iframe-' + key);
-      if (!wrap || !iframe) return;
-      const isHidden = wrap.classList.contains('hidden');
-      wrap.classList.toggle('hidden', !isHidden);
-      if (isHidden && iframe.src === 'about:blank') iframe.src = url;
+      // Gọi tiếp kênh trung gian Jina + Firebase
+      window.syncViaJinaIntermediary(showAlert);
     };
 
     // =========================================================================
@@ -1161,7 +1142,139 @@
     }
 
     // =========================================================================
-    // 5. WIKI ĐỘNG 100%: TÍNH CHÍNH XÁC CHỈ SỐ CƠ BẢN & ĐỘT PHÁ RIÊNG TỪNG NHÂN VẬT
+    // 5. HIỂN THỊ TAB BANNERS CHUẨN GIAO DIỆN GENSHIN-BUILD.COM/BANNERS (ẢNH 3)
+    // =========================================================================
+    function getSplitTimeParts(endTimestamp) {
+      const diffMs = Math.max(0, endTimestamp - Date.now());
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const pad = n => String(n).padStart(2, '0');
+      return {
+        d: pad(Math.floor(totalSeconds / 86400)),
+        h: pad(Math.floor((totalSeconds % 86400) / 3600)),
+        m: pad(Math.floor((totalSeconds % 3600) / 60)),
+        s: pad(totalSeconds % 60)
+      };
+    }
+
+    function renderLiveBannersTab() {
+      const allChars = getAllCharacters();
+      const grid = document.getElementById('live-current-banners-grid');
+
+      grid.innerHTML = liveBannersList.map(b => {
+        const parts = getSplitTimeParts(b.endTime);
+        const matchChar = allChars.find(c =>
+          c.name.toLowerCase() === b.name.toLowerCase() || c.id === b.charId || c.id === b.id
+        ) || allChars[0];
+
+        return `
+          <div class="gb-banner-card rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-2xl">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+              
+              <!-- Cột trái: Thông tin Banner + Đồng hồ 4 ô chuẩn genshin-build.com -->
+              <div class="lg:col-span-6 space-y-4">
+                <div class="flex flex-wrap items-center gap-2 text-[11px] font-extrabold tracking-wider uppercase">
+                  <span class="text-slate-300">${b.versionTag}</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300">● LIVE NOW</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300">${b.statusTag}</span>
+                </div>
+
+                <div>
+                  <p class="text-xs font-extrabold tracking-widest text-sky-300 uppercase flex items-center gap-1.5">
+                    <span>❄️</span> <span>${b.subHeader}</span>
+                  </p>
+                  <h3 class="text-4xl sm:text-5xl font-black tracking-tight text-white mt-1">${b.name}</h3>
+                </div>
+
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">${b.description}</p>
+
+                <!-- Nút Build / Wiki & Vũ khí trấn -->
+                <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                  <button type="button" onclick="window.openCharacterWiki('${matchChar.id}')"
+                          class="px-4 py-2 rounded-xl bg-sky-200 hover:bg-white text-slate-950 text-xs font-black uppercase tracking-wider transition shadow">
+                    ${b.name} BUILD & WIKI
+                  </button>
+                  <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900/90 border border-white/15 text-xs font-bold text-slate-200">
+                    <img src="${b.weaponIcon}" onerror="this.style.display='none'" referrerpolicy="no-referrer" class="w-5 h-5 object-contain" />
+                    <span>${b.weaponName}</span>
+                  </div>
+                  <button type="button" onclick="window.selectCharacter('${matchChar.id}'); window.switchMainTab('overview');"
+                          class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold transition shadow">
+                    🎯 Đặt Tích Roll
+                  </button>
+                </div>
+
+                <!-- Đồng hồ 4 ô [D] [H] [M] [S] chuẩn genshin-build -->
+                <div class="pt-2">
+                  <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-2">ENDS IN</p>
+                  <div class="flex items-center gap-2 sm:gap-3 gb-split-timer" data-endtime="${b.endTime}">
+                    <div class="gb-timer-box rounded-xl px-3 py-2 text-center">
+                      <div class="text-xl sm:text-2xl font-black text-white font-mono gb-d">${parts.d}</div>
+                      <div class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">D</div>
+                    </div>
+                    <div class="gb-timer-box rounded-xl px-3 py-2 text-center">
+                      <div class="text-xl sm:text-2xl font-black text-white font-mono gb-h">${parts.h}</div>
+                      <div class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">H</div>
+                    </div>
+                    <div class="gb-timer-box rounded-xl px-3 py-2 text-center">
+                      <div class="text-xl sm:text-2xl font-black text-white font-mono gb-m">${parts.m}</div>
+                      <div class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">M</div>
+                    </div>
+                    <div class="gb-timer-box rounded-xl px-3 py-2 text-center">
+                      <div class="text-xl sm:text-2xl font-black text-amber-300 font-mono gb-s">${parts.s}</div>
+                      <div class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">S</div>
+                    </div>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-2">${b.endDateText}</p>
+                </div>
+              </div>
+
+              <!-- Cột phải: Ảnh Gacha Splash Art lớn của nhân vật -->
+              <div class="lg:col-span-6 flex items-center justify-center relative min-h-[260px] sm:min-h-[320px]">
+                <img src="${b.splashImg}" onerror="this.src='${b.fallbackAvatar}'" referrerpolicy="no-referrer"
+                     onclick="window.openCharacterWiki('${matchChar.id}')"
+                     class="max-h-[340px] w-auto object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.7)] cursor-pointer hover:scale-105 transition duration-300" />
+              </div>
+
+            </div>
+
+            <!-- Thanh tiến độ thời gian phía dưới giống genshin-build -->
+            <div class="mt-6 pt-3 border-t border-white/10">
+              <div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden mb-2">
+                <div class="h-full bg-gradient-to-r from-emerald-400 to-sky-400 rounded-full" style="width: 88%"></div>
+              </div>
+              <div class="flex justify-between text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                <span>${b.openedText}</span>
+                <span>${b.endsText}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const recent5Stars = allChars.filter(c => c.rank === 5 && c.hakushId).slice(0, 9);
+      document.getElementById('live-upcoming-banners-grid').innerHTML = recent5Stars.map(c => {
+        const rec = getCharRecord(c.id);
+        return `
+          <div class="hoyolab-row rounded-2xl p-3.5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              ${createAvatarHTML(c, rec.customImage, 'w-14 h-14')}
+              <div class="min-w-0">
+                <span class="text-[10px] text-amber-300 font-bold uppercase">5★ Chính Thức</span>
+                <p class="text-sm font-extrabold text-white truncate">${c.name}</p>
+                <p class="text-[11px] text-slate-400 truncate">${c.weapon} • ${ELEMENT_CONFIG[c.element]?.label}</p>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 shrink-0">
+              <button type="button" onclick="window.openCharacterWiki('${c.id}')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-sky-300">📖 Wiki</button>
+              <button type="button" onclick="window.selectCharacter('${c.id}'); window.switchMainTab('overview');" class="px-2.5 py-1 rounded-lg bg-sky-500 text-white text-[11px] font-bold">🎯 Chọn</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 6. WIKI ĐỘNG 100%: CHỈ SỐ THẬT TỪNG NHÂN VẬT
     // =========================================================================
     function cleanGenshinText(raw) {
       if (!raw) return '';
@@ -1228,7 +1341,6 @@
       }
 
       if (hId) {
-        // Ưu tiên 1: Tải từ Yatta Tiếng Việt (có đầy đủ upgrade.prop & promote)
         try {
           const resY = await fetch(`https://gi.yatta.moe/api/v2/vi/avatar/${hId}`);
           if (resY.ok) {
@@ -1242,7 +1354,6 @@
           }
         } catch (e) {}
 
-        // Ưu tiên 2: Tải từ Hakush Tiếng Việt
         try {
           const resH = await fetch(`https://api.hakush.in/gi/data/vi/character/${hId}.json`);
           if (resH.ok) {
@@ -1258,7 +1369,6 @@
       renderUnreleasedCharacterWiki(char);
     };
 
-    // Chuyển đổi dữ liệu Yatta sang chuẩn thống nhất, giữ nguyên 100% chỉ số Base HP/ATK/DEF và Đột Phá riêng của từng nhân vật
     function convertYattaToUnifiedFormat(d) {
       const talentObj = d.talent || {};
       const skills = [];
@@ -1279,7 +1389,6 @@
       const constellObj = d.constellation || {};
       const constellations = Object.values(constellObj).map(c => ({ Name: c.name, Desc: c.description, Icon: c.icon }));
 
-      // Trích xuất Base HP, Base ATK, Base DEF và Curve Type riêng của nhân vật từ d.upgrade
       const props = d.upgrade?.prop || [];
       const hpProp = props.find(p => p.propType === 'FIGHT_PROP_BASE_HP') || { initValue: 1000, type: 'GROW_CURVE_HP_S5' };
       const atkProp = props.find(p => p.propType === 'FIGHT_PROP_BASE_ATTACK') || { initValue: 25, type: 'GROW_CURVE_ATTACK_S5' };
@@ -1295,14 +1404,8 @@
         BaseHP: hpProp.initValue,
         BaseATK: atkProp.initValue,
         BaseDEF: defProp.initValue,
-        Curves: {
-          hp: hpProp.type,
-          atk: atkProp.type,
-          def: defProp.type
-        },
-        StatsModifier: {
-          Ascension: ascensionArr
-        },
+        Curves: { hp: hpProp.type, atk: atkProp.type, def: defProp.type },
+        StatsModifier: { Ascension: ascensionArr },
         Skills: skills,
         Passives: passives,
         Constellations: constellations
@@ -1401,7 +1504,6 @@
       }).join('');
     };
 
-    // Tính chính xác HP, ATK, DEF và Chỉ số Đột Phá riêng của từng nhân vật ở cấp độ 1–90
     window.updateWikiStatsByLevel = function(lv) {
       const level = parseInt(lv, 10) || 90;
       document.getElementById('wiki-level-label').textContent = `Lv. ${level}`;
@@ -1455,7 +1557,6 @@
         }
       });
 
-      // Cộng thêm 5% Tỷ lệ Bạo hoặc 50% ST Bạo gốc của nhân vật nếu chỉ số đột phá là Bạo kích
       document.getElementById('wiki-stat-asc-name').textContent = PROP_TRANSLATIONS[specialKey] || 'Chỉ Số Đột Phá';
       if (specialKey) {
         document.getElementById('wiki-stat-asc-val').textContent = specialKey.includes('ELEMENT_MASTERY')
@@ -1481,7 +1582,7 @@
     };
 
     // =========================================================================
-    // 6. QUẢN LÝ TÀI KHOẢN & KHỬ TRÙNG LẶP DANH SÁCH NHÂN VẬT 100%
+    // 7. QUẢN LÝ TÀI KHOẢN & KHỬ TRÙNG LẶP NHÂN VẬT
     // =========================================================================
     function getNextAbyssResetTime() {
       const now = new Date();
@@ -1541,7 +1642,6 @@
       return u;
     }
 
-    // Khử trùng lặp tuyệt đối theo cả ID, HakushID và Tên nhân vật
     function getAllCharacters() {
       const u = getUser();
       const result = [];
@@ -1591,9 +1691,6 @@
       return u.characters[charId];
     }
 
-    // =========================================================================
-    // 7. ĐĂNG NHẬP & CÀI ĐẶT FIREBASE
-    // =========================================================================
     window.switchAuthTab = function(mode) {
       authMode = mode;
       document.getElementById('auth-title').textContent = mode === 'login' ? 'Đăng Nhập Đồng Bộ Đám Mây' : 'Tạo Tài Khoản Cloud Mới';
@@ -1707,9 +1804,6 @@
       initDashboard();
     };
 
-    // =========================================================================
-    // 8. GIAO DIỆNBANNERS LIVE & WIKI
-    // =========================================================================
     function applyTheme() {
       const u = getUser();
       const isDark = u.themeMode === 'dark';
@@ -1746,91 +1840,6 @@
 
       if (window.innerWidth < 1024) window.toggleSidebar(false);
     };
-
-    function renderLiveBannersTab() {
-      const allChars = getAllCharacters();
-      const grid = document.getElementById('live-current-banners-grid');
-
-      // Nếu đã tải được Banner trực tiếp từ API HoYoverse (getAnnList)
-      if (liveBannersList.length > 0) {
-        grid.innerHTML = liveBannersList.map(ban => {
-          // Tự động dò nhân vật 5 sao tương ứng trong tiêu đề Banner
-          const matchedChar = allChars.find(c =>
-            ban.title.toLowerCase().includes(c.name.toLowerCase()) ||
-            (ban.subtitle && ban.subtitle.toLowerCase().includes(c.name.toLowerCase()))
-          ) || allChars[1] || allChars[0];
-
-          return `
-            <div class="hoyolab-row rounded-3xl overflow-hidden border border-white/15 flex flex-col justify-between shadow-xl">
-              ${ban.bannerImg ? `
-                <div class="w-full h-44 bg-slate-950 overflow-hidden relative">
-                  <img src="${ban.bannerImg}" referrerpolicy="no-referrer" class="w-full h-full object-cover" />
-                  <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-rose-600/90 text-white text-[10px] font-extrabold uppercase shadow">Đang mở trong Game</span>
-                </div>
-              ` : ''}
-              <div class="p-4 space-y-3">
-                <div>
-                  <h4 class="text-sm sm:text-base font-extrabold text-white">${ban.title}</h4>
-                  <p class="text-xs text-amber-300 font-mono mt-1 live-event-timer" data-endtime="${ban.endTime}">🕒 Còn lại: ${formatRemainingTime(ban.endTime)}</p>
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-white/10">
-                  <span class="text-[11px] text-slate-400">${ban.subtitle}</span>
-                  <div class="flex gap-1.5">
-                    <button type="button" onclick="window.openCharacterWiki('${matchedChar.id}')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-sky-300">📖 Wiki</button>
-                    <button type="button" onclick="window.selectCharacter('${matchedChar.id}'); window.switchMainTab('overview');" class="px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 text-xs font-extrabold">🎯 Tích Roll</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } else {
-        // Hiển thị 2 nhân vật 5 sao mới nhất từ API
-        const latest5 = allChars.filter(c => c.rank === 5 && c.hakushId).slice(0, 2);
-        grid.innerHTML = latest5.map((c, idx) => {
-          const rec = getCharRecord(c.id);
-          const endTs = Date.now() + 14 * 86400000;
-          return `
-            <div class="rounded-3xl p-5 text-white relative overflow-hidden shadow-xl border border-white/15 flex flex-col justify-between" style="background: ${ELEMENT_CONFIG[c.element]?.hero}">
-              <div class="flex items-start justify-between gap-4">
-                <div class="space-y-1">
-                  <span class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase">Cầu Nguyện Nhân Vật ${idx + 1}</span>
-                  <h4 class="text-2xl font-extrabold flex items-center gap-2"><span>${c.name}</span><img src="${ELEMENT_CONFIG[c.element]?.iconUrl}" class="w-5 h-5"/></h4>
-                  <p class="text-xs text-sky-200">${c.title}</p>
-                  <p class="text-xs text-amber-300 font-mono pt-1 live-event-timer" data-endtime="${endTs}">🕒 ${formatRemainingTime(endTs)}</p>
-                </div>
-                <div onclick="window.openCharacterWiki('${c.id}')" class="cursor-pointer hover:scale-105 transition">${createAvatarHTML(c, rec.customImage, 'w-20 h-20')}</div>
-              </div>
-              <div class="mt-4 pt-3 border-t border-white/15 flex justify-end gap-2">
-                <button type="button" onclick="window.openCharacterWiki('${c.id}')" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-xs font-bold">📖 Wiki</button>
-                <button type="button" onclick="window.selectCharacter('${c.id}'); window.switchMainTab('overview');" class="px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 text-xs font-extrabold">🎯 Tích Roll</button>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-
-      const recent5Stars = allChars.filter(c => c.rank === 5).slice(0, 9);
-      document.getElementById('live-upcoming-banners-grid').innerHTML = recent5Stars.map(c => {
-        const rec = getCharRecord(c.id);
-        return `
-          <div class="hoyolab-row rounded-2xl p-3.5 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0">
-              ${createAvatarHTML(c, rec.customImage, 'w-14 h-14')}
-              <div class="min-w-0">
-                <span class="text-[10px] text-amber-300 font-bold uppercase">5★ Giới Hạn</span>
-                <p class="text-sm font-extrabold text-white truncate">${c.name}</p>
-                <p class="text-[11px] text-slate-400 truncate">${c.weapon} • ${ELEMENT_CONFIG[c.element]?.label}</p>
-              </div>
-            </div>
-            <div class="flex flex-col gap-1 shrink-0">
-              <button type="button" onclick="window.openCharacterWiki('${c.id}')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-sky-300">📖 Wiki</button>
-              <button type="button" onclick="window.selectCharacter('${c.id}'); window.switchMainTab('overview');" class="px-2.5 py-1 rounded-lg bg-sky-500 text-white text-[11px] font-bold">🎯 Chọn</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
 
     function renderWikiFilterBar() {
       const bar = document.getElementById('wiki-element-filters');
@@ -1890,9 +1899,6 @@
       }).join('');
     };
 
-    // =========================================================================
-    // 9. SIDEBAR DROPDOWN, DASHBOARD & LỊCH EVENT CÓ AVATAR SỰ KIỆN
-    // =========================================================================
     window.toggleCharDropdown = function() {
       isCharDropdownOpen = !isCharDropdownOpen;
       document.getElementById('char-dropdown-body').classList.toggle('hidden', !isCharDropdownOpen);
@@ -2105,9 +2111,6 @@
       renderQuickEventsWidget();
     }
 
-    // =========================================================================
-    // 10. CẬP NHẬT SỐ ROLL & LỊCH EVENT CÓ AVATAR SỰ KIỆN
-    // =========================================================================
     function nowFormatted() {
       const d = new Date();
       return d.toLocaleTimeString('vi-VN') + ' ' + d.toLocaleDateString('vi-VN');
@@ -2209,10 +2212,7 @@
 
     function getCombinedEventsList() {
       const u = getUser();
-      if (liveEventsList.length > 0) {
-        return [...liveEventsList, ...(u.customEvents || [])];
-      }
-      return u.customEvents || [];
+      return [...liveEventsList, ...(u.customEvents || [])];
     }
 
     window.claimEventById = function(eventId) {
@@ -2251,7 +2251,7 @@
       u.customEvents.push({
         id: 'custom_ev_' + Date.now(),
         name: name.trim(),
-        bannerImg: img.trim(),
+        bannerImg: img.trim() || 'https://enka.network/ui/UI_AvatarIcon_Paimon.png',
         endTime: Date.now() + Math.round(days * 86400000),
         primogems: primos,
         statusText: 'Đang Tiến Hành ›'
@@ -2268,7 +2268,7 @@
         return `
           <div class="hoyolab-row rounded-2xl p-2.5 flex items-center justify-between gap-2.5">
             <div class="flex items-center gap-2.5 min-w-0">
-              ${ev.bannerImg ? `<img src="${ev.bannerImg}" referrerpolicy="no-referrer" onerror="this.style.display='none'" class="w-11 h-11 rounded-xl object-cover bg-slate-900 shrink-0 border border-white/10" />` : ''}
+              <img src="${ev.bannerImg || window.PRIMOGEM_SVG}" referrerpolicy="no-referrer" onerror="this.src=window.PRIMOGEM_SVG" class="w-11 h-11 rounded-xl object-cover bg-slate-900 shrink-0 border border-white/10" />
               <div class="min-w-0">
                 <p class="text-xs font-bold text-white truncate">${ev.name}</p>
                 <p class="text-[10px] text-amber-300/90 font-mono live-event-timer" data-endtime="${ev.endTime}">🕒 ${formatRemainingTime(ev.endTime)}</p>
@@ -2293,38 +2293,31 @@
       const combinedEvents = getCombinedEventsList();
       const evContainer = document.getElementById('hoyolab-events-list');
 
-      if (combinedEvents.length === 0) {
-        evContainer.innerHTML = `<div class="p-6 rounded-2xl bg-slate-900/60 text-center text-xs text-slate-400">🔄 Đang tải danh sách sự kiện trực tiếp từ máy chủ HoYoverse...</div>`;
-      } else {
-        evContainer.innerHTML = combinedEvents.map(ev => {
-          const claimed = Boolean(u.claimedEvents[ev.id]);
-          return `
-            <div class="hoyolab-row rounded-2xl p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-4">
-              <div class="flex items-center gap-3.5 flex-1 min-w-[240px]">
-                ${ev.bannerImg ? `
-                  <img src="${ev.bannerImg}" referrerpolicy="no-referrer" onerror="this.style.display='none'"
-                       class="w-24 sm:w-32 h-14 sm:h-16 rounded-xl object-cover border border-white/15 shrink-0 shadow-md bg-slate-900" />
-                ` : `
-                  <div class="w-14 h-14 rounded-xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-xl shrink-0">✦</div>
-                `}
-                <div class="min-w-0">
-                  <p class="text-sm font-extrabold text-white leading-snug">${ev.name}</p>
-                  <p class="text-xs text-slate-400 mt-1">🕒 Thời gian còn: <span class="text-amber-300 font-bold font-mono live-event-timer" data-endtime="${ev.endTime}">${formatRemainingTime(ev.endTime)}</span></p>
-                </div>
-              </div>
-              <div class="flex items-center gap-4 ml-auto">
-                <button type="button" onclick="window.claimEventById('${ev.id}')"
-                        title="Bấm để cộng Nguyên Thạch vào quỹ"
-                        class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border transition ${claimed ? 'bg-emerald-900/40 border-emerald-500/50 opacity-75' : 'bg-slate-800 hover:bg-slate-700 border-amber-400/50 shadow'}">
-                  <img src="${window.PRIMOGEM_SVG}" class="w-7 h-7 object-contain" />
-                  <span class="text-[11px] font-extrabold ${claimed ? 'text-emerald-400' : 'text-white'}">${claimed ? 'Đã lấy' : `+${ev.primogems}`}</span>
-                </button>
-                <span class="text-xs font-bold text-amber-300 hidden sm:inline-block min-w-[90px] text-right">${ev.statusText || 'Đang mở ›'}</span>
+      evContainer.innerHTML = combinedEvents.map(ev => {
+        const claimed = Boolean(u.claimedEvents[ev.id]);
+        return `
+          <div class="hoyolab-row rounded-2xl p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5 flex-1 min-w-[240px]">
+              <img src="${ev.bannerImg || window.PRIMOGEM_SVG}" referrerpolicy="no-referrer" onerror="this.src=window.PRIMOGEM_SVG"
+                   class="w-14 h-14 rounded-2xl object-cover border border-amber-300/40 shrink-0 shadow-md bg-slate-900 p-0.5" />
+              <div class="min-w-0">
+                <p class="text-sm font-extrabold text-white leading-snug">${ev.name}</p>
+                <p class="text-[11px] text-sky-300 font-medium">${ev.subtitle || 'Sự Kiện Phiên Bản 7.1'}</p>
+                <p class="text-xs text-slate-400 mt-0.5">🕒 Thời gian còn: <span class="text-amber-300 font-bold font-mono live-event-timer" data-endtime="${ev.endTime}">${formatRemainingTime(ev.endTime)}</span></p>
               </div>
             </div>
-          `;
-        }).join('');
-      }
+            <div class="flex items-center gap-4 ml-auto">
+              <button type="button" onclick="window.claimEventById('${ev.id}')"
+                      title="Bấm để cộng Nguyên Thạch vào quỹ"
+                      class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border transition ${claimed ? 'bg-emerald-900/40 border-emerald-500/50 opacity-75' : 'bg-slate-800 hover:bg-slate-700 border-amber-400/50 shadow'}">
+                <img src="${window.PRIMOGEM_SVG}" class="w-7 h-7 object-contain" />
+                <span class="text-[11px] font-extrabold ${claimed ? 'text-emerald-400' : 'text-white'}">${claimed ? 'Đã lấy' : `+${ev.primogems}`}</span>
+              </button>
+              <span class="text-xs font-bold text-amber-300 hidden sm:inline-block min-w-[90px] text-right">${ev.statusText || 'Đang mở ›'}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
 
       document.getElementById('hoyolab-endgame-list').innerHTML = getDynamicEndgameModes().map(eg => {
         const claimed = Boolean(u.claimedEvents[eg.id]);
@@ -2332,7 +2325,7 @@
           <div class="hoyolab-row rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 relative overflow-hidden">
             <div class="absolute left-0 top-0 bottom-0 w-1.5 ${eg.colorBar}"></div>
             <div class="flex items-center gap-3.5 pl-2">
-              <img src="${eg.bannerImg}" referrerpolicy="no-referrer" onerror="this.style.display='none'" class="w-12 h-12 rounded-xl bg-slate-900/90 p-1.5 object-contain border border-white/10 shrink-0" />
+              <img src="${eg.bannerImg}" referrerpolicy="no-referrer" onerror="this.src=window.PRIMOGEM_SVG" class="w-12 h-12 rounded-xl bg-slate-900/90 p-1.5 object-contain border border-white/10 shrink-0" />
               <div>
                 <p class="text-sm font-extrabold text-white">${eg.name}</p>
                 <p class="text-xs text-slate-400 mt-1">🕒 Làm mới sau: <span class="text-amber-300 font-bold font-mono live-event-timer" data-endtime="${eg.endTime}">${formatRemainingTime(eg.endTime)}</span></p>
@@ -2352,14 +2345,29 @@
     }
 
     function updateAllRealTimeCountdowns() {
+      // Cập nhật các bộ đếm ngược dạng dòng chữ
       document.querySelectorAll('.live-event-timer').forEach(el => {
         const endTs = Number(el.getAttribute('data-endtime'));
         if (endTs) el.textContent = '🕒 ' + formatRemainingTime(endTs);
       });
+      // Cập nhật đồng hồ 4 ô [D] [H] [M] [S] chuẩn genshin-build.com/banners
+      document.querySelectorAll('.gb-split-timer').forEach(box => {
+        const endTs = Number(box.getAttribute('data-endtime'));
+        if (!endTs) return;
+        const p = getSplitTimeParts(endTs);
+        const dEl = box.querySelector('.gb-d');
+        const hEl = box.querySelector('.gb-h');
+        const mEl = box.querySelector('.gb-m');
+        const sEl = box.querySelector('.gb-s');
+        if (dEl) dEl.textContent = p.d;
+        if (hEl) hEl.textContent = p.h;
+        if (mEl) mEl.textContent = p.m;
+        if (sEl) sEl.textContent = p.s;
+      });
     }
 
     // =========================================================================
-    // 11. TẠO NHÂN VẬT MỚI & STICKER KÉO THẢ
+    // 8. TẠO NHÂN VẬT MỚI & STICKER KÉO THẢ
     // =========================================================================
     window.openCreateCharModal = function() {
       tempUploadedAvatar = '';
@@ -2435,7 +2443,6 @@
       commitDB(true); window.closeCharModal(); window.renderCharacterList(); window.renderWikiCharactersGrid(); renderMainView();
     };
 
-    // Sticker kéo thả
     let draggingStickerId = null, dragOffsetX = 0, dragOffsetY = 0;
 
     function renderStickersOnScreen() {
@@ -2523,9 +2530,6 @@
       `).join('');
     }
 
-    // =========================================================================
-    // 12. KHỞI CHẠY ỨNG DỤNG
-    // =========================================================================
     window.toggleSidebar = function(force) {
       const sb = document.getElementById('sidebar');
       if (typeof force === 'boolean') sb.classList.toggle('-translate-x-full', !force);
@@ -2537,10 +2541,6 @@
       document.getElementById('hero-primo-icon').src = window.PRIMOGEM_SVG;
       document.getElementById('widget-primo-icon').src = window.PRIMOGEM_SVG;
       document.getElementById('sticker-primo-preview').src = window.PRIMOGEM_SVG;
-      const initialFb = getActiveFirebaseUrl();
-      if (initialFb) {
-        document.getElementById('auth-firebase-url').value = initialFb;
-      }
     }
 
     function initDashboard() {
