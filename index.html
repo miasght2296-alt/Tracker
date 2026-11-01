@@ -14,13 +14,9 @@
     // ====================================================================================
   </script>
 
-  <!-- ICON TRÊN TAB TRÌNH DUYỆT (NGUYÊN THẠCH) -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230f172a' stroke='%2338bdf8' stroke-width='4'/%3E%3Cpath d='M50 8 L63 37 L92 50 L63 63 L50 92 L37 63 L8 50 L37 37 Z' fill='%237dd3fc' stroke='%23ffffff' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23ffffff'/%3E%3C/svg%3E" />
-
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { darkMode: 'class' };
-  </script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
@@ -48,9 +44,7 @@
   <div id="weather-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
   <div id="sticker-layer" class="fixed inset-0 pointer-events-none z-30 overflow-hidden"></div>
 
-  <!-- ===================================================================== -->
-  <!-- 1. MÀN HÌNH ĐĂNG NHẬP & GẮN LINK FIREBASE DATABASE TRỰC TIẾP -->
-  <!-- ===================================================================== -->
+  <!-- 1. MODAL ĐĂNG NHẬP & GẮN LINK FIREBASE DATABASE -->
   <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
     <div class="w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-3xl p-6 text-white shadow-2xl">
       <div class="flex items-center gap-3 mb-2">
@@ -68,13 +62,12 @@
       </div>
 
       <div class="space-y-3">
-        <!-- Ô Gắn Link Firebase trực tiếp không cần sửa code -->
         <div class="p-3 rounded-2xl bg-slate-950 border-2 border-amber-500/40 space-y-1.5">
           <div class="flex items-center justify-between">
             <label class="text-xs font-extrabold text-amber-300">🔥 Chỗ gắn Link Firebase Database:</label>
             <button type="button" onclick="window.testFirebaseConnection('auth-firebase-url')" class="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold">Kiểm tra kết nối</button>
           </div>
-          <input id="auth-firebase-url" type="text" placeholder="Dán link https://...-default-rtdb...firebasedatabase.app" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-emerald-300 font-mono focus:outline-none focus:border-amber-400" />
+          <input id="auth-firebase-url" type="text" placeholder="https://...-default-rtdb.asia-southeast1.firebasedatabase.app" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-emerald-300 font-mono focus:outline-none focus:border-amber-400" />
           <p id="auth-fb-test-msg" class="text-[11px] text-slate-400">Nếu đã gắn ở Dòng 12 trong code thì ô này sẽ tự động điền sẵn.</p>
         </div>
 
@@ -99,9 +92,7 @@
     </div>
   </div>
 
-  <!-- ===================================================================== -->
-  <!-- 2. MODAL WIKI ĐỘNG CHI TIẾT NHÂN VẬT (CUNG MỆNH C1-C6, THIÊN PHÚ THẬT) -->
-  <!-- ===================================================================== -->
+  <!-- 2. MODAL WIKI ĐỘNG CHI TIẾT NHÂN VẬT -->
   <div id="wiki-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 backdrop-blur-md p-2 sm:p-5">
     <div class="w-full max-w-5xl bg-slate-900 border border-slate-700/90 rounded-3xl text-white shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
       <div id="wiki-modal-header" class="p-4 sm:p-6 border-b border-white/10 flex flex-wrap items-center justify-between gap-4" style="background: linear-gradient(135deg, #0b1c31 0%, #1d3b5c 100%);">
@@ -128,7 +119,7 @@
       <div class="flex border-b border-slate-800 bg-slate-950 px-5 pt-2 gap-2 overflow-x-auto text-xs font-bold shrink-0">
         <button type="button" id="wtab-btn-talents" onclick="window.switchWikiSubTab('talents')" class="px-4 py-2.5 border-b-2 border-sky-400 text-sky-400">⚔️ Thiên Phú & Thông Số Kỹ Năng (Lv.1–15)</button>
         <button type="button" id="wtab-btn-constellations" onclick="window.switchWikiSubTab('constellations')" class="px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white">✨ Cung Mệnh (C1 – C6)</button>
-        <button type="button" id="wtab-btn-stats" onclick="window.switchWikiSubTab('stats')" class="px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white">📈 Chỉ Số Cơ Bản & Tiểu Sử (Lv.1–90)</button>
+        <button type="button" id="wtab-btn-stats" onclick="window.switchWikiSubTab('stats')" class="px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white">📈 Chỉ Số Cơ Bản & Đột Phá Thật (Lv.1–90)</button>
       </div>
 
       <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 bg-slate-900/95">
@@ -156,17 +147,17 @@
         <div id="wtab-content-stats" class="hidden space-y-4">
           <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <h4 class="text-sm font-extrabold text-amber-300">📊 Chỉ Số Cơ Bản Theo Cấp Độ</h4>
+              <h4 class="text-sm font-extrabold text-amber-300">📊 Chỉ Số Cơ Bản & Đột Phá Thực Tế Theo Cấp Độ (Lv.1 – Lv.90)</h4>
               <div class="flex items-center gap-2">
-                <input id="wiki-level-slider" type="range" min="1" max="90" value="90" oninput="window.updateWikiStatsByLevel(this.value)" class="w-32 accent-sky-400 cursor-pointer" />
+                <input id="wiki-level-slider" type="range" min="1" max="90" value="90" oninput="window.updateWikiStatsByLevel(this.value)" class="w-36 accent-sky-400 cursor-pointer" />
                 <span id="wiki-level-label" class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 font-extrabold text-xs">Lv. 90</span>
               </div>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800"><p class="text-[11px] text-slate-400">HP Cơ Bản</p><p id="wiki-stat-hp" class="text-lg font-extrabold text-emerald-400">--</p></div>
-              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800"><p class="text-[11px] text-slate-400">Tấn Công Cơ Bản</p><p id="wiki-stat-atk" class="text-lg font-extrabold text-rose-400">--</p></div>
-              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800"><p class="text-[11px] text-slate-400">Phòng Ngự Cơ Bản</p><p id="wiki-stat-def" class="text-lg font-extrabold text-amber-300">--</p></div>
-              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800"><p id="wiki-stat-asc-name" class="text-[11px] text-slate-400">Đột Phá</p><p id="wiki-stat-asc-val" class="text-lg font-extrabold text-sky-400">--</p></div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><p class="text-[11px] text-slate-400">HP Cơ Bản</p><p id="wiki-stat-hp" class="text-xl font-extrabold text-emerald-400">--</p></div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><p class="text-[11px] text-slate-400">Tấn Công Cơ Bản</p><p id="wiki-stat-atk" class="text-xl font-extrabold text-rose-400">--</p></div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><p class="text-[11px] text-slate-400">Phòng Ngự Cơ Bản</p><p id="wiki-stat-def" class="text-xl font-extrabold text-amber-300">--</p></div>
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800"><p id="wiki-stat-asc-name" class="text-[11px] text-slate-400">Chỉ Số Đột Phá</p><p id="wiki-stat-asc-val" class="text-xl font-extrabold text-sky-400">--</p></div>
             </div>
           </div>
           <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
@@ -178,9 +169,7 @@
     </div>
   </div>
 
-  <!-- ===================================================================== -->
   <!-- 3. MODAL CÀI ĐẶT TÀI KHOẢN & GẮN LINK FIREBASE DATABASE -->
-  <!-- ===================================================================== -->
   <div id="account-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-4">
@@ -197,7 +186,6 @@
           </div>
         </div>
 
-        <!-- Hộp gắn Link Firebase trực quan -->
         <div class="p-3.5 rounded-2xl bg-slate-950 border-2 border-amber-500/40 space-y-2">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <label class="font-extrabold text-amber-300">🔥 Link Firebase Realtime Database của bạn:</label>
@@ -240,9 +228,7 @@
     </div>
   </div>
 
-  <!-- ===================================================================== -->
   <!-- 4. MODAL TẠO / SỬA NHÂN VẬT -->
-  <!-- ===================================================================== -->
   <div id="char-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl">
       <div class="flex items-center justify-between mb-3">
@@ -287,9 +273,7 @@
     </div>
   </div>
 
-  <!-- ===================================================================== -->
   <!-- 5. MODAL STICKER TRANG TRÍ -->
-  <!-- ===================================================================== -->
   <div id="sticker-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 text-white shadow-2xl">
       <div class="flex items-center justify-between mb-3">
@@ -346,10 +330,10 @@
             <span>📊 Tổng quan Quỹ Roll</span><span>•</span>
           </button>
           <button type="button" id="nav-btn-banners" onclick="window.switchMainTab('banners')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition">
-            <span>🎯 Banners (genshin-build)</span><span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px]">LIVE</span>
+            <span>🎯 Banners Cầu Nguyện</span><span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px]">LIVE</span>
           </button>
           <button type="button" id="nav-btn-calendar" onclick="window.switchMainTab('calendar')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition">
-            <span>📅 Lịch Event (genshin-build)</span><span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">+NT</span>
+            <span>📅 Lịch Event (Real-Time)</span><span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">+NT</span>
           </button>
           <button type="button" id="nav-btn-wiki" onclick="window.switchMainTab('wiki')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition">
             <span>📖 Wiki Tất Cả Nhân Vật</span><span id="sidebar-char-count" class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">LIVE</span>
@@ -588,17 +572,17 @@
         </div>
       </div>
 
-      <!-- TAB 2: BANNERS LIVE -->
+      <!-- TAB 2: BANNERS LIVE (ĐỒNG BỘ TRỰC TIẾP TỪ MÁY CHỦ HOYOVERSE & GENSHIN-BUILD) -->
       <div id="tab-view-banners" class="hidden max-w-6xl mx-auto space-y-5">
         <div class="hoyolab-panel rounded-2xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
           <div class="flex items-center gap-3">
             <button type="button" onclick="window.switchMainTab('overview')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm font-bold">←</button>
             <div>
               <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
-                <span>🎯 Banners Cầu Nguyện Động (genshin-build.com/banners)</span>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">● Live Synced</span>
+                <span>🎯 Banners Cầu Nguyện Đang Mở (Real-Time)</span>
+                <span id="banners-sync-status" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">● Live Synced</span>
               </h2>
-              <p class="text-[11px] text-slate-400">Tự động đồng bộ danh sách Banner từ `genshin-build.com/banners` & Cơ sở dữ liệu Phiên bản hiện hành</p>
+              <p class="text-[11px] text-slate-400">Tự động lấy trực tiếp Banner đang mở kèm ảnh Banner gốc và thời gian thực tế trong game</p>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
@@ -615,12 +599,8 @@
         <div class="hoyolab-panel rounded-3xl p-5 sm:p-6 space-y-5 shadow-2xl">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
             <div>
-              <span class="px-2.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-extrabold uppercase">Đang Tiến Hành</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-extrabold uppercase">Đang Tiến Hành Trong Game</span>
               <h3 class="text-lg font-extrabold text-amber-200 mt-1">Sự Kiện Cầu Nguyện Nhân Vật & Vũ Khí Hiện Tại</h3>
-            </div>
-            <div class="text-right">
-              <p class="text-[11px] text-slate-400">Thời gian kết thúc Banner:</p>
-              <p class="live-banner-countdown text-sm sm:text-base font-extrabold text-amber-300 font-mono">Đang tính...</p>
             </div>
           </div>
           <div id="live-current-banners-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -628,30 +608,29 @@
 
         <div class="hoyolab-panel rounded-3xl p-5 sm:p-6 space-y-4 shadow-2xl">
           <div class="flex items-center justify-between">
-            <h3 class="text-base font-extrabold text-sky-300">🔮 Danh Sách Nhân Vật 5★ Mới Ra Mắt & Sắp Tới</h3>
-            <button type="button" onclick="window.promptSetBannerEndDate()" class="text-xs text-amber-300 hover:underline font-semibold">🕒 Chỉnh hạn Banner</button>
+            <h3 class="text-base font-extrabold text-sky-300">🔮 Danh Sách Nhân Vật 5★ Mới Nhất (Tự động cập nhật từ Game DB)</h3>
           </div>
           <div id="live-upcoming-banners-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
         </div>
       </div>
 
-      <!-- TAB 3: LỊCH EVENT LIVE -->
+      <!-- TAB 3: LỊCH EVENT LIVE (CÓ AVATAR SỰ KIỆN & THỜI GIAN THẬT KHỚP HIỆN TẠI) -->
       <div id="tab-view-calendar" class="hidden max-w-5xl mx-auto space-y-5">
         <div class="hoyolab-panel rounded-2xl px-5 py-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
           <div class="flex items-center gap-3">
             <button type="button" onclick="window.switchMainTab('overview')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm font-bold">←</button>
             <div>
               <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
-                <span>📅 Lịch Event Động (genshin-build.com/event)</span>
-                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">● Live Synced</span>
+                <span>📅 Lịch Sự Kiện Thời Gian Thực (Live In-Game Events)</span>
+                <span id="events-sync-status" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">● Live Synced</span>
               </h2>
-              <p class="text-[11px] text-slate-400">Click vào biểu tượng Nguyên Thạch khi hoàn thành để cộng thẳng Roll vào quỹ của <strong id="cal-active-char" class="text-sky-400">Tsaritsa</strong></p>
+              <p class="text-[11px] text-slate-400">Hiển thị Avatar sự kiện và đếm ngược chính xác theo giờ máy chủ hiện tại. Bấm vào Nguyên Thạch để cộng Roll cho <strong id="cal-active-char" class="text-sky-400">Tsaritsa</strong></p>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <button type="button" onclick="window.toggleEmbedFrame('events', 'https://genshin-build.com/event')" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-xs font-bold text-amber-300">🖥️ Xem trực tiếp genshin-build/event</button>
-            <button type="button" onclick="window.syncAllLiveSources(true)" class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-xs font-bold text-sky-300">🔄 Quét Event mới</button>
-            <button type="button" onclick="window.resetMonthlyEvents()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-amber-300">🔄 Reset Kỳ Mới</button>
+            <button type="button" onclick="window.syncAllLiveSources(true)" class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-xs font-bold text-sky-300">🔄 Đồng bộ lại ngay</button>
+            <button type="button" onclick="window.resetMonthlyEvents()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-amber-300">🔄 Reset Trạng Thái Nhận</button>
           </div>
         </div>
 
@@ -663,10 +642,10 @@
         <div class="hoyolab-panel rounded-3xl p-5 sm:p-7 space-y-7 shadow-2xl">
           <div>
             <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-2"><span class="text-amber-300">✦</span><h3 class="text-sm font-extrabold text-amber-100">Tổng Quan Sự Kiện Đang Diễn Ra (Đồng bộ genshin-build.com/event)</h3></div>
-              <button type="button" onclick="window.promptAddNewEvent()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-sky-300">+ Thêm sự kiện</button>
+              <div class="flex items-center gap-2"><span class="text-amber-300">✦</span><h3 class="text-sm font-extrabold text-amber-100">Sự Kiện Đang Diễn Ra Trong Game (Cập nhật trực tiếp từ Server)</h3></div>
+              <button type="button" onclick="window.promptAddNewEvent()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold text-sky-300">+ Thêm sự kiện tùy chỉnh</button>
             </div>
-            <div id="hoyolab-events-list" class="space-y-2.5"></div>
+            <div id="hoyolab-events-list" class="space-y-3"></div>
           </div>
 
           <div>
@@ -679,7 +658,7 @@
         </div>
       </div>
 
-      <!-- TAB 4: WIKI TẤT CẢ NHÂN VẬT -->
+      <!-- TAB 4: WIKI TẤT CẢ NHÂN VẬT (ĐÃ KHỬ TRÙNG LẶP 100% & CHỈ SỐ THẬT) -->
       <div id="tab-view-wiki" class="hidden max-w-6xl mx-auto space-y-5">
         <div class="hoyolab-panel rounded-3xl p-5 sm:p-6 shadow-xl space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-4">
@@ -689,7 +668,7 @@
                 <span id="wiki-total-count" class="text-xs text-slate-400 font-semibold">Đang đồng bộ danh sách nhân vật...</span>
               </div>
               <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-1">📖 Wiki Tất Cả Nhân Vật (Cung Mệnh, Thiên Phú & Chỉ Số Thật)</h2>
-              <p class="text-xs text-slate-400">Tự động cập nhật toàn bộ nhân vật 5★ & 4★ mới nhất. Bấm vào nhân vật bất kỳ để tải trực tiếp **Thông số Thiên Phú Lv.1–15** và **Cung Mệnh C1–C6** chính thức.</p>
+              <p class="text-xs text-slate-400">Tự động cập nhật toàn bộ nhân vật 5★ & 4★ mới nhất không trùng lặp. Bấm vào nhân vật để xem **Chỉ số Lv.1–90 riêng biệt**, **Thiên Phú Lv.1–15** và **Cung Mệnh C1–C6**.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <button type="button" onclick="window.toggleEmbedFrame('wiki', 'https://genshin-build.com/characters')" class="px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-xs font-bold text-amber-300">🖥️ Xem trực tiếp genshin-build/characters</button>
@@ -764,67 +743,18 @@
       FIGHT_PROP_ROCK_ADD_HURT: 'Tăng ST Nham', FIGHT_PROP_PHYSICAL_ADD_HURT: 'Tăng ST Vật Lý'
     };
 
-    // Danh sách Nhân vật 5★ có sẵn kèm đúng Mã ID Game (để mở trang lên có ngay lập tức, sau đó API sẽ tự động bổ sung toàn bộ 100+ nhân vật)
-    const CORE_CHARACTERS = [
+    // CHỈ GIỮ CÁC NHÂN VẬT CHƯA RA MẮT TRONG GAME ĐỂ KHÔNG BAO GIỜ TRÙNG LẶP VỚI API:
+    const UNRELEASED_SPECIAL_CHARS = [
       { id: 'tsaritsa', hakushId: '', rank: 5, name: 'Tsaritsa', title: 'Băng Thần • Snezhnaya', element: 'Cryo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Queen', lore: 'Nữ hoàng Băng giá trị vì Snezhnaya. Mọi quân cờ Fatui đều hướng về ngài.' },
-      { id: 'skirk', hakushId: '10000113', rank: 5, name: 'Skirk', title: 'Kiếm Khách Vực Sâu', element: 'Cryo', region: 'Vực Sâu', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Skirk', lore: 'Sư phụ của Tartaglia, nữ kiếm khách bí ẩn sống nơi Vực Sâu.' },
-      { id: 'escoffier', hakushId: '10000112', rank: 5, name: 'Escoffier', title: 'Đầu Bếp Fontaine', element: 'Cryo', region: 'Fontaine', weapon: 'Vũ Khí Cán Dài', icon: 'UI_AvatarIcon_Escoffier', lore: 'Bậc thầy ẩm thực trứ danh đến từ Fontaine.' },
-      { id: 'varesa', hakushId: '10000111', rank: 5, name: 'Varesa', title: 'Chiến Binh Trù Phú', element: 'Electro', region: 'Natlan', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Varesa', lore: 'Nhà vô địch đấu vật tràn đầy năng lượng của Natlan.' },
-      { id: 'mizuki', hakushId: '10000109', rank: 5, name: 'Yumemizuki Mizuki', title: 'Bác Sĩ Giấc Mơ', element: 'Anemo', region: 'Inazuma', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Mizuki', lore: 'Yêu quái Baku thanh lọc những cơn ác mộng tại Inazuma.' },
-      { id: 'citlali', hakushId: '10000107', rank: 5, name: 'Citlali', title: 'Bà Ngoại Itztli', element: 'Cryo', region: 'Natlan', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Citlali', lore: 'Đại pháp sư bộ tộc Chủ Nhân Gió Đêm tại Natlan.' },
-      { id: 'mavuika', hakushId: '10000106', rank: 5, name: 'Mavuika', title: 'Hỏa Thần • Haborym', element: 'Pyro', region: 'Natlan', weapon: 'Trọng Kiếm', icon: 'UI_AvatarIcon_Mavuika', lore: 'Vị Hỏa Thần rực cháy dẫn dắt 6 bộ tộc Natlan.' },
-      { id: 'chasca', hakushId: '10000104', rank: 5, name: 'Chasca', title: 'Người Hòa Giải Bầu Trời', element: 'Anemo', region: 'Natlan', weapon: 'Cung', icon: 'UI_AvatarIcon_Chasca', lore: 'Xạ thủ cưỡi súng bay lượn trên bầu trời Hội Hoa Vũ.' },
-      { id: 'xilonen', hakushId: '10000103', rank: 5, name: 'Xilonen', title: 'Thợ Rèn Tên Cổ', element: 'Geo', region: 'Natlan', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Xilonen', lore: 'Nghệ nhân rèn Tên Cổ kiêm DJ sành điệu của Natlan.' },
-      { id: 'mualani', hakushId: '10000102', rank: 5, name: 'Mualani', title: 'Người Đuổi Sóng', element: 'Hydro', region: 'Natlan', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Mualani', lore: 'Hướng dẫn viên lướt sóng năng động của Cư Dân Suối Nước.' },
-      { id: 'kinich', hakushId: '10000101', rank: 5, name: 'Kinich', title: 'Thợ Săn Hồi Hỏa', element: 'Dendro', region: 'Natlan', weapon: 'Trọng Kiếm', icon: 'UI_AvatarIcon_Kinich', lore: 'Thợ săn Saurian đồng hành cùng Thánh Long Ajaw.' },
-      { id: 'emilie', hakushId: '10000099', rank: 5, name: 'Emilie', title: 'Nhà Điều Hương Fontaine', element: 'Dendro', region: 'Fontaine', weapon: 'Vũ Khí Cán Dài', icon: 'UI_AvatarIcon_Emilie', lore: 'Chuyên gia nước hoa kiêm điều tra viên tại Fontaine.' },
-      { id: 'clorinde', hakushId: '10000098', rank: 5, name: 'Clorinde', title: 'Đấu Sĩ Đại Diện Bất Bại', element: 'Electro', region: 'Fontaine', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Clorinde', lore: 'Đấu sĩ đại diện mạnh nhất của tòa án Fontaine.' },
-      { id: 'arlecchino', hakushId: '10000096', rank: 5, name: 'Arlecchino', title: 'Quan Chấp Hành • The Knave', element: 'Pyro', region: 'Snezhnaya', weapon: 'Vũ Khí Cán Dài', icon: 'UI_AvatarIcon_Arlecchino', lore: 'Cha của Căn Nhà Hơi Ấm, Quan Chấp Hành thứ 4 của Fatui.' },
-      { id: 'sigewinne', hakushId: '10000095', rank: 5, name: 'Sigewinne', title: 'Y Tá Trưởng Meropide', element: 'Hydro', region: 'Fontaine', weapon: 'Cung', icon: 'UI_AvatarIcon_Sigewinne', lore: 'Melusine nhân hậu chăm sóc sức khỏe cho Pháo Đài Meropide.' },
-      { id: 'chiori', hakushId: '10000094', rank: 5, name: 'Chiori', title: 'Nhà Thiết Kế Chioriya', element: 'Geo', region: 'Fontaine', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Chiori', lore: 'Nhà thiết kế thời trang thẳng thắn nổi danh khắp Fontaine.' },
-      { id: 'xianyun', hakushId: '10000093', rank: 5, name: 'Xianyun', title: 'Lưu Vân Tá Phong Chân Quân', element: 'Anemo', region: 'Liyue', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Liuyun', lore: 'Tiên nhân cơ quan tinh xảo tại Liyue.' },
-      { id: 'navia', hakushId: '10000091', rank: 5, name: 'Navia', title: 'Hội Trưởng Spina di Rosula', element: 'Geo', region: 'Fontaine', weapon: 'Trọng Kiếm', icon: 'UI_AvatarIcon_Navia', lore: 'Tiểu thư lạc quan dẫn dắt Spina di Rosula.' },
-      { id: 'furina', hakushId: '10000089', rank: 5, name: 'Furina', title: 'Ngôi Sao Vĩnh Cửu Fontaine', element: 'Hydro', region: 'Fontaine', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Furina', lore: 'Tâm điểm của sân khấu Fontaine.' },
-      { id: 'neuvillette', hakushId: '10000087', rank: 5, name: 'Neuvillette', title: 'Thẩm Phán Tối Cao', element: 'Hydro', region: 'Fontaine', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Neuvillette', lore: 'Thủy Long Vương cổ đại nắm giữ Quyền Năng Thủy.' },
-      { id: 'wriothesley', hakushId: '10000086', rank: 5, name: 'Wriothesley', title: 'Công Tước Meropide', element: 'Cryo', region: 'Fontaine', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Wriothesley', lore: 'Chúa tể tối cao cai quản Pháo Đài Meropide.' },
-      { id: 'lyney', hakushId: '10000084', rank: 5, name: 'Lyney', title: 'Ảo Thuật Gia Tuyệt Đỉnh', element: 'Pyro', region: 'Fontaine', weapon: 'Cung', icon: 'UI_AvatarIcon_Liney', lore: 'Đại ảo thuật gia lừng danh của Đại Viện Kịch Epiclese.' },
-      { id: 'baizhu', hakushId: '10000082', rank: 5, name: 'Baizhu', title: 'Chủ Nhân Nhà Thuốc Bubu', element: 'Dendro', region: 'Liyue', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Baizhuer', lore: 'Thầy thuốc nổi tiếng của Nhà Thuốc Bubu.' },
-      { id: 'alhaitham', hakushId: '10000078', rank: 5, name: 'Alhaitham', title: 'Quan Thư Ký Giáo Viện', element: 'Dendro', region: 'Sumeru', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Alhatham', lore: 'Quan Thư Ký sắc bén của Giáo Viện Sumeru.' },
-      { id: 'wanderer', hakushId: '10000075', rank: 5, name: 'Kẻ Lang Thang', title: 'Kiếp Trước Không Tên', element: 'Anemo', region: 'Sumeru', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Wanderer', lore: 'Người lữ khách tự do bước đi trên con đường của riêng mình.' },
-      { id: 'nahida', hakushId: '10000073', rank: 5, name: 'Nahida', title: 'Thảo Thần • Kusanali', element: 'Dendro', region: 'Sumeru', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Nahida', lore: 'Vị thần trí tuệ kết nối mọi giấc mơ của Sumeru.' },
-      { id: 'cyno', hakushId: '10000071', rank: 5, name: 'Cyno', title: 'Tổng Quản Mahamatra', element: 'Electro', region: 'Sumeru', weapon: 'Vũ Khí Cán Dài', icon: 'UI_AvatarIcon_Cyno', lore: 'Người đứng đầu các Mahamatra tại Sumeru.' },
-      { id: 'nilou', hakushId: '10000070', rank: 5, name: 'Nilou', title: 'Vũ Điệu Ánh Sen', element: 'Hydro', region: 'Sumeru', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Nilou', lore: 'Vũ công tỏa sáng của Nhà Hát Zubayr.' },
-      { id: 'ayato', hakushId: '10000066', rank: 5, name: 'Kamisato Ayato', title: 'Trụ Cột Vững Chãi', element: 'Hydro', region: 'Inazuma', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Ayato', lore: 'Gia chủ nhà Kamisato đứng đầu Hiệp Hội Yashiro.' },
-      { id: 'shenhe', hakushId: '10000063', rank: 5, name: 'Shenhe', title: 'Cô Thần Độc Lữ', element: 'Cryo', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'UI_AvatarIcon_Shenhe', lore: 'Đệ tử chân truyền của Lưu Vân Tá Phong Chân Quân.' },
-      { id: 'yelan', hakushId: '10000060', rank: 5, name: 'Yelan', title: 'Lan Sinh U Cốc', element: 'Hydro', region: 'Liyue', weapon: 'Cung', icon: 'UI_AvatarIcon_Yelan', lore: 'Người nắm giữ mạng lưới tình báo bí mật tại Liyue.' },
-      { id: 'yaemiko', hakushId: '10000058', rank: 5, name: 'Yae Miko', title: 'Guuji Đền Narukami', element: 'Electro', region: 'Inazuma', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Yae', lore: 'Đại Vu Nữ đền Grand Narukami.' },
-      { id: 'itto', hakushId: '10000057', rank: 5, name: 'Arataki Itto', title: 'Quỷ Vương Bang Arataki', element: 'Geo', region: 'Inazuma', weapon: 'Trọng Kiếm', icon: 'UI_AvatarIcon_Itto', lore: 'Thủ lĩnh hào sảng của Bang Arataki.' },
-      { id: 'kokomi', hakushId: '10000054', rank: 5, name: 'Sangonomiya Kokomi', title: 'Trí Tuệ Trân Châu', element: 'Hydro', region: 'Inazuma', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Kokomi', lore: 'Thánh Pháp Sư tối cao của đảo Watatsumi.' },
-      { id: 'raiden', hakushId: '10000052', rank: 5, name: 'Raiden Shogun', title: 'Lôi Thần • Beelzebul', element: 'Electro', region: 'Inazuma', weapon: 'Vũ Khí Cán Dài', icon: 'UI_AvatarIcon_Shougun', lore: 'Tướng Quân tối cao của Inazuma.' },
-      { id: 'eula', hakushId: '10000051', rank: 5, name: 'Eula', title: 'Vũ Điệu Bọt Biển', element: 'Cryo', region: 'Mondstadt', weapon: 'Trọng Kiếm', icon: 'UI_AvatarIcon_Eula', lore: 'Đội trưởng Đội Du Kích thuộc Đội Kỵ Sĩ Tây Phong.' },
-      { id: 'yoimiya', hakushId: '10000049', rank: 5, name: 'Yoimiya', title: 'Vũ Điệu Bão Lửa', element: 'Pyro', region: 'Inazuma', weapon: 'Cung', icon: 'UI_AvatarIcon_Yoimiya', lore: 'Chủ tiệm pháo hoa Naganohara.' },
-      { id: 'kazuha', hakushId: '10000047', rank: 5, name: 'Kaedehara Kazuha', title: 'Lá Đỏ Đuổi Sóng', element: 'Anemo', region: 'Inazuma', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Kazuha', lore: 'Samurai lãng khách lắng nghe tiếng nói của thiên nhiên.' },
-      { id: 'hutao', hakushId: '10000046', rank: 5, name: 'Hu Tao', title: 'Đường Chủ Vãng Sinh Đường', element: 'Pyro', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'UI_AvatarIcon_Hutao', lore: 'Đường chủ đời thứ 77 của Vãng Sinh Đường.' },
-      { id: 'albedo', hakushId: '10000038', rank: 5, name: 'Albedo', title: 'Giả Kim Thuật Sĩ', element: 'Geo', region: 'Mondstadt', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Albedo', lore: 'Đội trưởng Đội Điều Tra Đội Kỵ Sĩ Tây Phong.' },
-      { id: 'ganyu', hakushId: '10000037', rank: 5, name: 'Ganyu', title: 'Người Bảo Vệ Tận Tâm', element: 'Cryo', region: 'Liyue', weapon: 'Cung', icon: 'UI_AvatarIcon_Ganyu', lore: 'Tổng thư ký Nguyệt Hải Đình mang dòng máu Kỳ Lân.' },
-      { id: 'tartaglia', hakushId: '10000033', rank: 5, name: 'Tartaglia', title: 'Quan Chấp Hành • Childe', element: 'Hydro', region: 'Snezhnaya', weapon: 'Cung', icon: 'UI_AvatarIcon_Tartaglia', lore: 'Quan Chấp Hành thứ 11 của Fatui.' },
-      { id: 'zhongli', hakushId: '10000030', rank: 5, name: 'Zhongli', title: 'Nham Thần • Morax', element: 'Geo', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'UI_AvatarIcon_Zhongli', lore: 'Vị thần của Khế Ước với tấm khiên Nham kiên cố nhất.' },
-      { id: 'klee', hakushId: '10000029', rank: 5, name: 'Klee', title: 'Mặt Trời Chạy Trốn', element: 'Pyro', region: 'Mondstadt', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Klee', lore: 'Kỵ Sĩ Tia Lửa của Đội Kỵ Sĩ Tây Phong.' },
-      { id: 'xiao', hakushId: '10000026', rank: 5, name: 'Xiao', title: 'Hộ Pháp Dạ Xoa', element: 'Anemo', region: 'Liyue', weapon: 'Vũ Khí Cán Dài', icon: 'UI_AvatarIcon_Xiao', lore: 'Tiên nhân Dạ Xoa cuối cùng bảo vệ Liyue.' },
-      { id: 'venti', hakushId: '10000022', rank: 5, name: 'Venti', title: 'Phong Thần • Barbatos', element: 'Anemo', region: 'Mondstadt', weapon: 'Cung', icon: 'UI_AvatarIcon_Venti', lore: 'Nhà thơ lang thang yêu tự do của thành Mondstadt.' },
-      { id: 'ayaka', hakushId: '10000002', rank: 5, name: 'Kamisato Ayaka', title: 'Bạch Hạc Sương Hoa', element: 'Cryo', region: 'Inazuma', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Ayaka', lore: 'Đại tiểu thư nhà Kamisato thuộc Hiệp Hội Yashiro.' },
-      { id: 'columbina', hakushId: '', rank: 5, name: 'Columbina', title: 'Quan Chấp Hành • Damselette', element: 'Hydro', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Columbina', lore: 'Thiếu Nữ đứng vị trí thứ 3 trong Quan Chấp Hành Fatui.' },
-      { id: 'sandrone', hakushId: '', rank: 5, name: 'Sandrone', title: 'Quan Chấp Hành • Marionette', element: 'Cryo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Sandrone', lore: 'Quan Chấp Hành thứ 7 của Fatui.' },
-      { id: 'varka', hakushId: '', rank: 5, name: 'Varka', title: 'Đại Đội Trưởng Tây Phong', element: 'Anemo', region: 'Mondstadt', weapon: 'Trọng Kiếm', icon: 'UI_AvatarIcon_Varka', lore: 'Huyền thoại Bắc Phong Kỵ Sĩ dẫn đầu đoàn viễn chinh.' },
-      { id: 'durin', hakushId: '', rank: 5, name: 'Durin', title: 'Trái Tim Rồng Tái Sinh', element: 'Pyro', region: 'Mondstadt', weapon: 'Kiếm Đơn', icon: 'UI_AvatarIcon_Durin', lore: 'Hậu duệ rồng mang sức mạnh giả kim thuật.' }
+      { id: 'sandrone', hakushId: '', rank: 5, name: 'Sandrone', title: 'Quan Chấp Hành • Marionette', element: 'Cryo', region: 'Snezhnaya', weapon: 'Pháp Khí', icon: 'UI_AvatarIcon_Sandrone', lore: 'Quan Chấp Hành thứ 7 của Fatui, bậc thầy cơ khí và rối tự động.' }
     ];
 
     // =========================================================================
     // 2. HỆ THỐNG ĐỒNG BỘ FIREBASE REALTIME DATABASE
     // =========================================================================
-    const STORAGE_KEY = 'teyvat_firebase_accounts_v11';
-    const ACTIVE_USER_KEY = 'teyvat_firebase_active_user_v11';
-    const SAVED_FB_URL_KEY = 'teyvat_saved_firebase_url_v11';
+    const STORAGE_KEY = 'teyvat_firebase_accounts_v12';
+    const ACTIVE_USER_KEY = 'teyvat_firebase_active_user_v12';
+    const SAVED_FB_URL_KEY = 'teyvat_saved_firebase_url_v12';
 
     window.selectedCharId = 'tsaritsa';
     let authMode = 'login';
@@ -836,6 +766,9 @@
     let tempUploadedUserAvatar = '';
     let accountsDB = {};
     let dynamicApiCharacters = [];
+    let liveEventsList = [];
+    let liveBannersList = [];
+    let globalAvatarCurves = null;
     let currentWikiChar = null;
     let currentWikiRawJson = null;
 
@@ -849,7 +782,6 @@
       ).trim().replace(/\/$/, '');
     }
 
-    // Hàm kiểm tra kết nối Firebase trực tiếp
     window.testFirebaseConnection = async function(inputId) {
       const inputEl = document.getElementById(inputId);
       const rawUrl = (inputEl ? inputEl.value : getActiveFirebaseUrl()).trim().replace(/\/$/, '');
@@ -869,9 +801,9 @@
         });
         if (res.ok) {
           localStorage.setItem(SAVED_FB_URL_KEY, rawUrl);
-          if (msgEl) msgEl.innerHTML = `<span class="text-emerald-400 font-bold">✅ Kết nối thành công! Đã đọc/ghi được lên Firebase Database của bạn!</span>`;
+          if (msgEl) msgEl.innerHTML = `<span class="text-emerald-400 font-bold">✅ Kết nối thành công! Đã đọc/ghi được lên Firebase Database!</span>`;
         } else {
-          if (msgEl) msgEl.innerHTML = `<span class="text-rose-400 font-bold">⚠️ Không ghi được dữ liệu (Mã lỗi ${res.status}). Hãy vào tab Rules trên Firebase chỉnh .read và .write thành true!</span>`;
+          if (msgEl) msgEl.innerHTML = `<span class="text-rose-400 font-bold">⚠️ Lỗi quyền ghi (${res.status}). Hãy vào tab Rules trên Firebase chỉnh .read và .write thành true!</span>`;
         }
       } catch (e) {
         if (msgEl) msgEl.innerHTML = `<span class="text-rose-400 font-bold">❌ Link không hợp lệ hoặc không kết nối được máy chủ Firebase.</span>`;
@@ -884,9 +816,7 @@
 
     function commitDB(syncCloud = true) {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(accountsDB)); } catch (e) {}
-      if (syncCloud && currentUser) {
-        window.pushAccountToCloud(false);
-      }
+      if (syncCloud && currentUser) window.pushAccountToCloud(false);
     }
 
     window.pushAccountToCloud = async function(manualToast = false) {
@@ -910,7 +840,7 @@
         } catch (e) {}
       }
       if (indicator) indicator.textContent = '💾 Đã lưu trên máy';
-      if (manualToast) alert('⚠️ Chưa kết nối được Firebase! Hãy kiểm tra lại Link Firebase và Rules (.read / .write = true).');
+      if (manualToast) alert('⚠️ Chưa kết nối được Firebase! Hãy kiểm tra lại Link Firebase.');
     };
 
     window.pullAccountFromCloud = async function(manualToast = false) {
@@ -940,17 +870,18 @@
     };
 
     // =========================================================================
-    // 3. ĐỒNG BỘ ĐỘNG 100+ NHÂN VẬT TỪ HAKUSH & YATTA (AMBR) API
+    // 3. ĐỒNG BỘ ĐỘNG: NHÂN VẬT KHÔNG TRÙNG LẶP + LỊCH SỰ KIỆN & BANNER THỜI GIAN THỰC
     // =========================================================================
     async function fetchViaCorsProxy(targetUrl) {
       const proxies = [
         u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-        u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`
+        u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+        u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
       ];
       for (const p of proxies) {
         try {
           const ctrl = new AbortController();
-          const t = setTimeout(() => ctrl.abort(), 6000);
+          const t = setTimeout(() => ctrl.abort(), 7000);
           const res = await fetch(p(targetUrl), { signal: ctrl.signal });
           clearTimeout(t);
           if (res.ok) return await res.text();
@@ -959,9 +890,21 @@
       return null;
     }
 
+    // Parse chuỗi ngày giờ từ máy chủ HoYoverse (UTC+8) sang timestamp thực tế
+    function parseServerTime(timeStr) {
+      if (!timeStr) return Date.now() + 7 * 86400000;
+      const clean = String(timeStr).trim().replace(' ', 'T');
+      const d = new Date(clean.includes('+') ? clean : (clean + '+08:00'));
+      return isNaN(d.getTime()) ? (Date.now() + 7 * 86400000) : d.getTime();
+    }
+
     window.syncAllLiveSources = async function(showAlert = false) {
       const dot = document.getElementById('live-sync-dot');
-      if (dot) dot.textContent = '🔄 Đang tải Live DB...';
+      const evStatus = document.getElementById('events-sync-status');
+      const banStatus = document.getElementById('banners-sync-status');
+      if (dot) dot.textContent = '🔄 Đang đồng bộ Live...';
+      if (evStatus) evStatus.textContent = '🔄 Đang tải từ Server...';
+      if (banStatus) banStatus.textContent = '🔄 Đang tải từ Server...';
 
       const weaponMap = {
         WEAPON_SWORD_ONE_HAND: 'Kiếm Đơn', WEAPON_CLAYMORE: 'Trọng Kiếm',
@@ -972,22 +915,40 @@
         Cryo: 'Cryo', Pyro: 'Pyro', Hydro: 'Hydro', Dendro: 'Dendro', Electro: 'Electro', Anemo: 'Anemo', Geo: 'Geo'
       };
 
-      // Nguồn 1: Tải từ gi.yatta.moe (Ambr Tiếng Việt)
-      let loadedChars = [];
+      // 1. Tải bảng đường cong tăng trưởng chỉ số Lv.1–Lv.90 (avatarCurve) từ Yatta
+      if (!globalAvatarCurves) {
+        try {
+          const cRes = await fetch('https://gi.yatta.moe/api/v2/static/avatarCurve');
+          if (cRes.ok) {
+            const cJson = await cRes.json();
+            globalAvatarCurves = cJson?.data || null;
+          }
+        } catch (e) {}
+      }
+
+      // 2. Tải danh sách toàn bộ nhân vật từ gi.yatta.moe & api.hakush.in (Khử trùng lặp 100% theo ID & Tên)
+      const uniqueMap = new Map();
+      const seenNames = new Set();
+
       try {
         const resYatta = await fetch('https://gi.yatta.moe/api/v2/vi/avatar');
         if (resYatta.ok) {
           const yattaJson = await resYatta.json();
           const items = yattaJson?.data?.items || {};
           Object.values(items).forEach(info => {
-            if (!info.name || String(info.id).startsWith('10000005') || String(info.id).startsWith('10000007')) return;
+            const numId = String(info.id).split('-')[0];
+            if (!info.name || numId === '10000005' || numId === '10000007') return;
             const elem = elemMap[info.element];
             if (!elem) return;
+            const normName = info.name.trim().toLowerCase();
+            if (seenNames.has(normName) || uniqueMap.has(numId)) return;
+
             const iconKey = info.icon || `UI_AvatarIcon_${info.route}`;
             const shortId = iconKey.replace('UI_AvatarIcon_', '').toLowerCase();
-            loadedChars.push({
+            seenNames.add(normName);
+            uniqueMap.set(numId, {
               id: shortId,
-              hakushId: String(info.id),
+              hakushId: numId,
               rank: info.rank === 5 ? 5 : 4,
               name: info.name,
               title: `${ELEMENT_CONFIG[elem]?.label || elem} • ${weaponMap[info.weaponType] || 'Teyvat'}`,
@@ -1002,19 +963,20 @@
         }
       } catch (e) {}
 
-      // Nguồn 2: Bổ sung thêm từ api.hakush.in
       try {
         const resHakush = await fetch('https://api.hakush.in/gi/data/character.json');
         if (resHakush.ok) {
           const charMap = await resHakush.json();
-          const existingIds = new Set(loadedChars.map(x => x.hakushId));
           Object.entries(charMap).forEach(([numId, info]) => {
-            if (existingIds.has(numId) || !info.EN || info.EN === 'Traveler' || info.EN === 'Manekin') return;
+            if (uniqueMap.has(numId) || !info.EN || info.EN === 'Traveler' || info.EN === 'Manekin') return;
+            const normName = info.EN.trim().toLowerCase();
+            if (seenNames.has(normName)) return;
             const elem = elemMap[info.element];
             if (!elem) return;
             const iconKey = info.icon || `UI_AvatarIcon_${info.EN}`;
             const shortId = iconKey.replace('UI_AvatarIcon_', '').toLowerCase();
-            loadedChars.push({
+            seenNames.add(normName);
+            uniqueMap.set(numId, {
               id: shortId,
               hakushId: numId,
               rank: info.rank === 5 ? 5 : 4,
@@ -1031,37 +993,112 @@
         }
       } catch (e) {}
 
-      if (loadedChars.length > 0) {
-        loadedChars.sort((a, b) => Number(b.hakushId) - Number(a.hakushId));
-        dynamicApiCharacters = loadedChars;
+      if (uniqueMap.size > 0) {
+        const arr = Array.from(uniqueMap.values());
+        arr.sort((a, b) => Number(b.hakushId) - Number(a.hakushId));
+        dynamicApiCharacters = arr;
       }
 
-      // Quét sự kiện trực tiếp từ genshin-build.com/event
+      // 3. TẢI TRỰC TIẾP LỊCH SỰ KIỆN & BANNER ĐANG MỞ TỪ API HOYOVERSE CHÍNH THỨC (getAnnList)
+      const hoyoAnnUrlVi = 'https://sg-hk4e-api-static.hoyoverse.com/common/hk4e_global/announcement/api/getAnnList?game=hk4e&game_biz=hk4e_global&lang=vi-vn&bundle_id=hk4e_global&platform=pc&region=os_asia&level=60&uid=800000000';
+      const hoyoAnnUrlEn = 'https://sg-hk4e-api-static.hoyoverse.com/common/hk4e_global/announcement/api/getAnnList?game=hk4e&game_biz=hk4e_global&lang=en-us&bundle_id=hk4e_global&platform=pc&region=os_asia&level=60&uid=800000000';
+
+      let annJson = null;
       try {
-        const evHtml = await fetchViaCorsProxy('https://genshin-build.com/event');
-        if (evHtml) {
-          const doc = new DOMParser().parseFromString(evHtml, 'text/html');
-          const nextScript = doc.getElementById('__NEXT_DATA__');
-          if (nextScript) {
-            const json = JSON.parse(nextScript.textContent);
-            const rawEvents = json?.props?.pageProps?.events || [];
-            if (Array.isArray(rawEvents) && rawEvents.length > 0) {
-              const u = getUser();
-              u.eventsList = rawEvents.slice(0, 10).map((ev, i) => ({
-                id: 'gb_ev_' + i,
-                name: ev.name || ev.title || `Sự kiện Genshin #${i + 1}`,
-                endTime: ev.end ? new Date(ev.end).getTime() : (Date.now() + (8 + i * 2) * 86400000),
-                primogems: ev.primogems !== undefined ? Number(ev.primogems) : 420,
-                statusText: 'genshin-build Live ›'
-              }));
-              commitDB(false);
-            }
-          }
-        }
+        const directRes = await fetch(hoyoAnnUrlVi);
+        if (directRes.ok) annJson = await directRes.json();
       } catch (e) {}
 
+      if (!annJson || annJson.retcode !== 0) {
+        const rawText = await fetchViaCorsProxy(hoyoAnnUrlVi) || await fetchViaCorsProxy(hoyoAnnUrlEn);
+        if (rawText) {
+          try { annJson = JSON.parse(rawText); } catch (e) {}
+        }
+      }
+
+      if (annJson && annJson.data) {
+        const fetchedEvents = [];
+        const fetchedBanners = [];
+        const nowMs = Date.now();
+
+        // Lấy tất cả thông báo hoạt động từ cả list và pic_list
+        const allItems = [];
+        (annJson.data.list || []).forEach(group => {
+          if (group.type_id === 1 && Array.isArray(group.list)) {
+            allItems.push(...group.list);
+          }
+        });
+        (annJson.data.pic_list || []).forEach(group => {
+          if (Array.isArray(group.type_list)) {
+            group.type_list.forEach(t => {
+              if (Array.isArray(t.list)) allItems.push(...t.list);
+            });
+          }
+        });
+
+        const seenAnnIds = new Set();
+        allItems.forEach(item => {
+          if (!item.ann_id || seenAnnIds.has(item.ann_id)) return;
+          const endMs = parseServerTime(item.end_time);
+          const startMs = parseServerTime(item.start_time);
+          // Chỉ lấy sự kiện/banner đang diễn ra trong thời gian thực
+          if (endMs <= nowMs) return;
+
+          const title = (item.title || item.subtitle || '').replace(/<[^>]*>/g, '').trim();
+          const lower = title.toLowerCase();
+          const imgUrl = item.banner || item.img || '';
+
+          // Bỏ qua các thông báo hệ thống không phải Event/Banner
+          if (
+            lower.includes('hoyoplay') || lower.includes('khảo sát') || lower.includes('survey') ||
+            lower.includes('sửa lỗi') || lower.includes('issue') || lower.includes('nạp') ||
+            lower.includes('top-up') || lower.includes('nhật ký hành trình') || lower.includes('battle pass')
+          ) return;
+
+          seenAnnIds.add(item.ann_id);
+
+          // Phân loại: Cầu Nguyện (Wish Banner) vs Sự Kiện (Event)
+          if (lower.includes('cầu nguyện') || lower.includes('wish') || lower.includes('epitome invocation') || lower.includes('thân hình thần đúc')) {
+            fetchedBanners.push({
+              id: 'ann_ban_' + item.ann_id,
+              title: title,
+              subtitle: item.subtitle || 'Sự Kiện Cầu Nguyện Giới Hạn',
+              bannerImg: imgUrl,
+              startTime: startMs,
+              endTime: endMs
+            });
+          } else {
+            // Ước tính Nguyên Thạch thưởng theo loại sự kiện
+            const isBigEvent = lower.includes('chủ đề') || lower.includes('nhận') || lower.includes('mời');
+            fetchedEvents.push({
+              id: 'ann_ev_' + item.ann_id,
+              name: title,
+              subtitle: item.subtitle || 'Sự Kiện Phiên Bản',
+              bannerImg: imgUrl,
+              startTime: startMs,
+              endTime: endMs,
+              primogems: isBigEvent ? 960 : 420,
+              statusText: 'Đang Tiến Hành ›'
+            });
+          }
+        });
+
+        if (fetchedEvents.length > 0) {
+          fetchedEvents.sort((a, b) => a.endTime - b.endTime);
+          liveEventsList = fetchedEvents;
+        }
+        if (fetchedBanners.length > 0) {
+          liveBannersList = fetchedBanners;
+          const u = getUser();
+          u.bannerEndTime = fetchedBanners[0].endTime;
+        }
+      }
+
       const allCount = getAllCharacters().length;
+      const syncTimeStr = new Date().toLocaleTimeString('vi-VN');
       if (dot) dot.textContent = `● Live (${allCount} NV)`;
+      if (evStatus) evStatus.textContent = `● Đồng bộ lúc ${syncTimeStr} (${liveEventsList.length} Event)`;
+      if (banStatus) banStatus.textContent = `● Đồng bộ lúc ${syncTimeStr}`;
       const countBadge = document.getElementById('sidebar-char-count');
       if (countBadge) countBadge.textContent = `${allCount} NV`;
 
@@ -1071,7 +1108,9 @@
       renderHoYoLABCalendar();
       renderMainView();
 
-      if (showAlert) alert(`✅ Đã đồng bộ thành công ${allCount} nhân vật và Lịch Sự Kiện mới nhất!`);
+      if (showAlert) {
+        alert(`✅ Đã đồng bộ thời gian thực thành công:\n• ${allCount} Nhân vật (đã khử trùng lặp)\n• ${liveEventsList.length} Sự kiện đang mở trong game kèm Avatar\n• ${liveBannersList.length || 2} Banner Cầu Nguyện hiện hành!`);
+      }
     };
 
     window.toggleEmbedFrame = function(key, url) {
@@ -1084,7 +1123,7 @@
     };
 
     // =========================================================================
-    // 4. HỆ THỐNG AVATAR ĐA TẦNG KHÔNG BAO GIỜ LỖI CÚ PHÁP
+    // 4. HỆ THỐNG AVATAR ĐA TẦNG (YATTA PNG -> HAKUSH WEBP -> ENKA PNG)
     // =========================================================================
     window.handleAvatarFallback = function(imgEl) {
       const iconKey = imgEl.getAttribute('data-icon');
@@ -1122,7 +1161,7 @@
     }
 
     // =========================================================================
-    // 5. WIKI ĐỘNG 100%: GIẢI MÃ CÔNG THỨC GAME (HAKUSH + YATTA API)
+    // 5. WIKI ĐỘNG 100%: TÍNH CHÍNH XÁC CHỈ SỐ CƠ BẢN & ĐỘT PHÁ RIÊNG TỪNG NHÂN VẬT
     // =========================================================================
     function cleanGenshinText(raw) {
       if (!raw) return '';
@@ -1189,28 +1228,28 @@
       }
 
       if (hId) {
-        // Thử tải từ Hakush Tiếng Việt trước
-        try {
-          const res = await fetch(`https://api.hakush.in/gi/data/vi/character/${hId}.json`);
-          if (res.ok) {
-            currentWikiRawJson = await res.json();
-            document.getElementById('wiki-live-status').textContent = '● Dữ liệu Game Chính Thức ✓';
-            renderRealWikiData(currentWikiRawJson, char);
-            return;
-          }
-        } catch (e) {}
-
-        // Dự phòng: Tải từ Yatta/Ambr Tiếng Việt nếu Hakush nghẽn mạng
+        // Ưu tiên 1: Tải từ Yatta Tiếng Việt (có đầy đủ upgrade.prop & promote)
         try {
           const resY = await fetch(`https://gi.yatta.moe/api/v2/vi/avatar/${hId}`);
           if (resY.ok) {
             const yJson = await resY.json();
             if (yJson?.data) {
-              currentWikiRawJson = convertYattaToHakushFormat(yJson.data);
-              document.getElementById('wiki-live-status').textContent = '● Dữ liệu Game Chính Thức (Yatta) ✓';
+              currentWikiRawJson = convertYattaToUnifiedFormat(yJson.data);
+              document.getElementById('wiki-live-status').textContent = '● Dữ liệu Game Chính Thức (Yatta VI) ✓';
               renderRealWikiData(currentWikiRawJson, char);
               return;
             }
+          }
+        } catch (e) {}
+
+        // Ưu tiên 2: Tải từ Hakush Tiếng Việt
+        try {
+          const resH = await fetch(`https://api.hakush.in/gi/data/vi/character/${hId}.json`);
+          if (resH.ok) {
+            currentWikiRawJson = await resH.json();
+            document.getElementById('wiki-live-status').textContent = '● Dữ liệu Game Chính Thức (Hakush VI) ✓';
+            renderRealWikiData(currentWikiRawJson, char);
+            return;
           }
         } catch (e) {}
       }
@@ -1219,7 +1258,8 @@
       renderUnreleasedCharacterWiki(char);
     };
 
-    function convertYattaToHakushFormat(d) {
+    // Chuyển đổi dữ liệu Yatta sang chuẩn thống nhất, giữ nguyên 100% chỉ số Base HP/ATK/DEF và Đột Phá riêng của từng nhân vật
+    function convertYattaToUnifiedFormat(d) {
       const talentObj = d.talent || {};
       const skills = [];
       const passives = [];
@@ -1235,12 +1275,34 @@
           passives.push({ Name: t.name, Desc: t.description, Icon: t.icon });
         }
       });
+
       const constellObj = d.constellation || {};
       const constellations = Object.values(constellObj).map(c => ({ Name: c.name, Desc: c.description, Icon: c.icon }));
+
+      // Trích xuất Base HP, Base ATK, Base DEF và Curve Type riêng của nhân vật từ d.upgrade
+      const props = d.upgrade?.prop || [];
+      const hpProp = props.find(p => p.propType === 'FIGHT_PROP_BASE_HP') || { initValue: 1000, type: 'GROW_CURVE_HP_S5' };
+      const atkProp = props.find(p => p.propType === 'FIGHT_PROP_BASE_ATTACK') || { initValue: 25, type: 'GROW_CURVE_ATTACK_S5' };
+      const defProp = props.find(p => p.propType === 'FIGHT_PROP_BASE_DEFENSE') || { initValue: 60, type: 'GROW_CURVE_HP_S5' };
+
+      const promoteList = d.upgrade?.promote || [];
+      const ascensionArr = promoteList.slice(1).map(pr => pr.addProps || {});
+
       return {
         Name: d.name,
         Desc: d.fetter?.detail || '',
         CharaInfo: { Title: d.fetter?.title || '', Region: d.region || '' },
+        BaseHP: hpProp.initValue,
+        BaseATK: atkProp.initValue,
+        BaseDEF: defProp.initValue,
+        Curves: {
+          hp: hpProp.type,
+          atk: atkProp.type,
+          def: defProp.type
+        },
+        StatsModifier: {
+          Ascension: ascensionArr
+        },
         Skills: skills,
         Passives: passives,
         Constellations: constellations
@@ -1339,35 +1401,69 @@
       }).join('');
     };
 
+    // Tính chính xác HP, ATK, DEF và Chỉ số Đột Phá riêng của từng nhân vật ở cấp độ 1–90
     window.updateWikiStatsByLevel = function(lv) {
       const level = parseInt(lv, 10) || 90;
       document.getElementById('wiki-level-label').textContent = `Lv. ${level}`;
       if (!currentWikiRawJson) return;
 
-      const baseHP = currentWikiRawJson.BaseHP || 1050;
-      const baseATK = currentWikiRawJson.BaseATK || 26;
-      const baseDEF = currentWikiRawJson.BaseDEF || 62;
+      const baseHP = Number(currentWikiRawJson.BaseHP) || 1000;
+      const baseATK = Number(currentWikiRawJson.BaseATK) || 25;
+      const baseDEF = Number(currentWikiRawJson.BaseDEF) || 60;
       const mod = currentWikiRawJson.StatsModifier || {};
       const lvKey = String(level);
 
-      const hpMult = (mod.HP && mod.HP[lvKey]) ? mod.HP[lvKey] : (1 + (level / 90) * 11.5);
-      const atkMult = (mod.ATK && mod.ATK[lvKey]) ? mod.ATK[lvKey] : (1 + (level / 90) * 11.5);
-      const defMult = (mod.DEF && mod.DEF[lvKey]) ? mod.DEF[lvKey] : (1 + (level / 90) * 11.5);
+      let hpMult = 1, atkMult = 1, defMult = 1;
+      const curves = currentWikiRawJson.Curves;
+
+      if (mod.HP && mod.HP[lvKey]) {
+        hpMult = mod.HP[lvKey];
+        atkMult = mod.ATK[lvKey];
+        defMult = mod.DEF[lvKey];
+      } else if (globalAvatarCurves && globalAvatarCurves[lvKey]?.curveInfos && curves) {
+        const cInfo = globalAvatarCurves[lvKey].curveInfos;
+        hpMult = cInfo[curves.hp] || 1;
+        atkMult = cInfo[curves.atk] || 1;
+        defMult = cInfo[curves.def] || 1;
+      } else {
+        const is4Star = currentWikiChar && currentWikiChar.rank === 4;
+        const maxMult = is4Star ? 8.414 : 8.739;
+        hpMult = 1 + ((level - 1) / 89) * (maxMult - 1);
+        atkMult = hpMult;
+        defMult = hpMult;
+      }
 
       const ascArr = mod.Ascension || [];
-      const ascIdx = level >= 80 ? 5 : level >= 70 ? 4 : level >= 60 ? 3 : level >= 50 ? 2 : level >= 40 ? 1 : 0;
-      const ascNode = ascArr[ascIdx] || {};
+      const ascIdx = level > 80 ? 5 : level > 70 ? 4 : level > 60 ? 3 : level > 50 ? 2 : level > 40 ? 1 : level > 20 ? 0 : -1;
+      const ascNode = (ascIdx >= 0 && ascArr[ascIdx]) ? ascArr[ascIdx] : (ascArr[ascArr.length - 1] || {});
+      const maxAscNode = ascArr[ascArr.length - 1] || {};
 
-      document.getElementById('wiki-stat-hp').textContent = Math.round(baseHP * hpMult + (ascNode.FIGHT_PROP_BASE_HP || 0)).toLocaleString('vi-VN');
-      document.getElementById('wiki-stat-atk').textContent = Math.round(baseATK * atkMult + (ascNode.FIGHT_PROP_BASE_ATTACK || 0)).toLocaleString('vi-VN');
-      document.getElementById('wiki-stat-def').textContent = Math.round(baseDEF * defMult + (ascNode.FIGHT_PROP_BASE_DEFENSE || 0)).toLocaleString('vi-VN');
+      const addHP = ascIdx >= 0 ? (ascNode.FIGHT_PROP_BASE_HP || 0) : 0;
+      const addATK = ascIdx >= 0 ? (ascNode.FIGHT_PROP_BASE_ATTACK || 0) : 0;
+      const addDEF = ascIdx >= 0 ? (ascNode.FIGHT_PROP_BASE_DEFENSE || 0) : 0;
+
+      document.getElementById('wiki-stat-hp').textContent = Math.round(baseHP * hpMult + addHP).toLocaleString('vi-VN');
+      document.getElementById('wiki-stat-atk').textContent = Math.round(baseATK * atkMult + addATK).toLocaleString('vi-VN');
+      document.getElementById('wiki-stat-def').textContent = Math.round(baseDEF * defMult + addDEF).toLocaleString('vi-VN');
 
       let specialKey = '', specialVal = 0;
-      Object.entries(ascNode).forEach(([k, v]) => { if (!k.includes('BASE_')) { specialKey = k; specialVal = v; } });
+      Object.entries(maxAscNode).forEach(([k, v]) => {
+        if (!k.includes('BASE_') && Number(v) > 0) {
+          specialKey = k;
+          specialVal = (ascIdx >= 0 && ascNode[k] !== undefined) ? Number(ascNode[k]) : 0;
+          if (level >= 80) specialVal = Number(v);
+        }
+      });
+
+      // Cộng thêm 5% Tỷ lệ Bạo hoặc 50% ST Bạo gốc của nhân vật nếu chỉ số đột phá là Bạo kích
       document.getElementById('wiki-stat-asc-name').textContent = PROP_TRANSLATIONS[specialKey] || 'Chỉ Số Đột Phá';
-      document.getElementById('wiki-stat-asc-val').textContent = specialKey
-        ? (specialKey.includes('ELEMENT_MASTERY') ? `+${Math.round(specialVal)}` : `+${(specialVal * 100).toFixed(1)}%`)
-        : '+38.4% ST Bạo';
+      if (specialKey) {
+        document.getElementById('wiki-stat-asc-val').textContent = specialKey.includes('ELEMENT_MASTERY')
+          ? `+${Math.round(specialVal)}`
+          : `+${(specialVal * 100).toFixed(1)}%`;
+      } else {
+        document.getElementById('wiki-stat-asc-val').textContent = 'Đang cập nhật';
+      }
     };
 
     window.switchWikiSubTab = function(sub) {
@@ -1385,7 +1481,7 @@
     };
 
     // =========================================================================
-    // 6. QUẢN LÝ TÀI KHOẢN & DỮ LIỆU NHÂN VẬT
+    // 6. QUẢN LÝ TÀI KHOẢN & KHỬ TRÙNG LẶP DANH SÁCH NHÂN VẬT 100%
     // =========================================================================
     function getNextAbyssResetTime() {
       const now = new Date();
@@ -1403,20 +1499,10 @@
 
     function formatRemainingTime(endTimestamp) {
       const diffMs = Math.max(0, endTimestamp - Date.now());
-      if (diffMs <= 0) return 'Đang làm mới...';
+      if (diffMs <= 0) return 'Đã kết thúc / Làm mới';
       const s = Math.floor(diffMs / 1000);
       const pad = n => String(n).padStart(2, '0');
       return `${Math.floor(s / 86400)} ngày ${pad(Math.floor((s % 86400) / 3600))} giờ ${pad(Math.floor((s % 3600) / 60))} phút ${pad(s % 60)} giây`;
-    }
-
-    function getDefaultEventsWithTimestamps() {
-      const now = Date.now(), H = 3600000, D = 86400000;
-      return [
-        { id: 'ev_1', name: 'Bản Chất Của Chiến Thắng', endTime: now + 6 * D + 10 * H, primogems: 420, statusText: 'Đang Tiến Hành ›' },
-        { id: 'ev_2', name: 'Ảo Cảnh Hiểm Ác', endTime: now + 17 * D + 4 * H, primogems: 450, statusText: '🌪️ 108 Giây ›' },
-        { id: 'ev_3', name: 'Chế Độ Nhiệt Huyết: Chiến Lược Tự Động', endTime: now + 9 * D + 4 * H, primogems: 0, badgeText: '3000 Xu', statusText: 'Đang Tiến Hành ›' },
-        { id: 'ev_4', name: 'Nghiên Cứu Tập Luyện - Cuộc Chiến Sách Lược', endTime: now + 18 * D + 7 * H, primogems: 0, badgeText: '8000 Xu', statusText: 'Đang Tiến Hành ›' }
-      ];
     }
 
     function createDefaultUserAccount(username, password, nickname, firebaseUrl = '') {
@@ -1427,11 +1513,10 @@
         userAvatar: '',
         themeMode: 'dark',
         selectedCharId: 'tsaritsa',
-        favorites: ['tsaritsa', 'skirk', 'escoffier'],
+        favorites: ['tsaritsa'],
         customCharacters: [],
         claimedEvents: {},
-        bannerEndTime: Date.now() + (17 * 86400 + 15 * 3600) * 1000,
-        eventsList: getDefaultEventsWithTimestamps(),
+        customEvents: [],
         stickers: [
           { id: 'st_paimon', url: 'https://enka.network/ui/UI_AvatarIcon_Paimon.png', x: Math.max(20, window.innerWidth - 130), y: Math.max(80, window.innerHeight - 140), size: 88 }
         ],
@@ -1451,25 +1536,37 @@
       if (!u.customCharacters) u.customCharacters = [];
       if (!u.favorites) u.favorites = ['tsaritsa'];
       if (!u.claimedEvents) u.claimedEvents = {};
-      if (!u.eventsList || !u.eventsList.length) u.eventsList = getDefaultEventsWithTimestamps();
-      if (!u.bannerEndTime) u.bannerEndTime = Date.now() + 15 * 86400000;
+      if (!u.customEvents) u.customEvents = [];
       if (!u.stickers) u.stickers = [];
       return u;
     }
 
+    // Khử trùng lặp tuyệt đối theo cả ID, HakushID và Tên nhân vật
     function getAllCharacters() {
       const u = getUser();
-      const map = new Map();
-      dynamicApiCharacters.forEach(c => map.set(c.id, { ...c }));
-      CORE_CHARACTERS.forEach(c => {
-        if (!map.has(c.id)) map.set(c.id, { ...c });
-        else {
-          const ex = map.get(c.id);
-          map.set(c.id, { ...ex, title: c.title || ex.title, lore: c.lore || ex.lore });
-        }
-      });
-      (u.customCharacters || []).forEach(c => map.set(c.id, { ...c }));
-      return Array.from(map.values());
+      const result = [];
+      const seenIds = new Set();
+      const seenNames = new Set();
+      const seenHakushIds = new Set();
+
+      function addUnique(c) {
+        if (!c || !c.name) return;
+        const normName = c.name.trim().toLowerCase();
+        const normId = String(c.id).trim().toLowerCase();
+        const hId = c.hakushId ? String(c.hakushId) : '';
+
+        if (seenNames.has(normName) || seenIds.has(normId) || (hId && seenHakushIds.has(hId))) return;
+        seenNames.add(normName);
+        seenIds.add(normId);
+        if (hId) seenHakushIds.add(hId);
+        result.push({ ...c });
+      }
+
+      (u.customCharacters || []).forEach(addUnique);
+      UNRELEASED_SPECIAL_CHARS.forEach(addUnique);
+      dynamicApiCharacters.forEach(addUnique);
+
+      return result;
     }
 
     function getCharRecord(charId) {
@@ -1488,7 +1585,7 @@
           guaranteed: false,
           weaponType: base ? base.weapon : 'Kiếm Đơn',
           customImage: base && base.customImage ? base.customImage : '',
-          history: [{ time: '16/10/2026', total: charId === 'tsaritsa' ? 86 : 0, diff: '+5 roll', note: 'Khởi tạo quỹ tích lũy' }]
+          history: [{ time: 'Khởi tạo', total: charId === 'tsaritsa' ? 86 : 0, diff: '+5 roll', note: 'Khởi tạo quỹ tích lũy' }]
         };
       }
       return u.characters[charId];
@@ -1611,7 +1708,7 @@
     };
 
     // =========================================================================
-    // 8. GIAO DIỆN & CÁC TAB
+    // 8. GIAO DIỆNBANNERS LIVE & WIKI
     // =========================================================================
     function applyTheme() {
       const u = getUser();
@@ -1652,34 +1749,66 @@
 
     function renderLiveBannersTab() {
       const allChars = getAllCharacters();
-      const curBanners = [
-        { title: 'Cầu Nguyện Nhân Vật 1 • Đang Diễn Ra', id: 'skirk', f4: ['Dahlia', 'Candace', 'Mika'], grad: 'linear-gradient(135deg, #0b1c31 0%, #1e3a5f 60%, #2a5d84 100%)' },
-        { title: 'Cầu Nguyện Nhân Vật 2 • Đang Diễn Ra', id: 'escoffier', f4: ['Dahlia', 'Candace', 'Mika'], grad: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%)' }
-      ];
+      const grid = document.getElementById('live-current-banners-grid');
 
-      document.getElementById('live-current-banners-grid').innerHTML = curBanners.map(b => {
-        const c = allChars.find(x => x.id === b.id) || allChars[0];
-        const rec = getCharRecord(c.id);
-        return `
-          <div class="rounded-3xl p-5 text-white relative overflow-hidden shadow-xl border border-white/15 flex flex-col justify-between" style="background:${b.grad}">
-            <div class="flex items-start justify-between gap-4">
-              <div class="space-y-1">
-                <span class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase">${b.title}</span>
-                <h4 class="text-2xl font-extrabold flex items-center gap-2"><span>${c.name}</span><img src="${ELEMENT_CONFIG[c.element].iconUrl}" class="w-5 h-5"/></h4>
-                <p class="text-xs text-sky-200">${c.title}</p>
+      // Nếu đã tải được Banner trực tiếp từ API HoYoverse (getAnnList)
+      if (liveBannersList.length > 0) {
+        grid.innerHTML = liveBannersList.map(ban => {
+          // Tự động dò nhân vật 5 sao tương ứng trong tiêu đề Banner
+          const matchedChar = allChars.find(c =>
+            ban.title.toLowerCase().includes(c.name.toLowerCase()) ||
+            (ban.subtitle && ban.subtitle.toLowerCase().includes(c.name.toLowerCase()))
+          ) || allChars[1] || allChars[0];
+
+          return `
+            <div class="hoyolab-row rounded-3xl overflow-hidden border border-white/15 flex flex-col justify-between shadow-xl">
+              ${ban.bannerImg ? `
+                <div class="w-full h-44 bg-slate-950 overflow-hidden relative">
+                  <img src="${ban.bannerImg}" referrerpolicy="no-referrer" class="w-full h-full object-cover" />
+                  <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-rose-600/90 text-white text-[10px] font-extrabold uppercase shadow">Đang mở trong Game</span>
+                </div>
+              ` : ''}
+              <div class="p-4 space-y-3">
+                <div>
+                  <h4 class="text-sm sm:text-base font-extrabold text-white">${ban.title}</h4>
+                  <p class="text-xs text-amber-300 font-mono mt-1 live-event-timer" data-endtime="${ban.endTime}">🕒 Còn lại: ${formatRemainingTime(ban.endTime)}</p>
+                </div>
+                <div class="flex items-center justify-between pt-2 border-t border-white/10">
+                  <span class="text-[11px] text-slate-400">${ban.subtitle}</span>
+                  <div class="flex gap-1.5">
+                    <button type="button" onclick="window.openCharacterWiki('${matchedChar.id}')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-sky-300">📖 Wiki</button>
+                    <button type="button" onclick="window.selectCharacter('${matchedChar.id}'); window.switchMainTab('overview');" class="px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 text-xs font-extrabold">🎯 Tích Roll</button>
+                  </div>
+                </div>
               </div>
-              <div onclick="window.openCharacterWiki('${c.id}')" class="cursor-pointer hover:scale-105 transition">${createAvatarHTML(c, rec.customImage, 'w-20 h-20')}</div>
             </div>
-            <div class="mt-4 pt-3 border-t border-white/15 flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center gap-1">${b.f4.map(n => `<span class="px-2 py-0.5 rounded bg-purple-600/50 text-[10px] font-bold">${n}</span>`).join('')}</div>
-              <div class="flex gap-1.5">
+          `;
+        }).join('');
+      } else {
+        // Hiển thị 2 nhân vật 5 sao mới nhất từ API
+        const latest5 = allChars.filter(c => c.rank === 5 && c.hakushId).slice(0, 2);
+        grid.innerHTML = latest5.map((c, idx) => {
+          const rec = getCharRecord(c.id);
+          const endTs = Date.now() + 14 * 86400000;
+          return `
+            <div class="rounded-3xl p-5 text-white relative overflow-hidden shadow-xl border border-white/15 flex flex-col justify-between" style="background: ${ELEMENT_CONFIG[c.element]?.hero}">
+              <div class="flex items-start justify-between gap-4">
+                <div class="space-y-1">
+                  <span class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase">Cầu Nguyện Nhân Vật ${idx + 1}</span>
+                  <h4 class="text-2xl font-extrabold flex items-center gap-2"><span>${c.name}</span><img src="${ELEMENT_CONFIG[c.element]?.iconUrl}" class="w-5 h-5"/></h4>
+                  <p class="text-xs text-sky-200">${c.title}</p>
+                  <p class="text-xs text-amber-300 font-mono pt-1 live-event-timer" data-endtime="${endTs}">🕒 ${formatRemainingTime(endTs)}</p>
+                </div>
+                <div onclick="window.openCharacterWiki('${c.id}')" class="cursor-pointer hover:scale-105 transition">${createAvatarHTML(c, rec.customImage, 'w-20 h-20')}</div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-white/15 flex justify-end gap-2">
                 <button type="button" onclick="window.openCharacterWiki('${c.id}')" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-xs font-bold">📖 Wiki</button>
                 <button type="button" onclick="window.selectCharacter('${c.id}'); window.switchMainTab('overview');" class="px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 text-xs font-extrabold">🎯 Tích Roll</button>
               </div>
             </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
 
       const recent5Stars = allChars.filter(c => c.rank === 5).slice(0, 9);
       document.getElementById('live-upcoming-banners-grid').innerHTML = recent5Stars.map(c => {
@@ -1736,7 +1865,7 @@
       });
 
       const countEl = document.getElementById('wiki-total-count');
-      if (countEl) countEl.textContent = `Hiển thị ${filtered.length} nhân vật (Dữ liệu thật từ Game API)`;
+      if (countEl) countEl.textContent = `Hiển thị ${filtered.length} nhân vật (Không trùng lặp • Chỉ số thật)`;
 
       const grid = document.getElementById('wiki-characters-grid');
       if (!grid) return;
@@ -1762,7 +1891,7 @@
     };
 
     // =========================================================================
-    // 9. SIDEBAR DROPDOWN, DASHBOARD & LỊCH EVENT
+    // 9. SIDEBAR DROPDOWN, DASHBOARD & LỊCH EVENT CÓ AVATAR SỰ KIỆN
     // =========================================================================
     window.toggleCharDropdown = function() {
       isCharDropdownOpen = !isCharDropdownOpen;
@@ -1977,7 +2106,7 @@
     }
 
     // =========================================================================
-    // 10. CẬP NHẬT SỐ ROLL & NHẬN THƯỞNG AN TOÀN BẰNG ID
+    // 10. CẬP NHẬT SỐ ROLL & LỊCH EVENT CÓ AVATAR SỰ KIỆN
     // =========================================================================
     function nowFormatted() {
       const d = new Date();
@@ -2055,29 +2184,45 @@
       commitDB(true); window.renderCharacterList(); renderMainView();
     };
 
-    window.promptSetBannerEndDate = function() {
-      const days = parseFloat(prompt('Nhập số ngày còn lại của Banner hiện tại:', '17.5'));
-      if (isNaN(days) || days <= 0) return;
-      const u = getUser();
-      u.bannerEndTime = Date.now() + Math.round(days * 86400 * 1000);
-      commitDB(true); updateAllRealTimeCountdowns();
-    };
-
     function getDynamicEndgameModes() {
       return [
-        { id: 'end_abyss', name: 'Ánh Trăng Vực Sâu (La Hoàn Thâm Cảnh)', endTime: getNextAbyssResetTime(), primogems: 800, progressText: '36/36 ⭐ ›', colorBar: 'bg-emerald-500' },
-        { id: 'end_theater', name: 'Nhà Hát Giả Tưởng', endTime: getNextTheaterResetTime(), primogems: 1000, progressText: 'Màn 8 • Sâu Nhất Đến Được ›', colorBar: 'bg-amber-400' }
+        {
+          id: 'end_abyss',
+          name: 'Ánh Trăng Vực Sâu (Spiral Abyss)',
+          endTime: getNextAbyssResetTime(),
+          primogems: 800,
+          progressText: '36/36 ⭐ ›',
+          colorBar: 'bg-emerald-500',
+          bannerImg: 'https://gi.yatta.moe/assets/UI/UI_Icon_Tower.png'
+        },
+        {
+          id: 'end_theater',
+          name: 'Nhà Hát Giả Tưởng (Imaginarium Theater)',
+          endTime: getNextTheaterResetTime(),
+          primogems: 1000,
+          progressText: 'Màn 10 • Sâu Nhất ›',
+          colorBar: 'bg-amber-400',
+          bannerImg: 'https://gi.yatta.moe/assets/UI/UI_Icon_RoleCombat.png'
+        }
       ];
+    }
+
+    function getCombinedEventsList() {
+      const u = getUser();
+      if (liveEventsList.length > 0) {
+        return [...liveEventsList, ...(u.customEvents || [])];
+      }
+      return u.customEvents || [];
     }
 
     window.claimEventById = function(eventId) {
       const u = getUser();
-      const allPool = [...getDynamicEndgameModes(), ...(u.eventsList || [])];
+      const allPool = [...getDynamicEndgameModes(), ...getCombinedEventsList()];
       const ev = allPool.find(x => x.id === eventId);
       if (!ev || !ev.primogems || ev.primogems <= 0) return;
 
       if (u.claimedEvents[eventId]) {
-        alert('Bạn đã nhận thưởng của mục này rồi! (Bấm "Reset Kỳ Mới" nếu sang tháng mới).');
+        alert('Bạn đã nhận thưởng của mục này rồi! (Bấm "Reset Trạng Thái Nhận" nếu sang kỳ mới).');
         return;
       }
       const rec = getCharRecord(window.selectedCharId);
@@ -2100,23 +2245,34 @@
       const name = prompt('Nhập tên sự kiện mới:');
       if (!name) return;
       const primos = parseInt(prompt('Số Nguyên Thạch thưởng:', '420'), 10) || 420;
-      const days = parseFloat(prompt('Số ngày còn lại:', '12')) || 12;
+      const days = parseFloat(prompt('Số ngày còn lại:', '10')) || 10;
+      const img = prompt('Dán link ảnh Avatar/Banner sự kiện (có thể để trống):', '') || '';
       const u = getUser();
-      u.eventsList.push({ id: 'custom_ev_' + Date.now(), name: name.trim(), endTime: Date.now() + Math.round(days * 86400000), primogems: primos, statusText: 'Đang Tiến Hành ›' });
+      u.customEvents.push({
+        id: 'custom_ev_' + Date.now(),
+        name: name.trim(),
+        bannerImg: img.trim(),
+        endTime: Date.now() + Math.round(days * 86400000),
+        primogems: primos,
+        statusText: 'Đang Tiến Hành ›'
+      });
       commitDB(true); renderHoYoLABCalendar(); renderMainView();
     };
 
     function renderQuickEventsWidget() {
       const u = getUser();
       const box = document.getElementById('overview-quick-events');
-      const quickList = [...getDynamicEndgameModes(), ...(u.eventsList || []).filter(e => e.primogems > 0).slice(0, 2)];
+      const quickList = [...getDynamicEndgameModes(), ...getCombinedEventsList().slice(0, 3)];
       box.innerHTML = quickList.map(ev => {
         const claimed = Boolean(u.claimedEvents[ev.id]);
         return `
-          <div class="hoyolab-row rounded-2xl p-3 flex items-center justify-between gap-2">
-            <div class="min-w-0">
-              <p class="text-xs font-bold text-white truncate">${ev.name}</p>
-              <p class="text-[10px] text-amber-300/90 font-mono live-event-timer" data-endtime="${ev.endTime}">🕒 ${formatRemainingTime(ev.endTime)}</p>
+          <div class="hoyolab-row rounded-2xl p-2.5 flex items-center justify-between gap-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              ${ev.bannerImg ? `<img src="${ev.bannerImg}" referrerpolicy="no-referrer" onerror="this.style.display='none'" class="w-11 h-11 rounded-xl object-cover bg-slate-900 shrink-0 border border-white/10" />` : ''}
+              <div class="min-w-0">
+                <p class="text-xs font-bold text-white truncate">${ev.name}</p>
+                <p class="text-[10px] text-amber-300/90 font-mono live-event-timer" data-endtime="${ev.endTime}">🕒 ${formatRemainingTime(ev.endTime)}</p>
+              </div>
             </div>
             <button type="button" onclick="window.claimEventById('${ev.id}')"
                     class="px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shrink-0 ${claimed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow'}">
@@ -2134,42 +2290,59 @@
       const char = allChars.find(c => c.id === window.selectedCharId) || allChars[0];
       document.getElementById('cal-active-char').textContent = char.name;
 
-      document.getElementById('hoyolab-events-list').innerHTML = (u.eventsList || []).map(ev => {
-        const claimed = Boolean(u.claimedEvents[ev.id]);
-        return `
-          <div class="hoyolab-row rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p class="text-sm font-bold text-white">${ev.name}</p>
-              <p class="text-xs text-slate-400 mt-1">🕒 Thời gian còn: <span class="text-amber-200 font-semibold font-mono live-event-timer" data-endtime="${ev.endTime}">${formatRemainingTime(ev.endTime)}</span></p>
-            </div>
-            <div class="flex items-center gap-4">
-              ${ev.primogems > 0 ? `
+      const combinedEvents = getCombinedEventsList();
+      const evContainer = document.getElementById('hoyolab-events-list');
+
+      if (combinedEvents.length === 0) {
+        evContainer.innerHTML = `<div class="p-6 rounded-2xl bg-slate-900/60 text-center text-xs text-slate-400">🔄 Đang tải danh sách sự kiện trực tiếp từ máy chủ HoYoverse...</div>`;
+      } else {
+        evContainer.innerHTML = combinedEvents.map(ev => {
+          const claimed = Boolean(u.claimedEvents[ev.id]);
+          return `
+            <div class="hoyolab-row rounded-2xl p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-3.5 flex-1 min-w-[240px]">
+                ${ev.bannerImg ? `
+                  <img src="${ev.bannerImg}" referrerpolicy="no-referrer" onerror="this.style.display='none'"
+                       class="w-24 sm:w-32 h-14 sm:h-16 rounded-xl object-cover border border-white/15 shrink-0 shadow-md bg-slate-900" />
+                ` : `
+                  <div class="w-14 h-14 rounded-xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-xl shrink-0">✦</div>
+                `}
+                <div class="min-w-0">
+                  <p class="text-sm font-extrabold text-white leading-snug">${ev.name}</p>
+                  <p class="text-xs text-slate-400 mt-1">🕒 Thời gian còn: <span class="text-amber-300 font-bold font-mono live-event-timer" data-endtime="${ev.endTime}">${formatRemainingTime(ev.endTime)}</span></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4 ml-auto">
                 <button type="button" onclick="window.claimEventById('${ev.id}')"
-                        class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border ${claimed ? 'bg-emerald-900/40 border-emerald-500/50 opacity-75' : 'bg-slate-800 hover:bg-slate-700 border-amber-400/50'}">
+                        title="Bấm để cộng Nguyên Thạch vào quỹ"
+                        class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border transition ${claimed ? 'bg-emerald-900/40 border-emerald-500/50 opacity-75' : 'bg-slate-800 hover:bg-slate-700 border-amber-400/50 shadow'}">
                   <img src="${window.PRIMOGEM_SVG}" class="w-7 h-7 object-contain" />
-                  <span class="text-[11px] font-extrabold ${claimed ? 'text-emerald-400' : 'text-white'}">${claimed ? 'Đã lấy' : ev.primogems}</span>
+                  <span class="text-[11px] font-extrabold ${claimed ? 'text-emerald-400' : 'text-white'}">${claimed ? 'Đã lấy' : `+${ev.primogems}`}</span>
                 </button>
-              ` : `<div class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-slate-800/60 border border-white/10"><span class="text-lg">🪙</span><span class="text-[10px] font-bold text-amber-200">${ev.badgeText || 'Thưởng'}</span></div>`}
-              <span class="text-xs font-bold text-amber-300 min-w-[90px] text-right">${ev.statusText || 'Đang mở ›'}</span>
+                <span class="text-xs font-bold text-amber-300 hidden sm:inline-block min-w-[90px] text-right">${ev.statusText || 'Đang mở ›'}</span>
+              </div>
             </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
 
       document.getElementById('hoyolab-endgame-list').innerHTML = getDynamicEndgameModes().map(eg => {
         const claimed = Boolean(u.claimedEvents[eg.id]);
         return `
           <div class="hoyolab-row rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 relative overflow-hidden">
             <div class="absolute left-0 top-0 bottom-0 w-1.5 ${eg.colorBar}"></div>
-            <div class="pl-2">
-              <p class="text-sm font-extrabold text-white">${eg.name}</p>
-              <p class="text-xs text-slate-400 mt-1">🕒 Làm mới sau: <span class="text-amber-300 font-bold font-mono live-event-timer" data-endtime="${eg.endTime}">${formatRemainingTime(eg.endTime)}</span></p>
+            <div class="flex items-center gap-3.5 pl-2">
+              <img src="${eg.bannerImg}" referrerpolicy="no-referrer" onerror="this.style.display='none'" class="w-12 h-12 rounded-xl bg-slate-900/90 p-1.5 object-contain border border-white/10 shrink-0" />
+              <div>
+                <p class="text-sm font-extrabold text-white">${eg.name}</p>
+                <p class="text-xs text-slate-400 mt-1">🕒 Làm mới sau: <span class="text-amber-300 font-bold font-mono live-event-timer" data-endtime="${eg.endTime}">${formatRemainingTime(eg.endTime)}</span></p>
+              </div>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4 ml-auto">
               <button type="button" onclick="window.claimEventById('${eg.id}')"
                       class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border ${claimed ? 'bg-emerald-900/40 border-emerald-500/50 opacity-75' : 'bg-slate-800 hover:bg-slate-700 border-amber-400/50'}">
                 <img src="${window.PRIMOGEM_SVG}" class="w-7 h-7 object-contain" />
-                <span class="text-[11px] font-extrabold ${claimed ? 'text-emerald-400' : 'text-white'}">${claimed ? 'Đã lấy' : eg.primogems}</span>
+                <span class="text-[11px] font-extrabold ${claimed ? 'text-emerald-400' : 'text-white'}">${claimed ? 'Đã lấy' : `+${eg.primogems}`}</span>
               </button>
               <span class="text-xs font-extrabold text-amber-400 min-w-[100px] text-right">${eg.progressText}</span>
             </div>
@@ -2179,12 +2352,9 @@
     }
 
     function updateAllRealTimeCountdowns() {
-      const u = getUser();
-      const bannerText = formatRemainingTime(u.bannerEndTime);
-      document.querySelectorAll('.live-banner-countdown').forEach(el => { el.textContent = bannerText; });
       document.querySelectorAll('.live-event-timer').forEach(el => {
         const endTs = Number(el.getAttribute('data-endtime'));
-        if (endTs) el.textContent = formatRemainingTime(endTs);
+        if (endTs) el.textContent = '🕒 ' + formatRemainingTime(endTs);
       });
     }
 
